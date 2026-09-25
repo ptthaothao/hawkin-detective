@@ -1,0 +1,799 @@
+/* --- stage: the world layer, full viewport ------------------------------------ */
+
+.stage {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  --cx: -100px;
+  --cy: -100px;
+  --beam: 1;
+  --par-x: 0;
+  --par-y: 0;
+  --near: 0;
+  /* Set to the object being approached, so the camera moves in on it (and back out from it). */
+  transform-origin: var(--look-x, 50%) var(--look-y, 50%);
+  transition:
+    transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1),
+    filter 0.6s ease;
+}
+/* Leaning in to an object: the room closes in on it before the close-up opens. */
+.stage.approaching {
+  transform: scale(1.1);
+  filter: brightness(0.92);
+  transition:
+    transform 0.44s cubic-bezier(0.45, 0, 0.55, 1),
+    filter 0.44s ease;
+}
+/* A reach (the switch, something on the desk): a small, quick move. */
+.stage.approaching.reach {
+  transform: scale(1.035);
+  filter: none;
+  transition-duration: 0.2s;
+}
+/* A close-up is open: the room stays leaned in, out of focus behind it. */
+.stage.leaning {
+  transform: scale(1.1);
+  filter: blur(4px) brightness(0.42) saturate(0.8);
+}
+
+/* The 16:9 playable frame. Room art bleeds past it; hotspots stay inside.
+   Centered without transforms: the frame must not form a stacking context, so the switch and
+   door glows inside it can sit above the flashlight mask. */
+.scene-frame {
+  position: absolute;
+  left: calc(50% - min(100vw, 177.78vh) / 2);
+  top: calc(50% - min(56.25vw, 100vh) / 2);
+  width: min(100vw, 177.78vh);
+  aspect-ratio: 16 / 9;
+}
+.room {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+/* The camera is never quite still: a slow hand-held drift, a little parallax against the pointer,
+   and a pull toward the radio when it makes a sound (doc §24: "what was that?"). */
+.scene-frame > .room {
+  transform-origin: 68.5% 46%;
+  translate: calc(var(--par-x) * -7px) calc(var(--par-y) * -4px);
+  animation: cam-drift 31s ease-in-out infinite alternate;
+  transition:
+    translate 1.4s cubic-bezier(0.2, 0.6, 0.2, 1),
+    scale 1.3s cubic-bezier(0.3, 0.6, 0.3, 1);
+}
+@keyframes cam-drift {
+  0% { transform: translate(0, 0); }
+  35% { transform: translate(-3px, 1.5px); }
+  70% { transform: translate(2px, -1px); }
+  100% { transform: translate(3.5px, 2px); }
+}
+.stage.drawn .scene-frame > .room {
+  scale: 1.025;
+}
+
+/* --- room details ------------------------------------------------------------- */
+
+.clock-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.clock-case {
+  fill: #4a2f1a;
+}
+.clock-rim {
+  fill: #eee4cb;
+}
+.clock-glass {
+  fill: rgba(255, 255, 255, 0.04);
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 0.6;
+}
+.clock-other .clock-case {
+  fill: #1a201c;
+}
+.clock-other .clock-rim {
+  fill: #7b8274;
+}
+.clock-other .clock-glass {
+  fill: rgba(30, 50, 40, 0.28);
+}
+.tick {
+  stroke: #2a2519;
+  stroke-width: 0.8;
+}
+.tick.major {
+  stroke-width: 2;
+}
+.clock-num {
+  font-family: var(--f-display);
+  font-size: 7.6px;
+  text-anchor: middle;
+  fill: #2a2519;
+}
+.clock-min {
+  font-family: var(--f-type);
+  font-size: 4.3px;
+  font-weight: 600;
+  text-anchor: middle;
+  fill: #8a2a1c;
+}
+.clock-other .clock-min {
+  fill: #5e3a30;
+}
+.hand {
+  stroke: #15120d;
+  stroke-linecap: round;
+}
+.hand.minute {
+  stroke-width: 2;
+}
+.hand.hour {
+  stroke-width: 3.6;
+}
+.hand.fallen {
+  opacity: 0.85;
+}
+.clock-pin {
+  fill: #15120d;
+}
+.poster-title {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 30px;
+  letter-spacing: 6px;
+  fill: #f1d9a0;
+}
+.radio-digits {
+  font-family: var(--f-lcd);
+  font-size: 27px;
+  fill: #3b2a12;
+}
+.radio-digits.on {
+  fill: var(--amber);
+}
+.carved line,
+.carved-groove line {
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+.carved line {
+  stroke: rgba(222, 214, 190, 0.85);
+}
+.carved-groove line {
+  stroke: #020303;
+  stroke-width: 1.3;
+}
+.carved-text {
+  font-family: var(--f-kid);
+  font-size: 21px;
+  letter-spacing: 1.5px;
+  fill: #ddd6c0;
+}
+.theo-hand {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: reach 2.4s ease-in-out infinite;
+}
+@keyframes reach {
+  50% {
+    transform: translate(-3px, -6px) rotate(-4deg);
+  }
+}
+.creature {
+  transition: transform 0.1s linear;
+}
+.creature.leaving {
+  transition:
+    transform 5s ease-in,
+    opacity 5s ease-in;
+  opacity: 0.15;
+}
+.radio-halo {
+  opacity: 0.55;
+  animation: mains 5s infinite;
+}
+/* The radio bursting: the glow flares and stutters. */
+.radio-halo.surging {
+  animation: halo-surge 0.26s steps(2) infinite;
+}
+/* The burst throws light across the wall and desk. */
+.radio-flare {
+  mix-blend-mode: screen;
+  animation: halo-surge 0.18s steps(2) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes halo-surge {
+  0% { opacity: 1; transform: scale(1.25); }
+  50% { opacity: 0.45; transform: scale(1.1); }
+}
+.radio-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+/* The speaker shivers with static. */
+.speaker-live {
+  transform-box: fill-box;
+  animation: shiver 0.12s steps(2) infinite;
+}
+.speaker-live.surging {
+  animation: shiver-hard 0.07s steps(2) infinite;
+}
+@keyframes shiver {
+  50% { transform: translate(0.4px, -0.3px); }
+}
+@keyframes shiver-hard {
+  50% { transform: translate(1.4px, -1px); }
+}
+.radio-digits.on {
+  animation: interference 9.3s steps(1) infinite;
+}
+.rx-blink {
+  animation: breathe 1.6s steps(2) infinite;
+}
+.lamp-pool,
+.lamp-bulb {
+  animation: mains 11s infinite;
+}
+.os-sky {
+  animation: rift 23s infinite;
+}
+@keyframes rift {
+  0%, 88%, 100% { opacity: 0.35; }
+  90% { opacity: 1; }
+  93% { opacity: 0.5; }
+}
+.door-gap {
+  animation: mains 6s infinite reverse;
+}
+.door-gap-warm {
+  animation: mains 13s infinite;
+}
+.door-spill {
+  mix-blend-mode: screen;
+  animation: mains 13s infinite;
+}
+/* Something walks past the other side of the door. */
+.door-shadow {
+  opacity: 0;
+  animation: pass-by 1.5s ease-in-out 1.1s both;
+}
+@keyframes pass-by {
+  0% { opacity: 0; translate: 0 0; }
+  15%, 85% { opacity: 1; }
+  100% { opacity: 0; translate: 92px 0; }
+}
+
+/* --- ambient life (this room only, not photos or glimpses) ------------------------ */
+
+.rain line {
+  animation-name: rain-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes rain-fall {
+  to { transform: translate(-14px, 340px); }
+}
+.scene-frame > .room .curtain {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: curtain 7.7s ease-in-out infinite alternate;
+}
+.scene-frame > .room .curtain.right {
+  animation-duration: 9.4s;
+  animation-delay: -3.1s;
+}
+@keyframes curtain {
+  from { transform: skewX(-0.7deg); }
+  to { transform: skewX(0.9deg); }
+}
+.tree {
+  transform-box: fill-box;
+  transform-origin: 40% 100%;
+  animation: branch 5.3s ease-in-out infinite alternate;
+}
+@keyframes branch {
+  from { transform: rotate(-0.8deg); }
+  to { transform: rotate(1.1deg); }
+}
+.scene-frame > .room .mic-cord {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: curtain 6.1s ease-in-out infinite alternate;
+}
+.hand.second {
+  stroke: #8a2a1c;
+  stroke-width: 0.7;
+  stroke-linecap: round;
+  transform-box: view-box;
+  transform-origin: 0 0;
+  animation: seconds 60s steps(60) infinite;
+}
+@keyframes seconds {
+  to { transform: rotate(360deg); }
+}
+/* Lightning through the blinds: two flashes, a long cold fade. */
+.lightning {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(ellipse 22% 40% at 38% 28%, rgba(210, 225, 255, 0.55), transparent 70%),
+    linear-gradient(rgba(160, 180, 230, 0.14), rgba(160, 180, 230, 0.05));
+  animation: lightning 1.3s linear forwards;
+}
+@keyframes lightning {
+  0% { opacity: 0; }
+  3% { opacity: 1; }
+  8% { opacity: 0.15; }
+  13% { opacity: 0.85; }
+  35% { opacity: 0.12; }
+  100% { opacity: 0; }
+}
+/* Something in the house: the lamp sags while it passes. */
+.stage.presence .lamp-light {
+  animation: sag 2.8s ease-in-out;
+}
+.stage.presence .scene-frame > .room {
+  animation:
+    cam-drift 31s ease-in-out infinite alternate,
+    dim 2.8s ease-in-out;
+}
+@keyframes sag {
+  0%, 100% { opacity: 1; }
+  25% { opacity: 0.3; }
+  29% { opacity: 0.85; }
+  33% { opacity: 0.2; }
+  60% { opacity: 0.6; }
+}
+@keyframes dim {
+  0%, 100% { filter: none; }
+  25%, 33% { filter: brightness(0.78); }
+}
+.stage.presence .fog {
+  animation: fog-thicken 2.8s ease-in-out;
+}
+@keyframes fog-thicken {
+  40% { opacity: 0.75; }
+}
+
+/* --- crossing over: the other side assembles itself as your eyes adjust ----------- */
+
+.scene-frame > .room-other .vines path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: grow 2.4s cubic-bezier(0.3, 0.6, 0.3, 1) 1.05s forwards;
+}
+.scene-frame > .room-other .vines path:nth-child(2n) {
+  animation-delay: 1.35s;
+}
+.scene-frame > .room-other .vines circle {
+  animation: fade-in 1.2s ease 2.2s both;
+}
+@keyframes grow {
+  to { stroke-dashoffset: 0; }
+}
+/* Theo carves the new mark while you watch (or while you listen, if the light isn't on it). */
+.scene-frame > .room .carved .fresh,
+.scene-frame > .room .carved-groove .fresh {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: grow 0.6s ease-out 2.35s forwards;
+}
+
+/* --- light ---------------------------------------------------------------------- */
+
+/* Warm tungsten from the desk lamp and ceiling bulb. Sags now and then; more often once
+   something on the other side knows about the room. */
+.lamp-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(ellipse 22% 30% at 81% 45%, rgba(255, 196, 120, 0.22), transparent 70%),
+    radial-gradient(ellipse 40% 36% at 50% 2%, rgba(255, 214, 150, 0.2), transparent 70%);
+  animation: mains 11s infinite;
+}
+.lamp-light.uneasy {
+  animation-duration: 4.2s;
+}
+
+.flicker-glimpse {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  filter: blur(4px) brightness(0.6);
+}
+.flicker-dark {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  background: #000;
+  pointer-events: none;
+}
+
+/* Flashlight: gameplay radius is --lr; outside it the room is (almost) black. */
+.flashlight {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at var(--px) var(--py),
+      rgba(255, 244, 222, 0.1) 0,
+      rgba(255, 244, 222, 0.03) calc(var(--lr) * var(--beam) * 0.45),
+      rgba(0, 0, 0, 0) calc(var(--lr) * var(--beam) * 0.55),
+      rgba(0, 3, 4, 0.5) calc(var(--lr) * var(--beam) * 0.82),
+      rgba(1, 3, 4, 0.955) calc(var(--lr) * var(--beam)),
+      rgba(0, 1, 2, 0.985) calc(var(--lr) * var(--beam) * 2.4)
+    );
+  /* Timed with .veil-lightOff (2.5s): the whole room shows once in the stutter, then darkness,
+     then the torch: click… nothing… a stutter, then the beam holds. Under 3 flashes per second. */
+  animation: torch-on 2.45s linear both;
+}
+@keyframes torch-on {
+  0%, 40% { --beam: 0; }
+  43.5% { --beam: 7; }
+  47%, 78% { --beam: 0; }
+  81% { --beam: 0.85; }
+  84% { --beam: 0.1; }
+  88%, 100% { --beam: 1; }
+}
+.darkness {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: #000;
+}
+/* Branch B: Theo's light comes on at the carved wall. */
+.darkness.theo-light {
+  background: radial-gradient(
+    ellipse calc(var(--fw) * 0.24) calc(var(--fh) * 0.38) at calc(var(--fx) + var(--fw) * 0.16)
+      calc(var(--fy) + var(--fh) * 0.47),
+    rgba(255, 236, 200, 0.06) 0,
+    transparent 60%,
+    rgba(0, 0, 0, 0.97) 100%
+  );
+  animation: fade-in 1.4s ease both;
+}
+
+/* Things that stay faintly visible in the dark: the switch (the way back) and the gap under
+   the door (something is out there). */
+.switch-glow {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  border-radius: 30%;
+  background: radial-gradient(closest-side, rgba(214, 236, 214, 0.28), transparent);
+  box-shadow: 0 0 18px rgba(190, 230, 200, 0.14);
+  animation: breathe 5s ease-in-out infinite;
+}
+.door-glow {
+  position: absolute;
+  z-index: 4;
+  left: 89.4%;
+  top: 74.6%;
+  width: 8.3%;
+  height: 0.6%;
+  pointer-events: none;
+  background: rgba(150, 26, 16, 0.32);
+  filter: blur(3px);
+  box-shadow: 0 0 16px rgba(179, 38, 26, 0.22);
+  animation: mains 7s infinite;
+}
+
+/* --- world transitions ------------------------------------------------------------ */
+
+.veil {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  background: #000;
+}
+/* Entering the room: the door opens a slit of landing light, you step in, it closes behind you,
+   and your eyes adjust. */
+.veil-arrive {
+  animation: veil-arrive 2.7s ease-in forwards;
+}
+@keyframes veil-arrive {
+  0%, 42% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.veil-arrive::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--fx, 0px) + var(--fw, 100vw) * 0.8925);
+  top: calc(var(--fy, 0px) + var(--fh, 100vh) * 0.18);
+  width: calc(var(--fw, 100vw) * 0.085);
+  height: calc(var(--fh, 100vh) * 0.57);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, rgba(255, 214, 150, 0.5), rgba(255, 190, 120, 0.12));
+  box-shadow: 0 0 60px rgba(255, 200, 130, 0.25);
+  filter: blur(3px);
+  animation: door-slit 2.7s ease-in-out forwards;
+}
+@keyframes door-slit {
+  0% { transform: scaleX(0); opacity: 0; }
+  12% { opacity: 1; }
+  30%, 48% { transform: scaleX(1); opacity: 1; }
+  62%, 100% { transform: scaleX(0); opacity: 0.6; }
+}
+/* World flip: the bulb flares and dies → black → the radio tears → one stutter of the other room
+   → black again → your eyes adjust to it. */
+.veil-lightOff {
+  animation: veil-off 2.5s linear forwards;
+}
+.veil-dark {
+  animation: veil-dark 1.8s ease-out forwards;
+}
+@keyframes veil-off {
+  0% { opacity: 1; background: rgba(255, 228, 176, 0.3); }
+  4% { opacity: 1; background: #000; }
+  40% { opacity: 1; }
+  44% { opacity: 0.45; }
+  48% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes veil-dark {
+  0% { opacity: 1; background: rgba(255, 228, 176, 0.3); }
+  5% { opacity: 1; background: #000; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+/* Light back on: the tungsten stutters once, then holds. */
+.veil-lightOn {
+  animation: veil-on 0.5s linear forwards;
+}
+@keyframes veil-on {
+  0% { opacity: 1; }
+  16% { opacity: 0.1; }
+  28% { opacity: 0.75; }
+  46%, 100% { opacity: 0; }
+}
+.veil-rescue {
+  animation: veil-rescue 1.2s ease-out forwards;
+}
+@keyframes veil-rescue {
+  0% { opacity: 1; }
+  22% { opacity: 1; background: rgba(255, 236, 205, 0.75); }
+  100% { opacity: 0; background: rgba(255, 236, 205, 0); }
+}
+.afterglow {
+  position: absolute;
+  z-index: 9;
+  left: 50%;
+  top: 4.5%;
+  width: 9%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 150, 60, 0.75), rgba(255, 110, 30, 0.2) 35%, transparent 70%);
+  animation: afterglow 1.1s ease-out forwards;
+}
+@keyframes afterglow {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  100% { opacity: 0; scale: 0.4; }
+}
+
+/* --- atmosphere ------------------------------------------------------------------- */
+
+.particles {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.is-normal .particles {
+  mix-blend-mode: screen;
+}
+.fog {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.45;
+  /* Rolls in once the eyes have adjusted to the dark. */
+  animation: fade-in 3.2s ease 0.9s both;
+}
+.fog-layer {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(ellipse 40% 22% at 30% 70%, rgba(120, 160, 150, 0.22), transparent 70%),
+    radial-gradient(ellipse 35% 18% at 75% 60%, rgba(100, 140, 130, 0.18), transparent 70%);
+  animation: drift 38s ease-in-out infinite alternate;
+}
+.fog-layer.b {
+  background:
+    radial-gradient(ellipse 50% 20% at 60% 85%, rgba(140, 170, 160, 0.2), transparent 70%),
+    radial-gradient(ellipse 30% 25% at 15% 40%, rgba(90, 120, 115, 0.14), transparent 70%);
+  animation-duration: 53s;
+  animation-direction: alternate-reverse;
+}
+@keyframes drift {
+  to {
+    transform: translate(6%, -3%);
+  }
+}
+
+/* --- interaction ------------------------------------------------------------------- */
+
+.hotspot {
+  position: absolute;
+  z-index: 3;
+  border-radius: 12px;
+}
+/* Hover: a faint warm catch-light on the object, no outline. */
+.hotspot::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 222, 170, 0.22), transparent);
+  opacity: 0;
+  transition: opacity 0.35s;
+  pointer-events: none;
+}
+.is-normal .hotspot:hover::after,
+.hotspot:focus-visible::after {
+  opacity: 1;
+}
+/* The catch-light above is the focus indicator; no box outline in the scene. */
+.hotspot:focus-visible {
+  outline: none;
+}
+/* NEARBY: the object you're after warms up as the hand comes close. */
+.is-normal .hotspot.beckon::before {
+  content: '';
+  position: absolute;
+  inset: -35%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 214, 150, 0.26), transparent);
+  opacity: var(--near);
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+/* The object the current objective is about breathes a little light. */
+.is-normal .hotspot.beckon::after {
+  animation: beckon 2.8s ease-in-out infinite;
+  background: radial-gradient(closest-side, rgba(255, 214, 150, 0.32), transparent);
+}
+@keyframes beckon {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.85; }
+}
+.debug-hotspots .hotspot {
+  outline: 1px dashed #0f0;
+}
+
+.cursor-ring {
+  position: absolute;
+  z-index: 12;
+  left: var(--cx);
+  top: var(--cy);
+  width: 12px;
+  height: 12px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 232, 196, 0.6);
+  pointer-events: none;
+  transition:
+    width 0.25s,
+    height 0.25s,
+    border-color 0.25s,
+    background 0.25s;
+}
+.is-other .cursor-ring {
+  width: 6px;
+  height: 6px;
+  border-color: rgba(200, 225, 215, 0.35);
+}
+.stage.hovering .cursor-ring {
+  width: 34px;
+  height: 34px;
+  border-color: rgba(255, 222, 170, 0.8);
+  background: rgba(255, 222, 170, 0.06);
+}
+.stage.leaning .cursor-ring {
+  opacity: 0;
+}
+/* The thing is close: the pointer itself won't hold still. */
+.unstable .cursor-ring {
+  animation: jitter 0.18s steps(2) infinite;
+}
+@keyframes jitter {
+  0% { transform: translate(1px, -1px); }
+  50% { transform: translate(-2px, 1px); }
+}
+@media (hover: hover) and (pointer: fine) {
+  .stage,
+  .hotspot {
+    cursor: none;
+  }
+}
+@media (hover: none) {
+  .cursor-ring {
+    display: none;
+  }
+}
+
+/* --- glitch: something reached through ---------------------------------------------- */
+
+.glitch .stage {
+  filter: url(#chroma);
+  animation: jolt 0.24s steps(2) 2;
+}
+@keyframes jolt {
+  0% { transform: translate(-4px, 2px); }
+  50% { transform: translate(5px, -1px); }
+  100% { transform: none; }
+}
+
+/* The action the current step is about, named next to the pointer. */
+.verb-prompt {
+  position: absolute;
+  z-index: 12;
+  left: var(--cx);
+  top: var(--cy);
+  translate: 22px -50%;
+  padding: 0.15rem 0.55rem 0.2rem;
+  font-family: var(--f-type);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #1b150e;
+  background: rgba(236, 226, 201, 0.92);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  white-space: nowrap;
+  animation: fade-in 0.2s ease;
+}
+.verb-prompt kbd {
+  display: inline-block;
+  margin-right: 0.5em;
+  padding: 0 0.3em;
+  font: inherit;
+  font-size: 0.6rem;
+  line-height: 1.3;
+  border: 1px solid rgba(27, 21, 14, 0.45);
+  border-radius: 2px;
+}
+/* Not the objective: the same prompt, quieter. */
+.stage:not(.on-target) .verb-prompt {
+  background: rgba(236, 226, 201, 0.62);
+}
+.stage.on-target .cursor-ring {
+  border-color: var(--tungsten);
+  background: rgba(255, 207, 138, 0.12);
+}
+/* Touch: no hover, so the prompt shows while the hand reaches for what you tapped. */
+@media (hover: none) {
+  .verb-prompt {
+    display: none;
+  }
+  .stage.approaching .verb-prompt {
+    display: block;
+  }
+  .verb-prompt kbd {
+    display: none;
+  }
+}

@@ -14,7 +14,7 @@ import {
   TO_PRECHOICE,
   type Step,
 } from './scripts';
-import { clueText, hintStage, hintTiersUnlocked, radioSignal, tally } from './selectors';
+import { clueText, hintStage, hintTiersUnlocked, objective, radioSignal, tally } from './selectors';
 import type { GameState, HintStage } from './types';
 
 const LEAK_17 = /3[:.]17|(^|[^0-9])17([^0-9]|$)/;
@@ -188,7 +188,7 @@ describe('không để lộ đáp án (doc §D, §F, §L)', () => {
     ]);
     const visible = (s: GameState) => [
       s.message?.text ?? '',
-      s.objective,
+      objective(s),
       ...s.radioLog,
       ...s.clues.map((c) => clueText(s, c)),
       ...(s.diaryFound ? DIARY_PAGES : []),
@@ -200,12 +200,12 @@ describe('không để lộ đáp án (doc §D, §F, §L)', () => {
   });
 
   it('hint trước khi liên lạc không nói ra 17', () => {
-    const before: HintStage[] = ['flip', 'diary', 'leap1', 'hour', 'minute'];
+    const before: HintStage[] = ['flip', 'diary', 'leap1', 'hour', 'minute', 'combine'];
     for (const stage of before) for (const h of HINTS[stage]) expect(h).not.toMatch(LEAK_17);
   });
 
   it('lời Theo không chứa khắc, vạch, tường, micro, radio', () => {
-    for (const line of THEO_CONTACT) {
+    for (const line of THEO_CONTACT.filter((l) => l.who === 'theo').map((l) => l.text)) {
       expect(line).not.toMatch(/khắc|vạch|tường|micro|radio/i);
     }
   });
@@ -224,7 +224,7 @@ describe('hint (doc §L)', () => {
     ).toBe('leap1');
     expect(
       hintStage(run([...OPENING, ...EXPLORE_NORMAL, ...FIRST_VISIT, ...DIARY_AND_RULE]).state),
-    ).toBe('minute');
+    ).toBe('combine');
   });
 
   it('tầng 1 mở sau khoảng 2 phút kẹt, mỗi tầng sau thêm khoảng 60 giây', () => {

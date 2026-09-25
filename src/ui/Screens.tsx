@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { audio } from '../audio/audio';
-import { ENDING, INTRO_LINES } from '../game/content';
+import { ENDING, INTRO_LINES, type IntroLine } from '../game/content';
 import { useStore } from '../store';
 
 const debugMode = () => new URLSearchParams(window.location.search).has('debug');
@@ -13,37 +13,47 @@ export function TitleScreen() {
   };
   return (
     <div className="screen title" onClick={start}>
-      <h1>STATIC</h1>
+      <div className="title-lamp" aria-hidden />
+      <h1 className="title-mark">STATIC</h1>
       <p className="sub">Chương 0 — Tín hiệu</p>
-      <p className="note">Nên đeo tai nghe.</p>
-      <p className="note warn">Có hiệu ứng đèn chớp.</p>
-      <button className="primary">Nhấn để bắt đầu</button>
+      <div className="title-notes">
+        <p className="note">Nên đeo tai nghe.</p>
+        <p className="note warn">Có hiệu ứng đèn chớp.</p>
+      </div>
+      <button className="press">Nhấn để bắt đầu</button>
     </div>
   );
 }
 
-const INTRO_LINE_MS = 1_800;
+/** How long each line holds before the next appears. */
+const INTRO_HOLD_MS: Record<IntroLine['kind'], number> = { kicker: 1_400, headline: 2_800, line: 2_300 };
 
 export function IntroScreen() {
   const dispatch = useStore((s) => s.dispatch);
   const [shown, setShown] = useState(1);
   useEffect(() => {
     if (shown >= INTRO_LINES.length) return;
-    const id = window.setTimeout(() => setShown((n) => n + 1), INTRO_LINE_MS);
+    const hold = INTRO_HOLD_MS[INTRO_LINES[shown - 1].kind];
+    const id = window.setTimeout(() => setShown((n) => n + 1), hold);
     return () => window.clearTimeout(id);
   }, [shown]);
   const done = shown >= INTRO_LINES.length;
+  // The headline lands with a low thud.
+  const headlineShown = INTRO_LINES.slice(0, shown).some((l) => l.kind === 'headline');
+  useEffect(() => {
+    if (headlineShown) audio.cue('thud');
+  }, [headlineShown]);
   return (
     <div
       className="screen intro"
       onClick={() => (done ? dispatch({ type: 'START_PLAY' }) : setShown(INTRO_LINES.length))}
     >
       {INTRO_LINES.slice(0, shown).map((l) => (
-        <p key={l} className="intro-line">
-          {l}
+        <p key={l.text} className={`intro-line intro-${l.kind}`}>
+          {l.text}
         </p>
       ))}
-      {done && <p className="note">Nhấn để tiếp tục</p>}
+      {done && <p className="press">Vào phòng</p>}
     </div>
   );
 }
@@ -77,9 +87,9 @@ export function EndingScreen() {
   const elapsed = (game.endedAt ?? 0) - (game.startedAt ?? 0);
   return (
     <div className="screen ending">
-      <h1>{ENDING.title}</h1>
+      <h1 className="ending-title">{ENDING.title}</h1>
       <p className="teaser">{game.choice === 'A' ? ENDING.teaserA : ENDING.teaserB}</p>
-      <dl className="summary">
+      <dl className="summary report">
         <dt>Manh mối</dt>
         <dd>{game.clues.length} / 6</dd>
         <dt>Lựa chọn</dt>
@@ -89,7 +99,7 @@ export function EndingScreen() {
         <dt>Thời gian</dt>
         <dd>{mmss(elapsed)}</dd>
       </dl>
-      <button className="primary" onClick={reset}>
+      <button className="press" onClick={reset}>
         Chơi lại
       </button>
     </div>

@@ -2,7 +2,7 @@
 
 > Vertical slice · 1 phòng · 2 thế giới · 15–20 phút
 > Tài liệu thiết kế gameplay, là **source of truth** cho Chapter 0. Chưa bao gồm architecture.
-> Cập nhật 25/09/2026 sau vòng stress-test và final validation.
+> Cập nhật 25/09/2026 sau vòng stress-test và final validation. Thêm mục R (xương sống câu chuyện) sau lần tự chơi thử bản build đầu.
 > Bản trước: [ideas.md](ideas.md)
 
 ---
@@ -73,14 +73,14 @@ Game không tìm cách hù dọa bằng jumpscare. Khoảnh khắc đáng sợ n
 | # | Vật thể | Phía này (Normal) | Phía bên kia (Other Side) | Vai trò |
 |---|---|---|---|---|
 | 1 | **Công tắc đèn** | Đèn sáng | Tối, chỉ có vùng sáng của đèn pin | Cơ chế flip. Mỗi lần tắt đèn, tường bên kia có thêm 1 vạch (mục I). |
-| 2 | **Bàn radio** | Radio sóng ngắn có 3 bánh xe số `_._ _ MHz`, đang để ở **2.58**. Bật lên sẽ nghe tiếng vọng của đêm 3. Micro cầm tay móc gọn trên giá. Có chồng tờ tìm người. Có đồng hồ đeo tay của Theo kèm giấy nhắn của mẹ. | Radio bị dây leo phủ kín, không đọc được số. **Vết cào dày đặc quanh radio.** Đèn bàn ngay cạnh **vẫn nguyên vẹn**. **Micro rơi dưới sàn, nút bấm nói bị quấn băng keo, dây kéo căng về phía bức tường cạnh giường.** | P1, slot A, slot D |
+| 2 | **Bàn radio** | Radio sóng ngắn có 3 bánh xe số `_._ _ MHz`, đang để ở **2.58**, **đang bật** khi người chơi bước vào (đèn LED sáng, loa rè khẽ). Lần đầu nghe sẽ phát tiếng vọng của đêm 3 (mục R). Micro cầm tay móc gọn trên giá. Có chồng tờ tìm người. Có đồng hồ đeo tay của Theo kèm giấy nhắn của mẹ. | Radio bị dây leo phủ kín, không đọc được số. **Vết cào dày đặc quanh radio.** Đèn bàn ngay cạnh **vẫn nguyên vẹn**. **Micro rơi dưới sàn, nút bấm nói bị quấn băng keo, dây kéo căng về phía bức tường cạnh giường.** | P1, slot A, slot D |
 | 3 | **Đồng hồ treo tường** | Chạy bình thường, 11:47 PM, có tiếng tích tắc | **Đứng yên. Kim ngắn gãy, nằm dưới đáy mặt kính. Kim dài dừng qua số 3 hai vạch nhỏ.** | P1 (số phút) |
 | 4 | **Thảm / sàn** | Tấm thảm; bên dưới có một tấm ván lỏng giấu nhật ký | Thảm mục nát, **tấm ván đã bị cạy lên**, hốc bên dưới trống, chỉ rộng bằng một cuốn sổ | Dẫn hướng tới nhật ký, bác bỏ đáp án "hốc sàn", kênh chuyển đồ ở nhánh B |
 | 5 | **Bức tường cạnh giường** | Poster, không có gì lạ | **Vạch khắc. Lần đầu thấy 4 vạch, sau đó +1 mỗi lần người chơi tắt đèn.** | Slot C, cho thấy Theo còn sống |
 
 - Cửa phòng ở phía bên kia không mở được ("Bạn không muốn mở cánh cửa đó"). Nó chỉ dùng cho âm thanh và bầu không khí.
 - Micro ở phía này không bấm được ("Bạn không dám bấm."). Người chơi không bao giờ phát sóng trong Chapter 0.
-- Intro có dòng *"Mẹ đã ngủ ở tầng dưới, sau ba đêm thức trắng."* Đây là tiền đề cho cái giá của lựa chọn A (mục K).
+- Intro có dòng *"Mẹ đã ngủ ở tầng dưới, sau ba đêm thức trắng."* Đây là tiền đề cho cái giá của lựa chọn A (mục K), và cũng là lý do giọng mẹ trên radio là điều không thể.
 
 ---
 
@@ -104,7 +104,13 @@ Clue card chỉ ghi lại **những gì thấy được**. Những chữ **in đ
 > *Đêm 3 — 02:58. Nó gọi tên em. Bằng giọng của mẹ. Đồng hồ đeo tay em tắt ngấm lúc nó tới, sáng ra mới chạy lại.*
 > *Radio của bố có **micro**. Em vẫn chưa dám bấm nút.*
 > *Em để đèn pin trong **hốc dưới sàn**. Sáng ra nó biến mất.*
-> *Đêm nay nó sẽ đến muộn hơn. Lần này em sẽ không chỉ ngồi nghe.*
+>
+> *(trang cuối)* *Đêm 4 — ▢▢:▢▢. Đêm nay nó sẽ đến muộn hơn. Nó tới lúc nào, em sẽ ghi vào đây.*
+> *Lần này em sẽ không chỉ ngồi nghe.*
+
+Trang cuối để **trống giờ** theo đúng mẫu của ba đêm trước. Ô trống đó chính là câu hỏi của puzzle: đêm Theo biến mất, nó tới lúc mấy giờ? Nhật ký không ghi con số nào.
+
+**Hai chiếc đồng hồ là hai nửa của một giờ.** Đồng hồ đeo tay còn số giờ, mất số phút. Đồng hồ bên kia còn kim dài, mất kim ngắn. Mặt đồng hồ (cả hai phía, cùng một mẫu) có vòng số phút nhỏ màu đỏ 5, 10, … 60 như đồng hồ trường học, và kim dài chạm tới vạch, nên kim còn lại đọc được là kim phút. Chiếc nào được tìm thấy sau thì người chơi nhận ra nó khớp với chiếc kia ("Nó cũng đã dừng, như…"). Đó là quan sát, không phải đáp án.
 
 **Nguồn của các chip deduction:**
 
@@ -166,11 +172,18 @@ Mở trong Case File **sau khi đã liên lạc được bằng radio**:
 > Giờ em đang trốn ở **[ C ]**.
 > Thứ đang săn em tìm đến **[ D ]**.
 
-**Lời Theo khi liên lạc lần đầu ở 3.17** (có phụ đề), là bằng chứng cho slot C và D:
+**Liên lạc lần đầu ở 3.17** là một đoạn hội thoại ngắn (có phụ đề), cũng là bằng chứng cho slot C và D. Âm thanh đi qua được giữa hai phía (luật 4), nên Theo nghe được bạn nói:
 
-> *"…chị? …chị nghe được em hả?… em vẫn ở trong phòng, nhưng không phải phòng mình… mỗi lần bên chị tối đi, bên này sáng lên một chút… em đếm từng lần… em vẫn ở chỗ em đếm… nó đang tới… tắt—"* (mất tín hiệu)
+> **Theo:** *…chị? …chị nghe được em hả?…*
+> **Bạn:** Theo? Em đang ở đâu?
+> **Theo:** *Em vẫn ở đây. Trong phòng.*
+> *(Bạn nhìn quanh. Căn phòng trống không.)*
+> **Theo:** *…nhưng không phải phòng của chị. Ở đây tối lắm. Mỗi lần bên chị tối đi, bên này sáng lên một chút… em đếm từng lần. Em vẫn ở chỗ em đếm.*
+> **Bạn:** Chị phải làm sao để tìm em?
+> **Theo:** *…nó đang tới… tắt—* (mất tín hiệu)
+> *Bạn nghĩ: "Không phải phòng của chị"… Căn phòng mình thấy mỗi khi đèn tắt?*
 
-Lời thoại này không được chứa các chữ "khắc", "vạch", "tường", "micro", "radio".
+Lời của Theo không được chứa các chữ "khắc", "vạch", "tường", "micro", "radio". Chỉ lời của Theo được ghi vào nhật ký radio.
 
 **Nguyên tắc chung:** mỗi đáp án đúng cần ít nhất 2 bằng chứng. Không clue nào được tự nói ra đáp án.
 
@@ -381,17 +394,20 @@ Người chơi học dần các luật này và không có tutorial nào nói ra
 [0:00] TITLE
   "Nên đeo tai nghe."  →  nhấn để bắt đầu (mở khóa audio)
 
-[0:30] INTRO — chữ trắng trên nền đen, 4 dòng
-  "Theo biến mất ba đêm trước."
-  "Cảnh sát nói em bỏ nhà đi."
+[0:30] OPENING CINEMATIC — nền đen (mục R)
+  BA ĐÊM TRƯỚC / THEO BIẾN MẤT.         (tiếng thịch)
+  "Em trai bạn. 12 tuổi."
+  "Cảnh sát nghĩ em bỏ nhà đi. Bạn thì không."
+  "Đêm qua, mẹ tìm thấy đồng hồ đeo tay của em dưới gầm giường.
+   Nó dừng lúc 3 giờ. Hai số phút đã vỡ."
   "Mẹ đã ngủ ở tầng dưới, sau ba đêm thức trắng."
-  "Đêm nay bạn mở cửa phòng em lần đầu tiên."
-  Objective: "Theo đã đi đâu?"
+  "Đêm nay, bạn bước vào phòng của Theo để tìm hiểu chuyện gì đã xảy ra."
+  → MỤC TIÊU: Kiểm tra radio.   (radio đang bật, sáng, rè khẽ)
 
 BEAT 1 — PHÍA NÀY
   Tờ tìm người     → C1
   Đồng hồ đeo tay  → C2 (03:▯▯)
-  Radio            → bật lên: rè, rồi giọng đàn bà gọi "Theo…" (tiếng vọng ở 2.58).
+  Radio            → nghe: rè, im lặng, rồi giọng đàn bà gọi "Theo…" (tiếng vọng ở 2.58).
                      Xoay đi chỗ khác: chỉ còn rè.
   Micro            → móc gọn trên giá. "Bạn không dám bấm."
   Đồng hồ treo tường → "11:47. Vẫn chạy."   (để lát sau có cái so sánh)
@@ -490,9 +506,11 @@ Ký hiệu: 🟢 người chơi chắc chắn tự suy ra được · 🟡 có n
 
 **Lời Theo trước lúc chọn** (radio tự rè lên ở 3.17 sau khi nộp deduction đúng):
 
-> *"Em ở ngay chỗ lúc trước em bị kéo qua. Nó đứng giữa phòng, chắn đường. Em vẫn trốn được… nhưng tối lắm. Chị định làm gì?"*
+> *"Em ở ngay chỗ lúc trước em bị kéo qua. Nó đứng giữa phòng, chắn đường. Nếu chị vặn radio thật to… nó sẽ bỏ em, đi về phía tiếng động. Em sẽ chạy được qua. Nhưng đêm em vặn to, sáng ra cửa phòng có vết cào. Ở phía bên ngoài. Mẹ đang ngủ dưới nhà đó chị. Còn nếu chị tắt đi… nó mất dấu. Em trốn thêm được một đêm nữa. Nhưng bên này tối lắm. Chị có thấy cái hốc dưới sàn không? Bên này nó cũng có. Hôm trước em để đèn pin vào đó, sáng ra nó biến mất. Đồ bỏ vào đó… sang được bên này. Chị định làm gì?"*
 
-Sau đó hiện hai điều khiển trên radio: **[ VẶN TO HẾT CỠ ]** và **[ TẮT RADIO ]**.
+Câu về cái hốc là lý do cho hành động ở nhánh B: người chơi không "đặt đèn pin vào hốc" vì game bảo, mà vì Theo vừa nói hốc sàn nối hai phía và bên đó tối. Trước lúc chọn B, hốc sàn chỉ chứa nhật ký; hành động "gửi ánh sáng cho Theo" chỉ xuất hiện sau khi chọn B.
+
+Deduction đã giải xong nên lời này không làm lộ đáp án nào; nó đặt lợi ích và cái giá của cả hai lựa chọn vào lời của Theo, để người chơi lần đầu vẫn hiểu mình đang đánh đổi gì. Sau câu hỏi là một khoảng im lặng, rồi mới dùng được hai điều khiển trên radio: **núm âm lượng (vặn to hết cỡ)** và **công tắc nguồn (tắt radio)**.
 
 ### Những gì người chơi đã biết trước lúc chọn
 
@@ -537,7 +555,8 @@ Nút **"Nghĩ"** là giọng nội tâm của nhân vật. Hint tầng 1 chỉ m
 | Tìm nhật ký | "Bên kia, sàn nhà có gì đó khác." | "Ván sàn bên kia bị cạy. Cùng chỗ đó ở bên này thì sao?" | "Dưới tấm thảm có thể có gì đó." |
 | Radio: chưa thấy quy luật (LEAP 1) | "Lúc nãy radio phát ra cái gì?" | "Nhật ký có nhắc đến giọng của mẹ." | "Radio đang để ở 2.58. Đêm đó là 02:58. Còn những đêm khác thì sao?" |
 | Radio: chưa biết số giờ | "Có thứ gì trong phòng đã dừng lại vào đêm đó?" | "Nhật ký nói đồng hồ đeo tay tắt ngấm lúc nó tới." | "Đồng hồ đeo tay còn hiện số giờ." |
-| Radio: thiếu số phút | "Đồng hồ đeo tay chỉ còn số giờ. Còn thứ gì khác đã dừng lại?" | "Đồng hồ ở phía bên kia không chạy." | "Kim còn lại là kim dài." |
+| Radio: thiếu số phút | "Đồng hồ đeo tay chỉ còn số giờ. Còn thứ gì khác đã dừng lại?" | "Đồng hồ ở phía bên kia không chạy." | "Soi đồng hồ bên kia. Kim còn lại là kim dài." |
+| Radio: có cả hai đồng hồ, chưa ghép | "Hai chiếc đồng hồ đều dừng lúc nó tới. Mỗi chiếc chỉ còn lại một nửa." | "Đồng hồ đeo tay còn số giờ. Kim dài là kim phút." | "Đêm 3 là 02:58, và radio để ở 2.58. Đêm 4 thì sao?" |
 | Deduction A | "Đọc lại những trang cuối của nhật ký." | "Ở phía bên kia, micro đang ở trong tình trạng nào?" | "Mình đã tắt đèn bao nhiêu lần rồi? Theo đã làm gì khác mình?" |
 | Deduction C | "Nghe lại lời Theo trên radio." | "'Em đếm từng lần.' Ở phía bên kia, chỗ nào có dấu đếm?" | "Số vạch tăng lên mỗi lần mình tắt đèn. Có người đang đếm, ngay lúc này." |
 | Deduction D | "So sánh bàn radio bên kia trước và sau khi mình dò 3.17." | "Đèn bàn và radio nằm cạnh nhau. Cái nào bị cào?" | "Theo từng vặn to radio, sáng hôm sau có vết cào. Còn mình vừa bật radio lên..." |
@@ -658,7 +677,8 @@ Những điểm dưới đây là giả thuyết thiết kế, **chưa phải de
 | Rủi ro | Trạng thái | Cách giảm (không thêm hệ thống) |
 |---|---|---|
 | **LEAP 1** (giọng mẹ ↔ đêm 3): người chơi không nhớ âm thanh đã nghe, hoặc đã xoay bánh xe đi mà quên mất | Được thiết kế để giải được bằng quan sát + thử nghiệm, nhưng cần playtest xác nhận. | Hint mục L. Phương án dự phòng là vạch bút chì trên mặt số radio (mục H). |
-| **Đọc kim dài thành kim giờ** | Có nguy cơ kẹt | Vẽ kim dài thật dài. Thử 3.00 thất bại đã tự sửa hướng nghĩ này. Hint H3: "Kim còn lại là kim dài." |
+| **Đọc kim dài thành kim giờ** | Đã giảm (sau playtest nội bộ: "manh mối tần số hơi mơ hồ") | Kim dài chạm vạch, vòng số phút 5…60, kim ngắn gãy nằm rõ dưới đáy. Thử 3.00 thất bại đã tự sửa hướng nghĩ này. Hint stage `combine` khi đã có cả hai đồng hồ mà chưa ghép. |
+| **Không biết đêm nào là đêm cần dò** | Đã giảm | Trang cuối nhật ký "Đêm 4 — ▢▢:▢▢". Câu hỏi đổi thành "Đêm Theo biến mất, radio đã bắt được gì?" ngay khi phát hiện radio phát lại các đêm. |
 | **Nhật ký quá nặng chữ:** 6 dòng mang thông tin cho P1, slot A, slot D và choice | Có nguy cơ bị đọc lướt | Mỗi đêm một trang. |
 | **Choice** | Choice hiện đã có lợi ích và cái giá được ghi rõ trước lúc chọn; việc nó có công bằng hay không vẫn là câu hỏi cho playtest. | Đo theo playtest criterion ở mục K. |
 | **Nhánh B:** không nghĩ ra việc dùng hốc sàn | Có nguy cơ kẹt | Hint: "Theo đang ở trong bóng tối" → "đồ để trong hốc sàn thì biến mất" → "Mình đang cầm thứ gì mà Theo cần?" |
@@ -666,3 +686,95 @@ Những điểm dưới đây là giả thuyết thiết kế, **chưa phải de
 | **Dò mò 3.00–3.59** | Rủi ro thấp | Khoảng 60 lần thử, chấp nhận được. |
 | **Brute-force deduction** (48 tổ hợp) | Rủi ro thấp | Chỉ hiện "gần đúng" từ lần nộp sai thứ 2. |
 | **Glimpse làm lộ đồng hồ hoặc số vạch** | Rủi ro thấp | Trong glimpse, đồng hồ nằm ở rìa khung và bị mờ; số vạch không đếm được. |
+
+---
+
+## R. Story → Question → Action
+
+Sau ba vòng tự chơi thử, nguyên tắc cho mọi tương tác trong Chapter 0:
+
+```text
+STORY → QUESTION → PLAYER INTENT → ACTION → DISCOVERY → NEW QUESTION
+```
+
+Nếu người chơi không trả lời được *"Tại sao tôi lại làm việc này?"* thì tương tác đó chưa đủ tốt: phải sửa flow, không thêm nút hay hint.
+
+### Ba kênh, không trộn lẫn
+
+| Kênh | Là gì | Ví dụ | Hiển thị |
+|---|---|---|---|
+| **Câu hỏi** | Câu hỏi của câu chuyện mà người chơi đang theo đuổi | Theo đang ở đâu? | Góc trái (luôn có), thẻ "CÂU HỎI MỚI" khi đổi |
+| **Việc tiếp theo** | Hành động tiếp theo để trả lời câu hỏi, không bao giờ là lời giải | → Tìm Theo ở căn phòng bên kia. | Dưới câu hỏi; thẻ "TIẾP THEO" khi chỉ việc thay đổi |
+| **Phát hiện** | Điều người chơi vừa biết chắc. Không phải objective; nó mở ra câu hỏi tiếp theo | Theo còn sống. | Thẻ "PHÁT HIỆN" hiện trước câu hỏi mới |
+
+Các thẻ hiện lần lượt, và chờ khi hồ sơ đang mở hoặc khi có giọng nói trên radio. Vật thể liên quan tới việc tiếp theo khẽ sáng và hiện động từ khi rê chuột qua. Đứng yên 12 giây thì có một dòng nudge củng cố việc hiện tại. `currentStep(state)` và `discoveries(state)` suy ra tất cả từ GameState, không có quest engine.
+
+### Chuỗi của Chapter 0
+
+| Câu chuyện | Câu hỏi | Người chơi muốn | Hành động | Phát hiện |
+|---|---|---|---|---|
+| Theo mất tích, bạn không tin cảnh sát | Chuyện gì đã xảy ra với Theo? | Xem thứ duy nhất còn "sống" trong phòng | Kiểm tra radio đang bật | Giọng mẹ gọi "Theo…", nhưng mẹ đang ngủ dưới nhà |
+| Radio phát thứ không thể có | Vì sao radio của Theo vẫn còn phát? | "Em có ghi lại những gì đã nghe không?" | Tìm nhật ký (thảm lệch) | Mỗi đêm một giờ, một tiếng lạ |
+| Nhật ký ghi 02:58 = giọng mẹ; radio ở 2.58 | Ai đang nói qua radio? | Kiểm tra xem radio có phát lại các đêm khác không | Thử tần số khác | **PHÁT HIỆN:** Radio đang phát lại những đêm trước |
+| Trang cuối nhật ký: "Đêm 4 — ▢▢:▢▢", "nó sẽ đến muộn hơn" | Đêm Theo biến mất, radio đã bắt được gì? | Điền vào ô trống: đêm đó nó tới lúc mấy giờ | Tìm xem đêm đó nó tới lúc mấy giờ → đồng hồ đeo tay | 03:▯▯, thiếu số phút |
+| Đèn chớp, căn phòng khác hiện ra | Căn phòng vừa biến thành cái gì? | Xem lại cái vừa thấy | Tắt đèn | **PHÁT HIỆN:** Căn phòng có một phía khác |
+| Phía bên kia đứng yên ở một đêm | Nơi này là đâu? (+ tìm số phút còn thiếu) | Tìm thứ đã dừng lại đêm đó | Soi đồng hồ bên kia | "Nó cũng dừng, như đồng hồ đeo tay." Chỉ còn kim dài |
+| Có đủ giờ và phút | Đêm Theo biến mất, radio đã bắt được gì? | Nghe đêm Theo biến mất | Dò tần số đêm đó | Hội thoại với Theo → **PHÁT HIỆN:** Theo còn sống |
+| "Em vẫn ở trong phòng… nhưng không phải phòng của chị" | Theo đang ở đâu? | "Căn phòng mình thấy khi tắt đèn?" | Tìm Theo ở căn phòng bên kia | "Có thứ gì đó đang đứng ở bàn radio." |
+| Có thứ gì đó ở bàn | Thứ gì đang ở bàn radio? | Xem nó là gì | Soi bàn radio | **PHÁT HIỆN:** Nó tới ngay sau khi mình bật radio |
+| "Em vẫn ở chỗ em đếm" | Theo đang ở đâu? | Tìm chỗ có dấu đếm | Soi bức tường | Số vạch vừa tăng → "Mình đã có đủ bằng chứng." |
+| Có đủ bằng chứng | Chuyện gì đã thực sự xảy ra với Theo? | Ghép lại | Hồ sơ → kết luận | Sự thật viết trên trang; radio tự rè lên |
+| Theo nói cái giá của từng lựa chọn, và cái hốc | Có nên đưa Theo về không? | Quyết định | Vặn to / tắt radio | **PHÁT HIỆN:** Hai căn phòng thông nhau qua cái hốc |
+| (B) Radio im lặng, Theo ở trong bóng tối | Theo phải ở trong bóng tối cả đêm sao? | Gửi ánh sáng qua cái hốc Theo nói | Gửi ánh sáng cho Theo (hốc sàn) | Đèn pin biến mất |
+| (B) | Theo có nhận được không? | Kiểm tra | Sang phía bên kia | "EM ỔN. ĐÊM MAI. CÙNG GIỜ." |
+| (A) Nó đi về phía tiếng radio | Làm sao kéo Theo qua khi nó còn ở đó? | Canh lúc nó rời bức tường | Kéo Theo qua bức tường | Theo về, cửa bị cào, đồng hồ dừng |
+
+Các bước trước khi liên lạc được coi là xong ngay khi đã liên lạc (người đoán trước 3.17 không bị đưa ngược lại), trừ nhật ký, vì deduction vẫn cần nó.
+
+### Opening không được làm lộ puzzle
+
+Đồng hồ đeo tay chỉ còn số giờ (mục D). Opening nói "Nó dừng lúc 3 giờ. Hai số phút đã vỡ." Nếu opening nói "3:17" thì puzzle P1 và aha "giờ ở phía này, phút ở phía bên kia" biến mất.
+
+### Acceptance test
+
+Cho một người chưa đọc tài liệu chơi, không giải thích gì. Ở mỗi phát hiện, hỏi: Mình vừa biết được gì? Vậy câu hỏi tiếp theo là gì? Mình sẽ làm gì để trả lời nó, và tại sao? Nếu có lúc họ nghĩ "Rồi sao nữa?" thì đó là lỗi của flow, không phải của UI.
+
+## S. Tương tác vật lý và chuyển động
+
+Mọi hành động quan trọng đi qua cùng một vòng: **tiến lại → chạm → vật phản ứng → âm thanh → thế giới trả lời → phát hiện → câu hỏi mới**. Không có click nào nhảy thẳng từ state sang panel.
+
+### Vòng đời một vật thể
+
+| Nhịp | Người chơi thấy | Ở đâu trong code |
+|---|---|---|
+| Idle | Radio rè, đèn RX nhấp nháy, loa rung; rèm đung đưa, mưa, kim giây | `Room` (`live`), `scene.css` |
+| Nearby | Vật của bước hiện tại ấm dần khi tay lại gần; tiếng rè radio to dần | `--near`, `audio.radioNear` |
+| Hover / focus | Tên hành động cạnh con trỏ (`[E] Nghe`, `Xem hốc sàn`), vật của bước hiện tại đậm hơn | `.verb-prompt`, `VERBS` |
+| Tiến lại | Camera nghiêng vào đúng vật (close-up 0.44 s, với tay 0.2 s); thảm kêu cót két | `Scene.lean`, `.stage.approaching` |
+| Tương tác | Close-up mở ra từ chỗ camera đang nhìn; vật nhấc lên | `.radio-set`, `.diary-book`, `.floorboards` |
+| Thế giới trả lời | Mỗi sự kiện là một timeline ngắn trong `PRESENTATION` (`beats`) | `presentation/cues.ts` |
+
+Trên màn hình cảm ứng: chạm là đủ. Tên hành động hiện lúc tay đang với tới. Kéo thay cho cuộn (bánh số radio, trang nhật ký, đèn pin).
+
+### Từng vật
+
+- **Bánh số radio**: kéo lên/xuống, mỗi nấc một tiếng tách; tiếng rè đổi cao độ theo con số. Vuốt nhanh thì bánh quay thêm vài nấc rồi dừng. Chỉ chỗ bánh **dừng** mới được "nghe" (`RADIO_WHEEL` mang cả số nấc), nên quay lướt qua 3.17 không vô tình bắt được Theo.
+- **Giọng trên radio**: rè xé → im lặng (02:58: có tiếng thở) → giọng (tiếng thì thầm theo từng dòng, đèn RX đứng yên, loa bơm) → radio tắt phụt (02:58) / tiếng cào ba lần (3.17: có thứ gì trả lời tín hiệu).
+- **Nhật ký**: bìa mở ra; trang treo trên gáy lò xo, kéo sang trái để lật (sang phải để lật lại), trang cũ lật qua gáy.
+- **Hốc sàn**: quỳ xuống (camera hạ theo thảm), tấm ván lỏng trượt sang một bên, hơi lạnh bốc lên từ bên dưới (mạnh hơn sau khi biết sự thật). Nhánh B: đèn pin nằm trên ván, đang bật; kéo nó vào hốc (hoặc chạm) → đèn nghiêng rơi vào, ánh sáng lấp đầy hốc rồi chìm dần, tiếng rơi nhỏ dần, im lặng, xong.
+- **Công tắc / World Flip (2.5 s)**: tiếng tách → bóng đèn loé rồi tắt → radio xé tiếng → **một nhịp chớp thấy trọn căn phòng lạnh** → tối lại → mắt quen dần, sương tràn vào, dây leo mọc lên → click… đèn pin chập chờn rồi sáng. HUD ẩn trong lúc chuyển.
+- **Vạch đếm**: mỗi lần sang, vạch mới được khắc trước mắt. Nếu đã biết bức tường thì còn nghe tiếng khắc, dù đèn pin không chiếu vào đó.
+
+### Khoảnh khắc lớn
+
+| Sự kiện | Timeline |
+|---|---|
+| Bước vào | Đen → khe sáng hành lang mở ra (cửa) → cửa đóng sau lưng → phòng im (radio bị giữ im) → **radio vọt lên**, camera kéo về phía nó → mới cho điều khiển |
+| Liên lạc 3.17 | Số nhảy loạn → phòng lặng dần → giọng Theo → tiếng cào |
+| Có thứ gì trong nhà (sau khi liên lạc) | 24–46 s một lần, không đều: radio to lên, đèn sụt, ván kêu, tiếng cào, một bóng đi ngang khe cửa. Không bao giờ cho thấy nó |
+
+### Sống động nền
+
+Mưa (tiếng và vệt trên kính), sét 30–70 s một lần kèm sấm trễ, rèm, cành cây, dây micro, kim giây, bụi trong ánh đèn, camera trôi nhẹ và lệch theo con trỏ. Mỗi thứ một nhịp lệch nhau để không thành vòng lặp. Phía bên kia không có mưa, không có đồng hồ chạy: chỉ drone, sương và bào tử.
+
+Thứ bậc: nền rất khẽ → tương tác rõ và vật lý → phát hiện mạnh hơn (tiếng rơi, lặng, ánh sáng) → sự kiện lớn là cả một chuỗi. Không phải tương tác nào cũng kịch tính như nhau.

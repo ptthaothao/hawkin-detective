@@ -1,49 +1,62 @@
-import { useEffect } from 'react';
-import { audio } from './audio/audio';
-import { THEO_CONTACT, THEO_PRECALL } from './game/content';
-import { radioSignal } from './game/selectors';
+import type { CSSProperties } from 'react';
+import { usePresentation } from './presentation/usePresentation';
 import { useStore } from './store';
+import { CaseFile } from './ui/CaseFile';
+import { FloorView, HintNote, InspectView } from './ui/Closeups';
 import { DebugPanel } from './ui/DebugPanel';
 import { Hud } from './ui/Hud';
-import { CaseFile, FloorMenu, HintPanel, InspectView, RadioPanel } from './ui/Panels';
-import { Scene } from './ui/Scene';
+import { RadioView } from './ui/RadioView';
+import { FilmGrain } from './ui/scene/Atmosphere';
+import { Scene } from './ui/scene/Scene';
 import { EndingBeat, EndingScreen, IntroScreen, TitleScreen } from './ui/Screens';
 
-export function App() {
-  const game = useStore((s) => s.game);
-  const panel = useStore((s) => s.ui.panel);
-  const setUi = useStore((s) => s.setUi);
-  const signal = radioSignal(game);
-
-  // Presentation reacts to reducer output; it never decides story.
-  useEffect(() => audio.setRadio(signal), [signal]);
-
-  const fxId = game.fx?.id;
-  const fxKind = game.fx?.kind;
-  useEffect(() => {
-    if (!fxKind) return;
-    audio.fx(fxKind);
-    if (fxKind === 'contact') setUi({ panel: 'radio', subtitle: { lines: THEO_CONTACT, start: Date.now() } });
-    if (fxKind === 'precall') setUi({ panel: 'radio', subtitle: { lines: THEO_PRECALL, start: Date.now() } });
-  }, [fxId, fxKind, setUi]);
-
-  if (game.phase === 'title') return <TitleScreen />;
-  if (game.phase === 'intro') return <IntroScreen />;
-  if (game.phase === 'ending') return <EndingScreen />;
-
+/** Chromatic split used by the brief glitch when something from the other side reaches through. */
+function GlitchFilter() {
   return (
-    <div className="game">
-      <div className="stage">
-        <Scene />
-        <Hud />
-        <EndingBeat />
+    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden>
+      <filter id="chroma" colorInterpolationFilters="sRGB">
+        <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r" />
+        <feOffset in="r" dx="-6" dy="0" result="r2" />
+        <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="gb" />
+        <feOffset in="gb" dx="4" dy="0" result="gb2" />
+        <feBlend in="r2" in2="gb2" mode="screen" />
+      </filter>
+    </svg>
+  );
+}
+
+export function App() {
+  const phase = useStore((s) => s.game.phase);
+  const debug = useStore((s) => s.game.debug);
+  const panel = useStore((s) => s.ui.panel);
+  const glitch = useStore((s) => s.ui.glitch);
+  const v = usePresentation();
+
+  if (phase !== 'play') {
+    return (
+      <div className="game">
+        {phase === 'title' && <TitleScreen />}
+        {phase === 'intro' && <IntroScreen />}
+        {phase === 'ending' && <EndingScreen />}
+        <FilmGrain />
       </div>
-      {panel === 'radio' && <RadioPanel />}
-      {panel === 'casefile' && <CaseFile />}
+    );
+  }
+
+  const classes = ['game', `world-${v.world}`, glitch ? 'glitch' : '', v.dread >= 0.5 ? 'unstable' : ''];
+  return (
+    <div className={classes.join(' ')} style={{ '--dread': v.dread } as CSSProperties}>
+      <GlitchFilter />
+      <Scene v={v} />
+      <Hud v={v} />
+      <EndingBeat />
+      {panel === 'radio' && <RadioView v={v} />}
+      {panel === 'casefile' && <CaseFile v={v} />}
       {panel === 'inspect' && <InspectView />}
-      {panel === 'floor' && <FloorMenu />}
-      {panel === 'hint' && <HintPanel />}
-      {game.debug && <DebugPanel />}
+      {panel === 'floor' && <FloorView />}
+      {panel === 'hint' && <HintNote />}
+      <FilmGrain />
+      {debug && <DebugPanel />}
     </div>
   );
 }

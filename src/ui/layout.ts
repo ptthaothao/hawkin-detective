@@ -37,10 +37,3 @@ export const OTHER_HOTSPOTS: HotspotDef[] = [
   { id: 'os-desk', rect: { x: 54, y: 34, w: 30, h: 22 } },
   { id: 'os-door', rect: { x: 89, y: 18, w: 9, h: 62 } },
 ];
-
-/** Where the creature stands: middle of the room → desk (branch A) or → door (branch B). */
-export const CREATURE_POS = {
-  desk: { x: 66, y: 40 },
-  middle: { x: 44, y: 44 },
-  door: { x: 90, y: 40 },
-};

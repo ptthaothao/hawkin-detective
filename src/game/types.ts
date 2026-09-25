@@ -42,6 +42,8 @@ export type HintStage =
   | 'leap1'
   | 'hour'
   | 'minute'
+  /** Both clocks found; still has to put hour and minutes together. */
+  | 'combine'
   | 'dedA'
   | 'dedC'
   | 'dedD'
@@ -49,6 +51,8 @@ export type HintStage =
 
 /** Presentation cue emitted by the reducer; the UI plays it and never feeds it back as logic. */
 export type FxKind =
+  | 'arrive'
+  | 'motherVoice'
   | 'flicker'
   | 'lightOff'
   | 'lightOn'
@@ -95,6 +99,14 @@ export interface GameState {
   /** Everything heard on the radio, in order: echoes and Theo's lines. */
   radioLog: string[];
   contactMade: boolean;
+  /** Took in the radio after hearing the voice on it: the diary becomes the next lead. */
+  dialNoticed: boolean;
+  /** Light-off count at first contact; any later light-off means the player went looking for Theo. */
+  lightOffsAtContact: number | null;
+  /** Looked at the radio desk on the other side after contact (fresh claws, the thing standing there). */
+  sawAftermath: boolean;
+  /** Looked at the counted marks again after Theo said "em vẫn ở chỗ em đếm". */
+  wallAfterContact: boolean;
 
   slots: Record<SlotId, ChipId | null>;
   wrongSubmits: number;
@@ -108,7 +120,6 @@ export interface GameState {
   theoLightSeen: boolean;
   endingReady: boolean;
 
-  objective: string;
   message: { id: number; text: string } | null;
   fx: { id: number; kind: FxKind } | null;
   seq: number;
@@ -124,9 +135,12 @@ export type Action =
   | { type: 'START_PLAY'; now: number }
   | { type: 'INSPECT'; id: HotspotId; now: number }
   | { type: 'TOGGLE_LIGHT'; now: number }
+  /** The player has taken in the radio after hearing the voice (the dial reads 2.58). */
+  | { type: 'NOTICE_DIAL'; now: number }
   | { type: 'FLICKER_DONE'; now: number }
   | { type: 'RADIO_POWER'; on: boolean; now: number }
-  | { type: 'RADIO_WHEEL'; index: 0 | 1 | 2; delta: 1 | -1; now: number }
+  /** One wheel turned by `delta` notches. A drag or a spin lands as one turn: only where it stops is heard. */
+  | { type: 'RADIO_WHEEL'; index: 0 | 1 | 2; delta: number; now: number }
   | { type: 'PLACE_FLASHLIGHT'; now: number }
   | { type: 'FILL_SLOT'; slot: SlotId; chip: ChipId | null; now: number }
   | { type: 'SUBMIT_DEDUCTION'; now: number }

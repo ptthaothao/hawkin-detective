@@ -6,15 +6,18 @@ import {
   FEEDBACK_WRONG,
   HOTSPOT_TEXT,
   INITIAL_WHEELS,
+  CLUE_FOUND,
+  CLUE_FOUND_PAIRED,
+  type DialogueLine,
   LIVE_FREQ,
-  OBJECTIVE_ALIVE,
-  OBJECTIVE_START,
+  NARRATION,
   THEO_CONTACT,
   THEO_PRECALL,
 } from './content';
 import {
   chipAvailable,
   clueText,
+  evidenceReady,
   freq,
   hasClue,
   hintStage,
@@ -51,10 +54,15 @@ export function initialState(): GameState {
     clues: [],
     tallyLog: [],
     diaryFound: false,
-    radio: { on: false, wheels: [...INITIAL_WHEELS], volumeMax: false, broken: false, locked: false },
+    // Doc §R: the radio is on when the player walks in; it is the first thing to check.
+    radio: { on: true, wheels: [...INITIAL_WHEELS], volumeMax: false, broken: false, locked: false },
     heardFreqs: [],
     radioLog: [],
     contactMade: false,
+    sawAftermath: false,
+    dialNoticed: false,
+    wallAfterContact: false,
+    lightOffsAtContact: null,
     slots: { A: null, C: null, D: null },
     wrongSubmits: 0,
     deductionFeedback: null,
@@ -65,7 +73,6 @@ export function initialState(): GameState {
     flashlightGiven: false,
     theoLightSeen: false,
     endingReady: false,
-    objective: OBJECTIVE_START,
     message: null,
     fx: null,
     seq: 0,
@@ -94,6 +101,10 @@ function markInspected(s: GameState, id: HotspotId): GameState {
   return s.inspected.includes(id) ? s : { ...s, inspected: [...s.inspected, id] };
 }
 
+/** What the radio log keeps of a scene: only what came through the speaker. */
+const spoken = (lines: DialogueLine[]) =>
+  lines.filter((l) => l.who === 'theo').map((l) => `[${LIVE_FREQ}] ${l.text}`);
+
 function logRadio(s: GameState, lines: string[]): GameState {
   return { ...s, radioLog: [...s.radioLog, ...lines] };
 }
@@ -105,6 +116,8 @@ function enterOtherSide(s: GameState, now: number): GameState {
   if (hasClue(next, 'C5')) next = { ...next, tallyLog: [...next.tallyLog, tally(next)] };
   if (next.choice === 'A' && !next.rescued) next = { ...next, lureStartedAt: now };
   if (next.flashlightGiven && !next.theoLightSeen) return fx(next, 'dark');
+  if (next.lightOffCount === 1) next = say(next, NARRATION.firstOtherSide);
+  else if (next.contactMade && !next.sawAftermath && !next.choice) next = say(next, NARRATION.somethingAtDesk);
   return fx(next, 'lightOff');
 }
 
@@ -131,8 +144,8 @@ function afterRadioChange(s: GameState): GameState {
   if (f === LIVE_FREQ && !s.contactMade) {
     // Doc §F, §H: first live contact. Luật 7: only 3.17 draws it to the desk.
     const next = logRadio(
-      { ...s, contactMade: true, objective: OBJECTIVE_ALIVE, heardFreqs: [...s.heardFreqs, f] },
-      THEO_CONTACT.map((l) => `[${LIVE_FREQ}] ${l}`),
+      { ...s, contactMade: true, lightOffsAtContact: s.lightOffCount, heardFreqs: [...s.heardFreqs, f] },
+      spoken(THEO_CONTACT),
     );
     return fx(next, 'contact');
   }
@@ -146,19 +159,38 @@ const WHEEL_RANGE: [number, number][] = [
   [0, 9],
 ];
 
-function turnWheel(s: GameState, index: 0 | 1 | 2, delta: 1 | -1): GameState {
+function turnWheel(s: GameState, index: 0 | 1 | 2, delta: number): GameState {
+  if (!delta) return s;
   const [min, max] = WHEEL_RANGE[index];
   const span = max - min + 1;
   const wheels = [...s.radio.wheels] as GameState['radio']['wheels'];
-  wheels[index] = ((wheels[index] - min + delta + span) % span) + min;
+  wheels[index] = ((((wheels[index] - min + delta) % span) + span) % span) + min;
   return afterRadioChange({ ...s, radio: { ...s.radio, wheels } });
 }
 
 // --- hotspots ---------------------------------------------------------------
 
+/** The two stopped clocks: whichever is found second is recognised as the other half. */
+const PAIR: Partial<Record<ClueId, ClueId>> = { C2: 'C4', C4: 'C2' };
+
 function inspectClue(s: GameState, id: ClueId): GameState {
   const next = addClue(s, id);
-  return say(next, `${CLUES[id].title}: ${clueText(next, id)}`);
+  if (hasClue(s, id)) return say(next, `${CLUES[id].title}: ${clueText(next, id)}`);
+  const pair = PAIR[id];
+  return say(next, (pair && hasClue(s, pair) && CLUE_FOUND_PAIRED[id]) || CLUE_FOUND[id]);
+}
+
+const heardMother = (s: GameState) => s.heardFreqs.includes('2.58');
+
+/** Doc §R: the first time the player listens, the radio plays a voice that cannot be there. */
+function listen(s: GameState): GameState {
+  const next = afterRadioChange(s);
+  return !heardMother(s) && heardMother(next) ? fx(next, 'motherVoice') : next;
+}
+
+/** Any other lead followed after the voice counts as having taken in the radio. */
+function moveOn(s: GameState): GameState {
+  return heardMother(s) && !s.dialNoticed ? { ...s, dialNoticed: true } : s;
 }
 
 function inspectNormal(s: GameState, id: HotspotId): GameState {
@@ -179,8 +211,9 @@ function inspectNormal(s: GameState, id: HotspotId): GameState {
       return say(s, HOTSPOT_TEXT.deskEdge);
     case 'door-normal':
       return say(s, HOTSPOT_TEXT.doorNormal);
+    case 'radio':
+      return listen(s);
     default:
-      // 'radio' only opens the radio panel.
       return s;
   }
 }
@@ -188,13 +221,14 @@ function inspectNormal(s: GameState, id: HotspotId): GameState {
 function inspectOther(s: GameState, id: HotspotId, now: number): GameState {
   switch (id) {
     case 'os-wall':
-      return inspectWall(s, now);
+      return inspectWall(s.contactMade ? { ...s, wallAfterContact: true } : s, now);
     case 'os-clock':
       return inspectClue(s, 'C4');
     case 'os-floor':
       return say(s, HOTSPOT_TEXT.osFloor);
     case 'os-desk':
-      return inspectClue(s, 'C6');
+      if (s.contactMade && hasClue(s, 'C6')) return say({ ...s, sawAftermath: true }, HOTSPOT_TEXT.osDeskAfter);
+      return inspectClue(s.contactMade ? { ...s, sawAftermath: true } : s, 'C6');
     case 'os-door':
       return fx(say(s, HOTSPOT_TEXT.osDoor), 'movement');
     default:
@@ -206,9 +240,9 @@ function inspect(s: GameState, id: HotspotId, now: number): GameState {
   const isNormal = NORMAL_IDS.includes(id);
   if ((s.world === 'normal') !== isNormal) return s;
   const seen = markInspected(s, id);
-  if (!isNormal) return inspectOther(seen, id, now);
+  if (!isNormal) return inspectOther(moveOn(seen), id, now);
 
-  const next = inspectNormal(seen, id);
+  const next = inspectNormal(id === 'radio' ? seen : moveOn(seen), id);
   const normalSeen = next.inspected.filter((h) => NORMAL_IDS.includes(h)).length;
   if (next.flicker === 'none' && normalSeen >= FLICKER_AFTER_INSPECTIONS) {
     return fx({ ...next, flicker: 'pending' }, 'flicker');
@@ -244,9 +278,9 @@ function submitDeduction(s: GameState): GameState {
     const radio = { ...s.radio, on: true, wheels: [3, 1, 7] as GameState['radio']['wheels'] };
     const next = logRadio(
       { ...s, deductionSolved: true, deductionFeedback: null, radio },
-      THEO_PRECALL.map((l) => `[${LIVE_FREQ}] ${l}`),
+      spoken(THEO_PRECALL),
     );
-    return fx(next, 'precall');
+    return fx(say(next, NARRATION.truth), 'precall');
   }
   const wrongSubmits = s.wrongSubmits + 1;
   const deductionFeedback = wrongSubmits >= 2 && wrong === 1 ? FEEDBACK_NEAR : FEEDBACK_WRONG;
@@ -280,7 +314,7 @@ function step(s: GameState, a: Action): GameState {
       return s.phase === 'title' ? { ...s, phase: 'intro', debug: !!a.debug } : s;
     case 'START_PLAY':
       return s.phase === 'intro'
-        ? { ...s, phase: 'play', startedAt: a.now, lastProgressAt: a.now }
+        ? fx(say({ ...s, phase: 'play', startedAt: a.now, lastProgressAt: a.now }, NARRATION.arrive), 'arrive')
         : s;
     case 'END':
       return s.endingReady && s.phase === 'play' ? { ...s, phase: 'ending', endedAt: a.now } : s;
@@ -297,14 +331,17 @@ function step(s: GameState, a: Action): GameState {
     case 'FLICKER_DONE': {
       if (s.flicker !== 'pending') return s;
       const next: GameState = { ...s, flicker: 'done', queuedLightOff: false };
-      return s.queuedLightOff ? enterOtherSide(next, a.now) : next;
+      return s.queuedLightOff ? enterOtherSide(next, a.now) : say(next, NARRATION.glimpse);
     }
+    case 'NOTICE_DIAL':
+      if (!heardMother(s) || s.dialNoticed) return s;
+      return say({ ...s, dialNoticed: true }, NARRATION.noticeDial);
     case 'RADIO_POWER':
       if (s.radio.locked || s.world !== 'normal') return s;
       return afterRadioChange({ ...s, radio: { ...s.radio, on: a.on } });
     case 'RADIO_WHEEL':
       if (s.radio.locked || s.world !== 'normal') return s;
-      return turnWheel(s, a.index, a.delta);
+      return turnWheel(moveOn(s), a.index, a.delta);
     case 'PLACE_FLASHLIGHT':
       return placeFlashlight(s);
     case 'FILL_SLOT':
@@ -335,6 +372,9 @@ function progressKey(s: GameState): string {
     s.lightOffCount > 0,
     s.diaryFound,
     s.contactMade,
+    s.sawAftermath,
+    s.dialNoticed,
+    s.wallAfterContact,
     s.deductionSolved,
     s.choice,
     s.flashlightGiven,
@@ -344,6 +384,10 @@ function progressKey(s: GameState): string {
 export function reducer(s: GameState, a: Action): GameState {
   let next = step(s, a);
   if (next === s) return s;
+  if (!evidenceReady(s) && evidenceReady(next)) {
+    const said = next.message && next.message.id !== s.message?.id ? `${next.message.text}\n` : '';
+    next = say(next, said + NARRATION.evidenceReady);
+  }
   if (next.phase === 'play' && progressKey(next) !== progressKey(s)) {
     next = { ...next, lastProgressAt: a.now };
   }

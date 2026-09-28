@@ -1,0 +1,231 @@
+/* A line of a scene, as subtitles in a film: sits in the dark under the picture, no panel.
+   Speaker known → portrait + name, upright type. Otherwise narration: centred, italic, quieter.
+   Three columns keep the text in one place whether a portrait is showing or not. */
+
+.dialogue {
+  --portrait: clamp(58px, 7.5vw, 84px);
+  --gap: clamp(14px, 2.2vw, 24px);
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--portrait) minmax(0, 34rem) var(--portrait);
+  column-gap: var(--gap);
+  width: 100%;
+  max-width: calc(34rem + 2 * (var(--portrait) + var(--gap)));
+  align-items: center;
+  min-height: calc(var(--portrait) + 0.6rem);
+}
+/* Not a box: the scene just darkens behind the words. */
+.dialogue::before {
+  content: '';
+  position: absolute;
+  inset: -1.8rem -3.5rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse closest-side, rgba(0, 0, 0, 0.7), transparent);
+}
+
+/* --- portrait -------------------------------------------------------------- */
+
+.dialogue-portrait {
+  position: relative;
+  width: var(--portrait);
+  aspect-ratio: 1;
+}
+.portrait {
+  --zoom: 1.9;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #0c0a08;
+  box-shadow:
+    0 0 0 1px rgba(239, 228, 203, 0.12),
+    0 8px 20px rgba(0, 0, 0, 0.75);
+  /* Old print: a little faded until they speak. */
+  filter: saturate(0.7) sepia(0.15) brightness(0.72);
+  transition:
+    filter 0.7s ease,
+    box-shadow 0.7s ease;
+}
+/* Crop round the face: the portrait is enlarged and shifted so the face sits in the middle. */
+.portrait img {
+  position: absolute;
+  width: calc(var(--zoom) * 100%);
+  max-width: none;
+  left: calc(50% - var(--fx) * var(--zoom));
+  top: calc(50% - var(--fy) * var(--zoom));
+  display: block;
+}
+.portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 52%, rgba(0, 0, 0, 0.55));
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+/* A voice from a device: faint scan lines over the print, and it can't quite hold. */
+.portrait.transmitted::after {
+  background:
+    repeating-linear-gradient(rgba(0, 0, 0, 0.2) 0 1px, transparent 1px 3px),
+    radial-gradient(circle, transparent 52%, rgba(0, 0, 0, 0.6));
+}
+.dialogue.speaking .portrait.current.transmitted {
+  animation:
+    portrait-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both,
+    unsteady 5.5s 0.7s infinite;
+}
+/* Talking now: full colour and a thin warm rim, the lamp catching the print. */
+.dialogue.speaking .portrait.current {
+  filter: saturate(0.92) sepia(0.06) brightness(1);
+  box-shadow:
+    0 0 0 1px rgba(255, 207, 138, 0.42),
+    0 0 20px rgba(255, 190, 110, 0.14),
+    0 8px 20px rgba(0, 0, 0, 0.75);
+}
+.portrait.current {
+  animation: portrait-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.portrait.leaving {
+  animation: portrait-out 0.45s ease forwards;
+}
+@keyframes portrait-in {
+  from {
+    opacity: 0;
+    translate: -8px 0;
+  }
+}
+@keyframes portrait-out {
+  to {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+/* --- words ------------------------------------------------------------------- */
+
+.dialogue-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.dialogue.unstable .dialogue-body {
+  animation: tear 2.8s steps(1) infinite;
+}
+/* Always takes its line, even empty, so the text never jumps when a name comes or goes. */
+.dialogue-name {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  min-height: 1.1em;
+  font-family: var(--f-type);
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--tungsten);
+  text-shadow: 0 1px 2px #000;
+  animation: name-in 0.6s ease both;
+}
+@keyframes name-in {
+  from {
+    opacity: 0;
+    letter-spacing: 0.42em;
+  }
+}
+/* On air: the one red light, the same as the RX lamp on the set. */
+.on-air {
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 5px rgba(179, 38, 26, 0.7);
+}
+.dialogue:not(.speaking) .on-air {
+  background: var(--red-dim);
+  box-shadow: none;
+}
+.dialogue-text {
+  margin: 0;
+  min-height: 1.5em;
+  white-space: pre-line;
+  text-wrap: pretty;
+  font-size: clamp(1.15rem, 2vw, 1.42rem);
+  line-height: 1.5;
+  color: var(--ink);
+  text-shadow: 0 1px 3px #000;
+  animation: fade-in 0.35s ease both;
+}
+/* The words left hanging after the voice stops. */
+.dialogue.attributed:not(.speaking) .dialogue-text {
+  color: var(--ink-dim);
+  transition: color 1.2s ease;
+}
+/* You, speaking back into the dark: your own hand. */
+.dialogue.kind-you .dialogue-text {
+  font-family: var(--f-hand);
+  font-size: clamp(1.25rem, 2.2vw, 1.55rem);
+  line-height: 1.35;
+  color: var(--tungsten);
+}
+
+/* --- narration: no face, no name ---------------------------------------------- */
+
+.dialogue.narrated .dialogue-body {
+  text-align: center;
+}
+.dialogue.narrated .dialogue-text {
+  font-style: italic;
+  color: var(--ink-dim);
+  animation-duration: 1.2s;
+}
+/* A voice with no owner (the one on 2.58) stays nameless and uneasy. */
+.dialogue.narrated.kind-voice .dialogue-text {
+  color: var(--ink);
+  font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+}
+.dialogue.kind-aside .dialogue-text {
+  font-size: 1.05rem;
+}
+.dialogue.kind-sound .dialogue-text {
+  font-family: var(--f-type);
+  font-style: normal;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+}
+.dialogue.kind-thought .dialogue-text {
+  font-family: var(--f-hand);
+  font-style: normal;
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+  color: var(--tungsten);
+  animation-duration: 1.4s;
+}
+
+/* Lines move on by themselves: a hairline runs down while one is playing. */
+.dialogue-clock {
+  display: block;
+  width: min(100%, 10rem);
+  height: 1px;
+  margin-top: 0.4rem;
+  background: linear-gradient(90deg, rgba(239, 228, 203, 0.4), rgba(239, 228, 203, 0.06));
+  transform-origin: left;
+  animation: line-clock linear forwards;
+}
+.dialogue.narrated .dialogue-clock {
+  margin-inline: auto;
+  transform-origin: center;
+}
+@keyframes line-clock {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (max-width: 560px) {
+  .dialogue {
+    --portrait: 52px;
+    --gap: 12px;
+    grid-template-columns: var(--portrait) minmax(0, 1fr) 0;
+  }
+}

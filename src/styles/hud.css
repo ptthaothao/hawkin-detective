@@ -195,8 +195,9 @@
   left: 50%;
   bottom: max(26px, 7vh);
   translate: -50% 0;
-  width: min(92%, 46rem);
+  width: min(92%, 42rem);
   text-align: center;
+  animation: fade-in 1.2s ease both;
 }
 .narration::before {
   content: '';
@@ -205,12 +206,16 @@
   z-index: -1;
   background: radial-gradient(ellipse closest-side, rgba(0, 0, 0, 0.72), transparent);
 }
+/* Narration: the room speaking, not a person. Italic, a shade quieter than anyone's voice. */
 .narration p {
   margin: 0;
   white-space: pre-line;
-  font-size: clamp(1.02rem, 1.65vw, 1.3rem);
-  line-height: 1.45;
-  color: var(--ink);
+  text-wrap: pretty;
+  font-style: italic;
+  font-size: clamp(1.05rem, 1.65vw, 1.3rem);
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  color: #ddd1b6;
   text-shadow: 0 1px 2px #000;
 }
 .world-other .narration p,

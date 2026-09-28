@@ -7,32 +7,12 @@ import type { ClueId } from '../game/types';
 import type { VisualState } from '../presentation/visual';
 import { useStore, voiceAt } from '../store';
 import { Polaroid } from './paper/Polaroid';
-import { prefersReducedMotion, useNow } from './useNow';
+import { useNow } from './useNow';
+import { useTypewriter } from './useTypewriter';
 
 const MESSAGE_MS = 7_000;
 const OBJECTIVE_MS = 6_500;
 const TOAST_MS = 3_400;
-const CHAR_MS = 22;
-
-/** Reveals `text` a few characters at a time, like a line being typed out. */
-function useTypewriter(text: string, key: number | null): string {
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    if (prefersReducedMotion()) {
-      setN(text.length);
-      return;
-    }
-    setN(0);
-    const id = window.setInterval(() => {
-      setN((k) => {
-        if (k >= text.length) window.clearInterval(id);
-        return Math.min(text.length, k + 2);
-      });
-    }, CHAR_MS * 2);
-    return () => window.clearInterval(id);
-  }, [text, key]);
-  return text.slice(0, n);
-}
 
 /**
  * Shows `key` for `ms` once it can be seen: while `held` (a cinematic moment is playing) the clock

@@ -16,6 +16,7 @@ import './styles/base.css';
 import './styles/scene.css';
 import './styles/hud.css';
 import './styles/radio.css';
+import './styles/dialogue.css';
 import './styles/paper.css';
 
 // Dev-only handle for inspecting state from the browser console / automated playtests.

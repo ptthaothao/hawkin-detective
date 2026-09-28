@@ -425,12 +425,18 @@
 /* Flashlight: gameplay radius is --lr; outside it the room is (almost) black. */
 .flashlight {
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: 0;
+  width: 200%;
+  height: 200%;
   z-index: 2;
   pointer-events: none;
+  will-change: transform;
+  transform: translate(-25%, -25%);
+  /* Centered; useFlashlight moves the whole layer so its center follows the beam. */
   background:
     radial-gradient(
-      circle at var(--px) var(--py),
+      circle at 50% 50%,
       rgba(255, 244, 222, 0.1) 0,
       rgba(255, 244, 222, 0.03) calc(var(--lr) * var(--beam) * 0.45),
       rgba(0, 0, 0, 0) calc(var(--lr) * var(--beam) * 0.55),

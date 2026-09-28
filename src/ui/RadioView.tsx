@@ -4,6 +4,7 @@ import { freq, radioSignal } from '../game/selectors';
 import type { VisualState } from '../presentation/visual';
 import { audio } from '../audio/audio';
 import { lineMs, useStore, voiceAt } from '../store';
+import { Dialogue, type LineKind } from './Dialogue';
 import { Overlay } from './Overlay';
 import { prefersReducedMotion, useNow } from './useNow';
 
@@ -319,11 +320,14 @@ export function RadioView({ v }: { v: VisualState }) {
   }, [game.choice, setUi]);
 
   const KIND = { theo: 'voice', radio: 'voice', you: 'you', stage: 'aside' } as const;
-  let readout: { kind: 'voice' | 'sound' | 'thought' | 'you' | 'aside'; text: string } | null = null;
+  let readout: { kind: LineKind; text: string; who?: string } | null = null;
   if (voice?.phase === 'surge') readout = { kind: 'sound', text: 'rè… rè…' };
   else if (voice?.phase === 'hush') readout = null;
-  else if (line) readout = { kind: KIND[line.who], text: line.text };
-  else if (precall && subtitle) readout = choosing ? { kind: 'voice', text: subtitle.lines[subtitle.lines.length - 1].text } : null;
+  else if (line) readout = { kind: KIND[line.who], text: line.text, who: line.who };
+  else if (precall && subtitle) {
+    const last = subtitle.lines[subtitle.lines.length - 1];
+    readout = choosing ? { kind: 'voice', text: last.text, who: last.who } : null;
+  }
   else if (subtitle?.after) readout = { kind: 'thought', text: subtitle.after };
   else if (signal === 'static' || signal === 'precall') readout = { kind: 'sound', text: 'rè' };
   else if (signal === 'lure') readout = { kind: 'sound', text: 'rè, hết cỡ' };
@@ -423,9 +427,17 @@ export function RadioView({ v }: { v: VisualState }) {
         </div>
         <div className="radio-cheek" aria-hidden />
       </div>
-      <p className={`radio-caption ${readout?.kind ?? ''} ${v.dread > 0.4 ? 'unstable' : ''}`} aria-live="polite">
-        {readout?.kind === 'sound' ? `[${readout.text}]` : readout?.kind === 'you' ? `— ${readout.text}` : readout?.text}
-      </p>
+      <Dialogue
+        who={readout?.who}
+        kind={readout?.kind ?? null}
+        text={readout?.text ?? ''}
+        lineKey={`${lineIndex}:${readout?.text ?? ''}`}
+        speaking={!!line}
+        transmitted={readout?.who !== 'you'}
+        durationMs={line ? lineMs(line) : undefined}
+        unstable={v.dread > 0.4}
+      />
+
     </Overlay>
   );
 }

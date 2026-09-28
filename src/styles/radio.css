@@ -374,27 +374,6 @@
   }
 }
 
-.radio-caption {
-  min-height: 3.2em;
-  max-width: 38rem;
-  margin: 0;
-  text-align: center;
-  color: var(--ink);
-  text-shadow: 0 1px 3px #000;
-}
-.radio-caption.voice {
-  font-size: clamp(1.2rem, 2.2vw, 1.5rem);
-  font-style: italic;
-}
-.radio-caption.sound {
-  font-family: var(--f-type);
-  font-size: 0.9rem;
-  letter-spacing: 0.08em;
-  color: var(--ink-dim);
-}
-.radio-caption.unstable {
-  animation: tear 2.8s steps(1) infinite;
-}
 @keyframes tear {
   0%, 86%, 100% { transform: none; opacity: 1; }
   88% { transform: translateX(-3px) skewX(-6deg); opacity: 0.6; }
@@ -415,24 +394,6 @@
   to {
     transform: scale(1.07);
   }
-}
-.radio-caption.thought {
-  font-family: var(--f-hand);
-  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
-  color: var(--tungsten);
-  animation: fade-in 1.4s ease both;
-}
-
-/* You, speaking back into the dark. */
-.radio-caption.you {
-  font-family: var(--f-hand);
-  font-size: clamp(1.25rem, 2.2vw, 1.55rem);
-  color: var(--tungsten);
-}
-.radio-caption.aside {
-  font-style: italic;
-  font-size: 1.05rem;
-  color: var(--ink-dim);
 }
 /* "Bạn nhìn quanh": the close-up falls away and the empty room comes back into focus. */
 .radio-overlay.looking-around {

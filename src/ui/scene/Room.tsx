@@ -8,6 +8,7 @@ import { tally } from '../../game/selectors';
 import type { GameState, World } from '../../game/types';
 import type { VisualState } from '../../presentation/visual';
 import { NormalClock, OtherClock, TallyStrokes } from '../art/Props';
+import { useQuality } from '../quality';
 
 interface Palette {
   ceiling: string;
@@ -166,6 +167,13 @@ function Defs({ id, p, other }: { id: string; p: Palette; other: boolean }) {
         <stop offset="0.3" stopColor="#dcc098" />
         <stop offset="0.62" stopColor="#6e5034" />
         <stop offset="1" stopColor="#140c06" />
+      </radialGradient>
+      {/* The same falloff as plain darkness over the room (no blend pass), for low quality. */}
+      <radialGradient id={`${id}dimLow`} gradientUnits="userSpaceOnUse" cx="800" cy="240" r="1120">
+        <stop offset="0" stopColor="#140c06" stopOpacity="0.06" />
+        <stop offset="0.3" stopColor="#140c06" stopOpacity="0.3" />
+        <stop offset="0.62" stopColor="#140c06" stopOpacity="0.72" />
+        <stop offset="1" stopColor="#140c06" stopOpacity="0.95" />
       </radialGradient>
       <radialGradient id={`${id}pool`} cx="0.5" cy="0.5" r="0.5">
         <stop offset="0" stopColor="#ffd796" stopOpacity="0.55" />
@@ -518,9 +526,9 @@ function DeskThings({ p }: { p: Palette }) {
   );
 }
 
-function LampLight({ id }: { id: string }) {
+function LampLight({ id, low }: { id: string; low: boolean }) {
   return (
-    <g className="lamp-pool" style={{ mixBlendMode: 'screen' }}>
+    <g className="lamp-pool" style={low ? undefined : { mixBlendMode: 'screen' }}>
       <path d="M1258 364 L1334 364 L1430 476 L1160 476 Z" fill={`url(#${id}cone)`} />
       <ellipse cx="1296" cy="470" rx="150" ry="22" fill={`url(#${id}pool)`} />
     </g>
@@ -775,6 +783,7 @@ export function Room({
   const other = world === 'other';
   const p = other ? OTHER : NORMAL;
   const lit = !other;
+  const low = useQuality() === 'low';
 
   return (
     <svg
@@ -813,13 +822,20 @@ export function Room({
       {other && <Claws fresh={s.contactMade} color="#050605" />}
       {other && <Mic p={p} fallen />}
       {other && v.creature && <Creature c={v.creature} />}
-      {/* lighting */}
+      {/* lighting; on low quality, a plain darkening instead of a multiply pass */}
       {lit && (
-        <rect x="-1400" y="-1600" width="4400" height="4200" fill={`url(#${id}dim)`} style={{ mixBlendMode: 'multiply' }} />
+        <rect
+          x="-1400"
+          y="-1600"
+          width="4400"
+          height="4200"
+          fill={`url(#${id}${low ? 'dimLow' : 'dim'})`}
+          style={low ? undefined : { mixBlendMode: 'multiply' }}
+        />
       )}
-      {lit && <LampLight id={id} />}
+      {lit && <LampLight id={id} low={low} />}
       {live && <UnderDoor id={id} other={other} presence={presence} />}
-      {grain && (
+      {grain && !low && (
         <rect x="-1400" y="-1600" width="4400" height="4200" filter={`url(#${id}grain)`} opacity={other ? 0.5 : 0.35} />
       )}
       {children}

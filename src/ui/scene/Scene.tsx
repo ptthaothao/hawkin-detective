@@ -8,6 +8,7 @@ import { useStore } from '../../store';
 import { NORMAL_HOTSPOTS, OTHER_HOTSPOTS, SWITCH_RECT, type HotspotDef, type Rect } from '../layout';
 import { prefersReducedMotion } from '../useNow';
 import { Fog, Particles } from './Atmosphere';
+import { useAutoQuality } from '../quality';
 import { Room } from './Room';
 import { useRandomEvent } from './useRandomEvent';
 
@@ -77,6 +78,9 @@ function useFlashlight(stageRef: React.RefObject<HTMLDivElement | null>, active:
       target.current = { x: el.clientWidth / 2, y: el.clientHeight / 2 };
     }
     shown.current = { ...target.current };
+    // The beam is a fixed gradient twice the stage's size, moved with a transform: repainting a
+    // full-screen gradient every frame is what made the other side stutter on weak machines.
+    const light = el.querySelector<HTMLElement>('.flashlight');
     let raf = 0;
     const tick = (t: number) => {
       const k = reduced ? 1 : 0.22;
@@ -85,8 +89,9 @@ function useFlashlight(stageRef: React.RefObject<HTMLDivElement | null>, active:
       const sway = reduced ? 0 : 1.5 + dreadRef.current * 5;
       const sx = Math.sin(t / 530) * sway + Math.sin(t / 170) * sway * 0.3;
       const sy = Math.cos(t / 610) * sway;
-      el.style.setProperty('--px', `${shown.current.x + sx}px`);
-      el.style.setProperty('--py', `${shown.current.y + sy}px`);
+      const x = shown.current.x + sx - el.clientWidth;
+      const y = shown.current.y + sy - el.clientHeight;
+      if (light) light.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -97,6 +102,7 @@ function useFlashlight(stageRef: React.RefObject<HTMLDivElement | null>, active:
 }
 
 export function Scene({ v }: { v: VisualState }) {
+  useAutoQuality(true);
   const game = useStore((s) => s.game);
   const showHotspots = useStore((s) => s.ui.showHotspots);
   const transition = useStore((s) => s.ui.transition);

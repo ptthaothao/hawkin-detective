@@ -340,3 +340,20 @@ button:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Low quality (src/ui/quality.ts): no blend passes, no film grain. Light layers are
+   translucent and warm, so drawn normally they read almost the same. */
+:root[data-quality='low'] .film-grain {
+  display: none;
+}
+:root[data-quality='low'] :is(.lamp-light, .lightning, .particles, .fog, .door-spill, .radio-flare, .torch-beam) {
+  mix-blend-mode: normal;
+}
+/* Fog holds still, and fades per layer rather than as one group (a group fade is another full pass). */
+:root[data-quality='low'] .fog {
+  opacity: 1;
+}
+:root[data-quality='low'] .fog-layer {
+  opacity: 0.45;
+  animation: none;
+}

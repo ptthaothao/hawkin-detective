@@ -253,7 +253,7 @@ const RUB_ROWS = 6;
 const RUB_ENOUGH = 0.65;
 
 /**
- * Rubbing the wall under the poster with Theo's crayon: drag over the paper and the carved letters
+ * Rubbing the back of the radio with Theo's crayon: drag over the paper and the carved letters
  * come up through it. Optional; nothing depends on it.
  */
 export function RubView() {
@@ -311,7 +311,7 @@ export function RubView() {
   };
 
   return (
-    <Overlay label="Chà bút sáp lên tường" onClose={() => setUi({ panel: null })} className="rub-overlay">
+    <Overlay label="Chà bút sáp lên vỏ radio" onClose={() => setUi({ panel: null })} className="rub-overlay">
       <div className="closeup rub-closeup">
         <div className="rub-wall">
           <canvas
@@ -331,7 +331,7 @@ export function RubView() {
             MARTIN
           </span>
         </div>
-        <p className="rub-hint">{game.rubbed ? 'M-A-R-T-I-N.' : 'Chà bút sáp lên tường.'}</p>
+        <p className="rub-hint">{game.rubbed ? 'M-A-R-T-I-N.' : 'Chà bút sáp lên vỏ radio.'}</p>
       </div>
     </Overlay>
   );

@@ -493,3 +493,21 @@
     scale: 0.985;
   }
 }
+
+/* Optional find: the back of the radio has a carved name; offered once Theo's crayon is in hand. */
+.radio-flip {
+  display: block;
+  margin: 0.9rem auto 0;
+  max-width: 34rem;
+  padding: 0.5rem 0.9rem;
+  background: rgba(20, 14, 8, 0.7);
+  border: 1px solid rgba(233, 226, 207, 0.25);
+  border-radius: 3px;
+  color: #e9e2cf;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+.radio-flip:hover {
+  border-color: rgba(233, 226, 207, 0.6);
+}

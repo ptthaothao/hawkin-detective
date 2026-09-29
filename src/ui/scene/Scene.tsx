@@ -302,7 +302,6 @@ export function Scene({ v }: { v: VisualState }) {
     dispatch({ type: 'INSPECT', id });
     if (id === 'radio') setUi({ panel: 'radio' });
     else if (id === 'watch') setUi({ panel: 'inspect', inspect: 'watch' });
-    else if (id === 'poster' && game.crayonTaken && !game.rubbed) setUi({ panel: 'rub' });
     else if (id === 'os-clock') setUi({ panel: 'inspect', inspect: 'os-clock' });
     else if (id === 'rug') {
       if (game.diaryFound) setUi({ panel: 'floor' });

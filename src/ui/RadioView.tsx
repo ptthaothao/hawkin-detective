@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { ECHOES } from '../game/content';
+import { ECHOES, HOTSPOT_TEXT } from '../game/content';
 import { freq, radioSignal } from '../game/selectors';
 import type { VisualState } from '../presentation/visual';
 import { audio } from '../audio/audio';
@@ -430,6 +430,11 @@ export function RadioView({ v }: { v: VisualState }) {
         </div>
         <div className="radio-cheek" aria-hidden />
       </div>
+      {game.crayonTaken && !game.rubbed && !playing && !precall && !finale && game.world === 'normal' && (
+        <button className="radio-flip" onClick={() => setUi({ panel: 'rub' })}>
+          {HOTSPOT_TEXT.radioFaint} Chà thử?
+        </button>
+      )}
       <Dialogue
         who={readout?.who}
         kind={readout?.kind ?? null}

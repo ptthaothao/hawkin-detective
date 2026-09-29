@@ -255,13 +255,13 @@ describe('những thứ tìm thêm (không cái nào chặn tiến trình)', () 
     expect(s.flicker).toBe('none');
   });
 
-  it('chà tường chỉ được khi đã có bút sáp, và chỉ một lần', () => {
+  it('chà vỏ radio chỉ được khi đã có bút sáp, và chỉ một lần', () => {
     expect(run([...OPENING, { type: 'RUB_DONE' }]).state.rubbed).toBe(false);
-    const s = run([...OPENING, { type: 'INSPECT', id: 'crayon' }, { type: 'INSPECT', id: 'poster' }]).state;
-    expect(s.message?.text).toMatch(/nét lõm mờ/);
-    const rubbed = run([{ type: 'RUB_DONE' }, { type: 'INSPECT', id: 'poster' }], 5e5, s).state;
+    const s = run([...OPENING, { type: 'INSPECT', id: 'crayon' }]).state;
+    const rubbed = run([{ type: 'RUB_DONE' }], 5e5, s).state;
     expect(rubbed.rubbed).toBe(true);
-    expect(rubbed.message?.text).toMatch(/^Phim Theo thích nhất/);
+    expect(rubbed.message?.text).toMatch(/trên vỏ radio: M-A-R-T-I-N/);
+    expect(run([{ type: 'RUB_DONE' }], 6e5, rubbed).state).toBe(rubbed);
   });
 
   it('nín thở đủ lâu thì thấy vật loé trên tay nó, thở ra sớm thì nó khựng lại', () => {

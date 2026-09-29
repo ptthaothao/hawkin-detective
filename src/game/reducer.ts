@@ -206,7 +206,7 @@ function inspectNormal(s: GameState, id: HotspotId): GameState {
     case 'wall-clock':
       return say(s, HOTSPOT_TEXT.wallClock);
     case 'poster':
-      return say(s, s.crayonTaken && !s.rubbed ? HOTSPOT_TEXT.posterFaint : HOTSPOT_TEXT.poster);
+      return say(s, HOTSPOT_TEXT.poster);
     case 'crayon':
       return say(s.crayonTaken ? s : { ...s, crayonTaken: true }, s.crayonTaken ? HOTSPOT_TEXT.crayonAgain : HOTSPOT_TEXT.crayon);
     case 'rug':
@@ -286,7 +286,7 @@ function beginFinale(s: GameState, now: number): GameState {
   return { ...s, finaleStartedAt: now };
 }
 
-function rubWall(s: GameState): GameState {
+function rubRadio(s: GameState): GameState {
   if (s.world !== 'normal' || !s.crayonTaken || s.rubbed) return s;
   return say({ ...s, rubbed: true }, HOTSPOT_TEXT.rubbed);
 }
@@ -355,7 +355,7 @@ function step(s: GameState, a: Action): GameState {
     case 'KNOB_TRY':
       return s.world === 'normal' ? tryKnob(s) : s;
     case 'RUB_DONE':
-      return rubWall(s);
+      return rubRadio(s);
     case 'HOLD_BREATH':
       return holdBreath(s, a.ok);
     case 'FILL_SLOT':

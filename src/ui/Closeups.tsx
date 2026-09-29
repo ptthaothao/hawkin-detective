@@ -311,7 +311,7 @@ export function RubView() {
   };
 
   return (
-    <Overlay label="Chà bút sáp lên vỏ radio" onClose={() => setUi({ panel: null })} className="rub-overlay">
+    <Overlay label="Chà bút sáp lên đáy radio" onClose={() => setUi({ panel: null })} className="rub-overlay">
       <div className="closeup rub-closeup">
         <div className="rub-wall">
           <canvas
@@ -331,7 +331,7 @@ export function RubView() {
             MARTIN
           </span>
         </div>
-        <p className="rub-hint">{game.rubbed ? 'M-A-R-T-I-N.' : 'Chà bút sáp lên vỏ radio.'}</p>
+        <p className="rub-hint">{game.rubbed ? 'M-A-R-T-I-N.' : 'Chà bút sáp lên đáy radio.'}</p>
       </div>
     </Overlay>
   );

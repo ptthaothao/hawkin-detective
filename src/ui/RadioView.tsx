@@ -432,7 +432,7 @@ export function RadioView({ v }: { v: VisualState }) {
       </div>
       {game.crayonTaken && !game.rubbed && !playing && !precall && !finale && game.world === 'normal' && (
         <button className="radio-flip" onClick={() => setUi({ panel: 'rub' })}>
-          {HOTSPOT_TEXT.radioFaint} Chà thử?
+          {HOTSPOT_TEXT.radioFaint} Lật lên chà thử?
         </button>
       )}
       <Dialogue

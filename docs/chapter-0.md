@@ -31,8 +31,8 @@
 13. **Chỉ còn một kết thúc, không còn lựa chọn.** Bỏ nhánh A (vặn to hết cỡ), bỏ nhánh B cũ (gửi đèn pin qua hốc sàn). Khoảnh khắc kết là **một nhịp canh thời điểm**: tắt radio đúng giữa hai bước chân của thứ bên kia. Sai chỉ phải thử lại, không có game over. Mục K viết lại hoàn toàn.
 14. **Phía bên kia là quá khứ, phía của chị là hiện tại.** Bên kia có **hai lớp thấy được**: đồ cổ màu nâu là đêm của bà chủ nhà cũ (khoảng năm 1890, không có điện); đồ hiện đại màu sáng (radio, micro, bút sáp, đèn pin) là đêm Theo biến mất. Bên kia mục dần **chỉ ở rìa**; ngôi nhà và đồ liên quan tới đứa con của bà vẫn nguyên.
 15. **Theo có sẵn đèn pin và vài mẩu bút sáp trong túi quần** (em thích vẽ). Phía này không còn nội dung gửi đèn pin, không còn "Đèn pin biến mất". Đèn pin của người chơi chỉ để soi phía bên kia.
-16. **Vạch đếm của Theo vẽ bằng bút sáp (sáng, mới); tên MARTIN thì khắc trên vỏ radio (cũ).** Hai lớp thời gian nhìn khác nhau.
-17. **Hạt giống mới (không lộ gì):** tên MARTIN **khắc trên vỏ radio**, mặt sau (chỉ hiện khi chà bút sáp của Theo lên đó, tùy chọn); hai nốt huýt sáo rất xa; tiếng bước chân đều đặn; vết cào ở cửa là do bà chạm vào cửa phòng của con mình. Không gieo nghĩa địa ở Chapter 0. Việc chiếc radio của bố lại mang một cái tên khắc cũ **không được giải thích** ở Chapter 0.
+16. **Vạch đếm của Theo vẽ bằng bút sáp (sáng, mới); tên MARTIN thì khắc dưới đáy radio (cũ).** Hai lớp thời gian nhìn khác nhau.
+17. **Hạt giống mới (không lộ gì):** tên MARTIN **khắc dưới đáy radio** (chỉ hiện khi chà bút sáp của Theo lên đó, tùy chọn); hai nốt huýt sáo rất xa; tiếng bước chân đều đặn; vết cào ở cửa là do bà chạm vào cửa phòng của con mình. Không gieo nghĩa địa ở Chapter 0. Việc chiếc radio của bố lại mang một cái tên khắc cũ **không được giải thích** ở Chapter 0.
 18. **Nền truyện** (con quái là bố chồng lên bà chủ nhà cũ; 1979; mẹ và chị mất trí nhớ; tuyến đi cố định; nó hại cả người lớn nhưng nhắm trẻ con trước) nằm ở `chapter-0-revision/ke-hoach-sua-cot-truyen-chapter-0-v2.md`. Chapter 0 không nói gì trong số đó ra.
 
 ---

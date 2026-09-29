@@ -510,9 +510,17 @@ function Mic({ p, fallen }: { p: Palette; fallen: boolean }) {
   );
 }
 
-function DeskThings({ p }: { p: Palette }) {
+function DeskThings({ p, crayon }: { p: Palette; crayon: boolean }) {
   return (
     <g>
+      {/* a crayon stub of Theo's, on the front edge of the desk */}
+      {crayon && (
+        <g transform="rotate(-8 1110 468)">
+          <rect x="1092" y="464" width="36" height="8" rx="2" fill="#d6702e" />
+          <rect x="1092" y="464" width="36" height="3" rx="1.5" fill="#ffffff" opacity="0.22" />
+          <path d="M1128 464 l8 4 l-8 4 Z" fill="#a5501f" />
+        </g>
+      )}
       {/* missing-person flyers */}
       <path d="M892 462 L978 460 L986 476 L884 477 Z" fill="#cfc6ae" />
       <path d="M896 458 L980 456 L984 472 L890 474 Z" fill={p.paper} transform="rotate(-2 936 466)" />
@@ -798,7 +806,7 @@ export function Room({
       <Desk p={p} />
       <Radio id={id} p={p} s={s} broken={false} overgrown={other} surge={surge} />
       <Lamp p={p} lit={lit} />
-      {!other && <DeskThings p={p} />}
+      {!other && <DeskThings p={p} crayon={!s.crayonTaken} />}
       {!other && <Mic p={p} fallen={false} />}
       <Switch p={p} down={other} />
       <Door p={p} clawed={!other && v.scarred} other={other} />

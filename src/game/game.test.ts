@@ -246,6 +246,38 @@ describe('hint (doc §L)', () => {
   });
 });
 
+describe('những thứ tìm thêm (không cái nào chặn tiến trình)', () => {
+  const contactedOther = [...OPENING, ...EXPLORE_NORMAL, ...FIRST_VISIT, ...DIARY_AND_RULE, ...CONTACT, { type: 'TOGGLE_LIGHT' } as const];
+
+  it('nhặt bút sáp không tính vào 3 lần xem kích hoạt đèn chớp', () => {
+    const s = run([...OPENING, { type: 'INSPECT', id: 'crayon' }, { type: 'INSPECT', id: 'flyer' }]).state;
+    expect(s.crayonTaken).toBe(true);
+    expect(s.flicker).toBe('none');
+  });
+
+  it('chà tường chỉ được khi đã có bút sáp, và chỉ một lần', () => {
+    expect(run([...OPENING, { type: 'RUB_DONE' }]).state.rubbed).toBe(false);
+    const s = run([...OPENING, { type: 'INSPECT', id: 'crayon' }, { type: 'INSPECT', id: 'poster' }]).state;
+    expect(s.message?.text).toMatch(/nét lõm mờ/);
+    const rubbed = run([{ type: 'RUB_DONE' }, { type: 'INSPECT', id: 'poster' }], 5e5, s).state;
+    expect(rubbed.rubbed).toBe(true);
+    expect(rubbed.message?.text).toMatch(/^Phim Theo thích nhất/);
+  });
+
+  it('nín thở đủ lâu thì thấy vật loé trên tay nó, thở ra sớm thì nó khựng lại', () => {
+    const deskSeen = [...contactedOther, { type: 'INSPECT', id: 'os-desk' } as const];
+    const early = run([...deskSeen, { type: 'HOLD_BREATH', ok: false }]).state;
+    expect(early.sawGlint).toBe(false);
+    expect(early.fx?.kind).toBe('turnBack');
+    const ok = run([...deskSeen, { type: 'HOLD_BREATH', ok: true }]).state;
+    expect(ok.sawGlint).toBe(true);
+  });
+
+  it('không nín thở được khi chưa thấy bàn radio bên kia', () => {
+    expect(run([...contactedOther, { type: 'HOLD_BREATH', ok: true }]).state.sawGlint).toBe(false);
+  });
+});
+
 describe('playthrough (doc §J.2)', () => {
   const OFF: Step = { type: 'RADIO_POWER', on: false };
   // Press times are counted from the last FINALE_BEGIN; each action costs 1 s of script time.

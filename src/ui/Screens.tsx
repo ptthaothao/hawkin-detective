@@ -92,6 +92,8 @@ export function EndingScreen() {
       <dl className="summary report">
         <dt>Manh mối</dt>
         <dd>{game.clues.length} / 6</dd>
+        <dt>Tìm thêm</dt>
+        <dd>{Number(game.rubbed) + Number(game.sawGlint)} / 2</dd>
         <dt>Lần tắt radio hụt</dt>
         <dd>{game.finaleFails}</dd>
         <dt>Số hint đã dùng</dt>

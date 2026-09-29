@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { usePresentation } from './presentation/usePresentation';
 import { useStore } from './store';
 import { CaseFile } from './ui/CaseFile';
-import { FloorView, HintNote, InspectView } from './ui/Closeups';
+import { FloorView, HintNote, InspectView, RubView } from './ui/Closeups';
 import { DebugPanel } from './ui/DebugPanel';
 import { Hud } from './ui/Hud';
 import { RadioView } from './ui/RadioView';
@@ -54,6 +54,7 @@ export function App() {
       {panel === 'casefile' && <CaseFile v={v} />}
       {panel === 'inspect' && <InspectView />}
       {panel === 'floor' && <FloorView />}
+      {panel === 'rub' && <RubView />}
       {panel === 'hint' && <HintNote />}
       <FilmGrain />
       {debug && <DebugPanel />}

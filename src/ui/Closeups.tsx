@@ -247,6 +247,96 @@ export function FloorView() {
   );
 }
 
+const RUB_COLS = 20;
+const RUB_ROWS = 6;
+/** Share of the patch that has to be covered before the letters are fully there. */
+const RUB_ENOUGH = 0.65;
+
+/**
+ * Rubbing the wall under the poster with Theo's crayon: drag over the paper and the carved letters
+ * come up through it. Optional; nothing depends on it.
+ */
+export function RubView() {
+  const game = useStore((s) => s.game);
+  const dispatch = useStore((s) => s.dispatch);
+  const setUi = useStore((s) => s.setUi);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const cells = useRef(new Set<number>());
+  const last = useRef<{ x: number; y: number } | null>(null);
+  const [progress, setProgress] = useState(game.rubbed ? 1 : 0);
+  const done = useRef(game.rubbed);
+
+  useEffect(() => {
+    if (!game.rubbed) return;
+    const id = window.setTimeout(() => setUi({ panel: null }), 2_200);
+    return () => window.clearTimeout(id);
+  }, [game.rubbed, setUi]);
+
+  const at = (e: React.PointerEvent) => {
+    const r = canvasRef.current!.getBoundingClientRect();
+    return { x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 };
+  };
+  const stroke = (e: React.PointerEvent) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx || done.current) return;
+    const p = at(e);
+    const from = last.current ?? p;
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 30;
+    ctx.strokeStyle = 'rgba(214, 120, 48, 0.32)';
+    ctx.beginPath();
+    ctx.moveTo((from.x / 100) * w, (from.y / 100) * h);
+    ctx.lineTo((p.x / 100) * w, (p.y / 100) * h);
+    ctx.stroke();
+    last.current = p;
+    const col = Math.min(RUB_COLS - 1, Math.max(0, Math.floor((p.x / 100) * RUB_COLS)));
+    const row = Math.min(RUB_ROWS - 1, Math.max(0, Math.floor((p.y / 100) * RUB_ROWS)));
+    for (let dc = -1; dc <= 1; dc++) {
+      for (let dr = 0; dr <= 0; dr++) {
+        const c = col + dc;
+        const r = row + dr;
+        if (c >= 0 && c < RUB_COLS && r >= 0 && r < RUB_ROWS) cells.current.add(r * RUB_COLS + c);
+      }
+    }
+    const share = cells.current.size / (RUB_COLS * RUB_ROWS);
+    setProgress(Math.min(1, share / RUB_ENOUGH));
+    if (share >= RUB_ENOUGH) {
+      done.current = true;
+      audio.cue('page');
+      dispatch({ type: 'RUB_DONE' });
+    }
+  };
+
+  return (
+    <Overlay label="Chà bút sáp lên tường" onClose={() => setUi({ panel: null })} className="rub-overlay">
+      <div className="closeup rub-closeup">
+        <div className="rub-wall">
+          <canvas
+            ref={canvasRef}
+            className="rub-canvas"
+            width={640}
+            height={200}
+            onPointerDown={(e) => {
+              e.currentTarget.setPointerCapture(e.pointerId);
+              last.current = at(e);
+              stroke(e);
+            }}
+            onPointerMove={(e) => e.buttons > 0 && stroke(e)}
+            onPointerUp={() => (last.current = null)}
+          />
+          <span className="rub-letters" style={{ opacity: progress }} aria-hidden>
+            MARTIN
+          </span>
+        </div>
+        <p className="rub-hint">{game.rubbed ? 'M-A-R-T-I-N.' : 'Chà bút sáp lên tường.'}</p>
+      </div>
+    </Overlay>
+  );
+}
+
 export function HintNote() {
   const game = useStore((s) => s.game);
   const setUi = useStore((s) => s.setUi);

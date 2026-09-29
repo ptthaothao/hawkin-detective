@@ -22,6 +22,9 @@ const APPROACH_MS = 440;
 const REACH_MS = 200;
 /** Close-ups the player leans into; everything else is a reach. */
 const CLOSE_UPS = new Set(['radio', 'watch', 'os-clock', 'rug']);
+/** How long to hold still at the other-side desk for the glint on its hand (doc: nín thở). */
+const BREATH_HOLD_MS = 1_600;
+const BREATH_MIN_MS = 300;
 /** When the new mark is carved, after the room settles (matches `.carved .fresh`). */
 const SCRATCH_AT_MS = 2_350;
 
@@ -29,6 +32,7 @@ const HOTSPOT_NAMES: Record<string, string> = {
   switch: 'Công tắc đèn',
   'wall-clock': 'Đồng hồ treo tường',
   poster: 'Poster',
+  crayon: 'Mẩu bút sáp',
   rug: 'Tấm thảm',
   radio: 'Radio',
   flyer: 'Tờ tìm người',
@@ -298,6 +302,7 @@ export function Scene({ v }: { v: VisualState }) {
     dispatch({ type: 'INSPECT', id });
     if (id === 'radio') setUi({ panel: 'radio' });
     else if (id === 'watch') setUi({ panel: 'inspect', inspect: 'watch' });
+    else if (id === 'poster' && game.crayonTaken && !game.rubbed) setUi({ panel: 'rub' });
     else if (id === 'os-clock') setUi({ panel: 'inspect', inspect: 'os-clock' });
     else if (id === 'rug') {
       if (game.diaryFound) setUi({ panel: 'floor' });
@@ -305,7 +310,41 @@ export function Scene({ v }: { v: VisualState }) {
     }
   };
 
+  // Holding still at the desk on the other side: long enough and the glint shows; too soon and it turns.
+  const breathReady = other && game.contactMade && game.sawAftermath && !game.sawGlint && !game.deductionSolved;
+  const [breathing, setBreathing] = useState(false);
+  const breathTimer = useRef(0);
+  const breathStart = useRef(0);
+  const breathDone = useRef(false);
+  /** A long press ends in a click too; that click must not also inspect the desk. */
+  const swallowClick = useRef(false);
+  const endBreath = (hold: boolean) => {
+    if (!breathStart.current) return;
+    window.clearTimeout(breathTimer.current);
+    const held = Date.now() - breathStart.current;
+    breathStart.current = 0;
+    setBreathing(false);
+    if (hold && held >= BREATH_MIN_MS && !breathDone.current) dispatch({ type: 'HOLD_BREATH', ok: false });
+    if (held >= BREATH_MIN_MS) swallowClick.current = true;
+  };
+  const startBreath = () => {
+    if (!breathReady || locked || approach) return;
+    breathDone.current = false;
+    breathStart.current = Date.now();
+    setBreathing(true);
+    audio.cue('breath');
+    breathTimer.current = window.setTimeout(() => {
+      breathDone.current = true;
+      dispatch({ type: 'HOLD_BREATH', ok: true });
+    }, BREATH_HOLD_MS);
+  };
+  useEffect(() => () => window.clearTimeout(breathTimer.current), []);
+
   const onHotspot = (h: HotspotDef) => {
+    if (swallowClick.current) {
+      swallowClick.current = false;
+      return;
+    }
     if (locked || approach) return;
     if (!canSee(h)) return;
     const closeUp = CLOSE_UPS.has(h.id);
@@ -351,6 +390,7 @@ export function Scene({ v }: { v: VisualState }) {
         presence ? 'presence' : '',
         showHotspots ? 'debug-hotspots' : '',
         hover && !locked ? 'hovering' : '',
+        breathing ? 'holding-breath' : '',
         (approach?.id ?? hover) === target ? 'on-target' : '',
       ].join(' ')}
       onPointerMove={onPointerMove}
@@ -375,8 +415,13 @@ export function Scene({ v }: { v: VisualState }) {
             style={pct(h.rect)}
             aria-label={HOTSPOT_NAMES[h.id]}
             onClick={() => onHotspot(h)}
+            onPointerDown={h.id === 'os-desk' ? startBreath : undefined}
+            onPointerUp={h.id === 'os-desk' ? () => endBreath(true) : undefined}
             onPointerEnter={() => setHover(canSee(h) ? h.id : null)}
-            onPointerLeave={() => setHover(null)}
+            onPointerLeave={() => {
+              setHover(null);
+              if (h.id === 'os-desk') endBreath(true);
+            }}
           />
         ))}
       </div>

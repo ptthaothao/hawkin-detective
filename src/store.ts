@@ -9,7 +9,7 @@ import type { Cue } from './audio/audio';
 
 type Timeless<A> = A extends Action ? Omit<A, 'now'> : never;
 
-export type Panel = null | 'radio' | 'casefile' | 'inspect' | 'floor' | 'hint';
+export type Panel = null | 'radio' | 'casefile' | 'inspect' | 'floor' | 'rub' | 'hint';
 export type InspectTarget = 'watch' | 'os-clock' | 'diary';
 export type CaseTab = 'clues' | 'radio' | 'deduction';
 

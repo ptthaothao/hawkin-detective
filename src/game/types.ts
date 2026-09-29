@@ -28,7 +28,9 @@ export type NormalHotspotId =
   | 'poster'
   | 'rug'
   | 'desk-edge'
-  | 'door-normal';
+  | 'door-normal'
+  /** A crayon stub of Theo's on the desk. Optional: used to rub the carved name on the wall. */
+  | 'crayon';
 
 export type OtherHotspotId = 'os-wall' | 'os-clock' | 'os-floor' | 'os-desk' | 'os-door';
 
@@ -119,6 +121,13 @@ export interface GameState {
   theoLightSeen: boolean;
   endingReady: boolean;
 
+  /** Optional finds (doc: cải thiện Chapter 0). None gates progress. */
+  crayonTaken: boolean;
+  /** Rubbed the wall with the crayon: the carved name comes up. */
+  rubbed: boolean;
+  /** Held still while it stood at the desk and saw the glint on its hand. */
+  sawGlint: boolean;
+
   message: { id: number; text: string } | null;
   fx: { id: number; kind: FxKind } | null;
   seq: number;
@@ -146,6 +155,9 @@ export type Action =
   | { type: 'FINALE_BEGIN'; now: number }
   /** The player tried to turn the volume up; the knob comes off. */
   | { type: 'KNOB_TRY'; now: number }
+  | { type: 'RUB_DONE'; now: number }
+  /** Held still while it stood at the desk on the other side. `ok` = held long enough. */
+  | { type: 'HOLD_BREATH'; ok: boolean; now: number }
   | { type: 'THEO_LIGHT'; now: number }
   | { type: 'END'; now: number }
   | { type: 'REQUEST_HINT'; now: number };

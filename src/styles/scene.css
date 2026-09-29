@@ -803,3 +803,17 @@
     display: none;
   }
 }
+
+/* Holding still at the desk: the room narrows around you. */
+.stage.holding-breath::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, transparent 25%, rgba(0, 0, 0, 0.7) 85%);
+  animation: breath-in 1.6s ease-in forwards;
+}
+@keyframes breath-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

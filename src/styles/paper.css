@@ -866,3 +866,49 @@
   line-height: 1.35;
   color: var(--graphite);
 }
+
+/* Rubbing the carved name up through the paper with Theo's crayon (optional find). */
+.rub-closeup {
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+}
+.rub-wall {
+  position: relative;
+  width: min(80vw, 640px);
+  aspect-ratio: 640 / 200;
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.04) 0 2px, transparent 2px 5px),
+    #d9cdb0;
+  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), inset 0 0 40px rgba(60, 40, 20, 0.25);
+  overflow: hidden;
+  touch-action: none;
+}
+.rub-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+.rub-letters {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: 'Old Standard TT', serif;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 9vw, 5rem);
+  letter-spacing: 0.18em;
+  color: #3b2416;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  transition: opacity 0.25s linear;
+}
+.rub-hint {
+  color: #e9e2cf;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.15rem;
+  opacity: 0.85;
+}

@@ -37,6 +37,7 @@ const NORMAL_IDS: HotspotId[] = [
   'rug',
   'desk-edge',
   'door-normal',
+  'crayon',
 ];
 const FLICKER_AFTER_INSPECTIONS = 3;
 
@@ -72,6 +73,9 @@ export function initialState(): GameState {
     hushed: false,
     theoLightSeen: false,
     endingReady: false,
+    crayonTaken: false,
+    rubbed: false,
+    sawGlint: false,
     message: null,
     fx: null,
     seq: 0,
@@ -202,7 +206,9 @@ function inspectNormal(s: GameState, id: HotspotId): GameState {
     case 'wall-clock':
       return say(s, HOTSPOT_TEXT.wallClock);
     case 'poster':
-      return say(s, HOTSPOT_TEXT.poster);
+      return say(s, s.crayonTaken && !s.rubbed ? HOTSPOT_TEXT.posterFaint : HOTSPOT_TEXT.poster);
+    case 'crayon':
+      return say(s.crayonTaken ? s : { ...s, crayonTaken: true }, s.crayonTaken ? HOTSPOT_TEXT.crayonAgain : HOTSPOT_TEXT.crayon);
     case 'rug':
       return s.diaryFound ? s : say(addClue({ ...s, diaryFound: true }, 'C3'), HOTSPOT_TEXT.rugFirst);
     case 'desk-edge':
@@ -241,7 +247,7 @@ function inspect(s: GameState, id: HotspotId): GameState {
   if (!isNormal) return inspectOther(moveOn(seen), id);
 
   const next = inspectNormal(id === 'radio' ? seen : moveOn(seen), id);
-  const normalSeen = next.inspected.filter((h) => NORMAL_IDS.includes(h)).length;
+  const normalSeen = next.inspected.filter((h) => h !== 'crayon' && NORMAL_IDS.includes(h)).length;
   if (next.flicker === 'none' && normalSeen >= FLICKER_AFTER_INSPECTIONS) {
     return fx({ ...next, flicker: 'pending' }, 'flicker');
   }
@@ -278,6 +284,18 @@ function submitDeduction(s: GameState): GameState {
 function beginFinale(s: GameState, now: number): GameState {
   if (!s.deductionSolved || s.finaleStartedAt !== null) return s;
   return { ...s, finaleStartedAt: now };
+}
+
+function rubWall(s: GameState): GameState {
+  if (s.world !== 'normal' || !s.crayonTaken || s.rubbed) return s;
+  return say({ ...s, rubbed: true }, HOTSPOT_TEXT.rubbed);
+}
+
+/** Holding still while it stands at the desk: long enough and the glint on its hand shows; too soon and it turns. */
+function holdBreath(s: GameState, ok: boolean): GameState {
+  if (s.world !== 'other' || !s.contactMade || !s.sawAftermath || s.sawGlint || s.deductionSolved) return s;
+  if (ok) return say({ ...s, sawGlint: true }, HOTSPOT_TEXT.glint);
+  return fx(say(s, HOTSPOT_TEXT.breathOut), 'turnBack');
 }
 
 function tryKnob(s: GameState): GameState {
@@ -336,6 +354,10 @@ function step(s: GameState, a: Action): GameState {
       return beginFinale(s, a.now);
     case 'KNOB_TRY':
       return s.world === 'normal' ? tryKnob(s) : s;
+    case 'RUB_DONE':
+      return rubWall(s);
+    case 'HOLD_BREATH':
+      return holdBreath(s, a.ok);
     case 'FILL_SLOT':
       if (!s.contactMade || s.deductionSolved) return s;
       if (a.chip && !chipAvailable(s, a.chip)) return s;
@@ -368,6 +390,9 @@ function progressKey(s: GameState): string {
     s.deductionSolved,
     s.hushed,
     s.finaleFails,
+    s.crayonTaken,
+    s.rubbed,
+    s.sawGlint,
   ].join('|');
 }
 

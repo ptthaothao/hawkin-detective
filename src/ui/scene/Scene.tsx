@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { audio } from '../../audio/audio';
 import { VERBS } from '../../game/content';
-import { currentStep } from '../../game/selectors';
+import { currentStep, FOOT_PERIOD_MS } from '../../game/selectors';
 import type { HotspotId } from '../../game/types';
 import type { VisualState } from '../../presentation/visual';
 import { useStore } from '../../store';
@@ -127,23 +127,24 @@ export function Scene({ v }: { v: VisualState }) {
   useEffect(() => () => window.clearTimeout(approachTimer.current), []);
 
   // Something in the house answers the signal (doc §23): only once Theo has been heard, never shown.
-  const hunted = game.contactMade && !game.rescued && !game.theoLightSeen && !game.endingReady;
+  const hunted = game.contactMade && !game.hushed && !game.endingReady && game.finaleStartedAt === null;
   const presence = useRandomEvent(hunted && !leaning && !sceneLocked, 24_000, 46_000, 2_800, 16_000);
   useEffect(() => {
     if (!presence) return;
-    // Radio louder → the lamp sags → a board creaks somewhere → a scrape → a shadow passes the door.
+    // Radio louder → three steps on the fixed rhythm it will keep at the end (the player learns it here)
+    // → a scrape → a shadow passes the door.
     if (!other && game.radio.on) audio.surge(800, 0.16);
-    const creak = window.setTimeout(() => audio.cue('creak'), 900);
-    const scrape = window.setTimeout(() => audio.cue('scratch'), 1_700);
+    const steps = [0, 1, 2].map((k) => window.setTimeout(() => audio.cue('footstep'), 900 + k * FOOT_PERIOD_MS));
+    const scrape = window.setTimeout(() => audio.cue('scratch'), 900 + 3 * FOOT_PERIOD_MS);
     return () => {
-      window.clearTimeout(creak);
+      steps.forEach((t) => window.clearTimeout(t));
       window.clearTimeout(scrape);
     };
     // Plays once per event; the radio state at that moment is enough.
   }, [presence]);
 
   // Rain outside, and now and then lightning (this side only; the other side has no weather).
-  const lightning = useRandomEvent(!other && !game.rescued, 30_000, 70_000, 1_300, 12_000);
+  const lightning = useRandomEvent(!other, 30_000, 70_000, 1_300, 12_000);
   const flash = lightning !== null && !voiceOn;
   useEffect(() => {
     if (!flash) return;
@@ -155,10 +156,10 @@ export function Scene({ v }: { v: VisualState }) {
   const knowsMarks = useRef(false);
   knowsMarks.current = game.clues.includes('C5');
   useEffect(() => {
-    if (!other || !knowsMarks.current || game.flashlightGiven) return;
+    if (!other || !knowsMarks.current || game.hushed) return;
     const id = window.setTimeout(() => audio.cue('scratch'), SCRATCH_AT_MS);
     return () => window.clearTimeout(id);
-  }, [other, game.lightOffCount, game.flashlightGiven]);
+  }, [other, game.lightOffCount, game.hushed]);
 
   // The static only comes up to meet the hand on this side.
   useEffect(() => {
@@ -188,7 +189,7 @@ export function Scene({ v }: { v: VisualState }) {
     return () => cancelAnimationFrame(raf);
   }, [game.flicker, leaning, dispatch]);
 
-  // Branch B: pitch black until Theo turns the flashlight on.
+  // After the radio is silenced: pitch black until Theo's flashlight comes on.
   useEffect(() => {
     if (v.lighting !== 'dark') return;
     const id = window.setTimeout(() => dispatch({ type: 'THEO_LIGHT' }), DARK_BEFORE_THEO_MS);

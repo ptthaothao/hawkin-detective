@@ -28,7 +28,10 @@ export type Cue =
   | 'distort'
   | 'cut'
   | 'scratch'
-  | 'thunder';
+  | 'thunder'
+  // the closing beat
+  | 'footstep'
+  | 'whistle';
 
 /** What the room sounds like: nothing (title, ending), rain only (intro), or the full room. */
 export type AmbienceMode = 'off' | 'intro' | 'play';
@@ -40,7 +43,7 @@ const RADIO_LEVEL: Record<RadioSignal, number> = {
   echo2: 0.05,
   echo3: 0.05,
   precall: 0.06,
-  lure: 0.3,
+  steps: 0.09,
 };
 
 const ECHO_CUE: Partial<Record<RadioSignal, Cue>> = {
@@ -345,6 +348,28 @@ class AudioEngine {
           this.noiseBurst(t + d, 0.04, 2800, 0.05 / (i + 1));
         });
         break;
+      case 'footstep':
+        // One heavy step on old boards, the radio catching it.
+        this.thump(t, 62, 0.9);
+        this.noiseBurst(t + 0.02, 0.09, 700, 0.22);
+        this.creak(t + 0.05, 0.35, 300, 200, 0.05);
+        break;
+      case 'whistle': {
+        // Two faint notes from far off. Nobody is there.
+        [0, 0.7].forEach((d, i) => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(i === 0 ? 784 : 659, t + d);
+          g.gain.setValueAtTime(0.0001, t + d);
+          g.gain.exponentialRampToValueAtTime(0.03, t + d + 0.08);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.6);
+          osc.connect(g).connect(ctx.destination);
+          osc.start(t + d);
+          osc.stop(t + d + 0.65);
+        });
+        break;
+      }
       case 'doorOpen':
         this.creak(t, 1.3, 260, 150, 0.08);
         break;

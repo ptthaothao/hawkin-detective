@@ -12,10 +12,9 @@ export const freq = (s: GameState): string => {
 export const hasClue = (s: GameState, id: ClueId): boolean => s.clues.includes(id);
 
 export function radioSignal(s: GameState): RadioSignal {
-  if (!s.radio.on || s.radio.broken) return 'off';
-  if (s.choice === 'A' && !s.rescued) return 'lure';
+  if (!s.radio.on) return 'off';
   const f = freq(s);
-  if (f === LIVE_FREQ) return s.deductionSolved && !s.choice ? 'precall' : 'static';
+  if (f === LIVE_FREQ && s.deductionSolved) return s.finaleStartedAt === null ? 'precall' : 'steps';
   return ECHOES[f]?.signal ?? 'static';
 }
 
@@ -57,7 +56,7 @@ export function hintStage(s: GameState): HintStage | null {
     if (s.slots.C !== 'buc-tuong') return 'dedC';
     return 'dedD';
   }
-  if (s.choice === 'B' && !s.flashlightGiven) return 'branchB';
+  if (!s.hushed) return 'hush';
   return null;
 }
 
@@ -73,12 +72,39 @@ export function hintTiersUnlocked(s: GameState, now: number): number {
   return Math.min(3, 1 + Math.floor(stuck / (HINT_STEP_MS * scale)));
 }
 
-export const LURE_MS = 8_000;
+/**
+ * Doc §K: the closing beat. The thing walks past Theo's room on a fixed rhythm: one step every
+ * FOOT_PERIOD_MS, the first after FOOT_LEAD_MS. Between two steps the signal goes quiet for a moment;
+ * that is the only time the radio can be switched off without it hearing the click.
+ */
+export const FOOT_LEAD_MS = 2_400;
+export const FOOT_PERIOD_MS = 2_600;
+/** Steps the player hears before a switch-off can count: enough to learn the rhythm. */
+export const FOOT_LISTEN_STEPS = 3;
+const QUIET_HALF_MS = 550;
+/** After five misses the quiet gets a little longer, without saying so. */
+const QUIET_HALF_MS_KIND = 800;
 
-/** Branch A: 0 = creature in the middle of the room, 1 = at the radio desk. */
-export function lureProgress(s: GameState, now: number): number {
-  if (s.lureStartedAt === null) return 0;
-  return Math.min(1, (now - s.lureStartedAt) / LURE_MS);
+/** Time of step number `k` (0-based), or null before the beat has started. */
+export function footstepAt(s: GameState, k: number): number | null {
+  return s.finaleStartedAt === null ? null : s.finaleStartedAt + FOOT_LEAD_MS + k * FOOT_PERIOD_MS;
+}
+
+/** Steps that have sounded by `now`. */
+export function stepsHeard(s: GameState, now: number): number {
+  if (s.finaleStartedAt === null) return 0;
+  const since = now - s.finaleStartedAt - FOOT_LEAD_MS;
+  return since < 0 ? 0 : Math.floor(since / FOOT_PERIOD_MS) + 1;
+}
+
+/** Is `now` in the quiet between two steps, after the player has listened long enough? */
+export function inQuiet(s: GameState, now: number): boolean {
+  const heard = stepsHeard(s, now);
+  if (heard < FOOT_LISTEN_STEPS) return false;
+  const last = footstepAt(s, heard - 1);
+  if (last === null) return false;
+  const half = s.finaleFails >= 5 ? QUIET_HALF_MS_KIND : QUIET_HALF_MS;
+  return Math.abs(now - (last + FOOT_PERIOD_MS / 2)) <= half;
 }
 
 /** Everything slots A, C and D need has been seen, including what 3.17 brought to the desk. */
@@ -141,11 +167,8 @@ function step(id: StepId, target: StepTarget): Step {
 export function currentStep(s: GameState): Step {
   const other = s.world === 'other';
   if (s.endingReady) return step('resolved', null);
-  if (s.choice === 'A') return step('pull-theo', other ? 'os-wall' : 'switch');
-  if (s.choice === 'B') {
-    return s.flashlightGiven ? step('cross-over', 'switch') : step('help-theo', other ? 'switch' : 'rug');
-  }
-  if (s.deductionSolved) return step('choose', other ? 'switch' : 'radio');
+  if (s.hushed) return step('cross-over', 'switch');
+  if (s.deductionSolved) return step('hush', other ? 'switch' : 'radio');
   // The flicker is the one discovery that interrupts the spine: the player just saw something impossible.
   if (s.flicker === 'done' && s.lightOffCount === 0 && !s.contactMade) return step('glimpse', 'switch');
   const next = SPINE.find((st) => !st.done(s)) ?? SPINE[SPINE.length - 1];

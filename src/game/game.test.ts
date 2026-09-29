@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { CLUES, DIARY_PAGES, HINTS, THEO_CONTACT } from './content';
 import { initialState, reducer } from './reducer';
 import {
-  BRANCH_A,
-  BRANCH_B,
+  FINALE_ALL,
+  FINALE_START,
   CONTACT,
   DEDUCTION,
   DIARY_AND_RULE,
@@ -11,10 +11,10 @@ import {
   FIRST_VISIT,
   OPENING,
   run,
-  TO_PRECHOICE,
+  TO_FINALE,
   type Step,
 } from './scripts';
-import { clueText, hintStage, hintTiersUnlocked, objective, radioSignal, tally } from './selectors';
+import { clueText, hintStage, hintTiersUnlocked, objective, inQuiet, radioSignal, tally } from './selectors';
 import type { GameState, HintStage } from './types';
 
 const LEAK_17 = /3[:.]17|(^|[^0-9])17([^0-9]|$)/;
@@ -113,20 +113,22 @@ describe('khóa cứng (doc §J.1)', () => {
     expect(s.deductionSolved).toBe(false);
   });
 
-  it('choice chỉ mở sau khi nộp deduction đúng', () => {
+  it('màn kết chỉ mở sau khi nộp deduction đúng', () => {
     const s = run([
       ...OPENING,
       ...EXPLORE_NORMAL,
       ...FIRST_VISIT,
       ...DIARY_AND_RULE,
       ...CONTACT,
-      { type: 'CHOOSE', option: 'A' },
+      { type: 'FINALE_BEGIN' },
+      { type: 'RADIO_POWER', on: false },
     ]).state;
-    expect(s.choice).toBeNull();
+    expect(s.finaleStartedAt).toBeNull();
+    expect(s.hushed).toBe(false);
   });
 
-  it('ending chỉ xảy ra sau khi đã chọn', () => {
-    const s = run([...TO_PRECHOICE, { type: 'END' }]).state;
+  it('ending chỉ xảy ra sau khi đã tắt radio đúng nhịp', () => {
+    const s = run([...TO_FINALE, { type: 'END' }]).state;
     expect(s.phase).toBe('play');
   });
 });
@@ -206,7 +208,7 @@ describe('không để lộ đáp án (doc §D, §F, §L)', () => {
 
   it('lời Theo không chứa khắc, vạch, tường, micro, radio', () => {
     for (const line of THEO_CONTACT.filter((l) => l.who === 'theo').map((l) => l.text)) {
-      expect(line).not.toMatch(/khắc|vạch|tường|micro|radio/i);
+      expect(line).not.toMatch(/khắc|vạch|tường|micro|radio|bút|màu|vẽ/i);
     }
   });
 
@@ -245,35 +247,77 @@ describe('hint (doc §L)', () => {
 });
 
 describe('playthrough (doc §J.2)', () => {
-  it('nhánh A tới được ending', () => {
-    const s = run([...TO_PRECHOICE, ...BRANCH_A]).state;
-    expect(s.rescued).toBe(true);
-    expect(s.radio.broken).toBe(true);
-    expect(s.phase).toBe('ending');
-  });
+  const OFF: Step = { type: 'RADIO_POWER', on: false };
+  // Press times are counted from the last FINALE_BEGIN; each action costs 1 s of script time.
+  const pressAt = (ms: number): Step[] => [{ type: 'WAIT', ms: ms - 1_000 }, OFF];
 
-  it('nhánh A: click tường quá sớm thì nó quay đầu lại', () => {
-    const s = run([
-      ...TO_PRECHOICE,
-      { type: 'CHOOSE', option: 'A' },
-      { type: 'TOGGLE_LIGHT' },
-      { type: 'INSPECT', id: 'os-wall' },
-    ]).state;
-    expect(s.rescued).toBe(false);
-    expect(s.fx?.kind).toBe('turnBack');
-  });
-
-  it('nhánh B tới được ending', () => {
-    const s = run([...TO_PRECHOICE, ...BRANCH_B]).state;
-    expect(s.flashlightGiven).toBe(true);
+  it('tới được ending: tắt radio giữa hai bước', () => {
+    const s = run([...TO_FINALE, ...FINALE_ALL]).state;
+    expect(s.hushed).toBe(true);
+    expect(s.finaleFails).toBe(0);
+    expect(s.radio.on).toBe(false);
     expect(s.theoLightSeen).toBe(true);
     expect(s.phase).toBe('ending');
   });
 
-  it('đặt đèn pin trước nhánh B thì bị từ chối', () => {
-    const s = run([...OPENING, ...EXPLORE_NORMAL, { type: 'INSPECT', id: 'rug' }, { type: 'PLACE_FLASHLIGHT' }]).state;
-    expect(s.flashlightGiven).toBe(false);
-    expect(s.message?.text).toBe('Bạn còn cần nó.');
+  it('núm âm lượng gãy khi thử vặn, radio không vặn to được', () => {
+    const s = run([...TO_FINALE, ...FINALE_START]).state;
+    expect(s.radio.knobSnapped).toBe(true);
+    expect(s.message?.text).toBe('Bạn vặn núm âm lượng. Nó gãy rời trong tay bạn.');
+    expect(reducer(s, { type: 'RADIO_WHEEL', index: 0, delta: 1, now: 9e9 })).toBe(s);
+  });
+
+  it('tắt quá sớm thì nó quay lại, radio vẫn bật, nhịp bắt đầu lại, không mất gì', () => {
+    const s = run([...TO_FINALE, { type: 'FINALE_BEGIN' }, OFF]).state;
+    expect(s.hushed).toBe(false);
+    expect(s.finaleFails).toBe(1);
+    expect(s.radio.on).toBe(true);
+    expect(s.fx?.kind).toBe('turnBack');
+    expect(s.phase).toBe('play');
+  });
+
+  it('tắt đúng lúc nó đang bước cũng hụt', () => {
+    // The fourth step lands at 2.4 s + 3 x 2.6 s.
+    const s = run([...TO_FINALE, { type: 'FINALE_BEGIN' }, ...pressAt(2_400 + 3 * 2_600)]).state;
+    expect(s.hushed).toBe(false);
+    expect(s.finaleFails).toBe(1);
+  });
+
+  it('hụt vài lần rồi tắt đúng vẫn tới ending', () => {
+    const s = run([
+      ...TO_FINALE,
+      { type: 'FINALE_BEGIN' },
+      OFF,
+      OFF,
+      // Restarted at the second miss: the quiet after the third step is 2.4 + 2 x 2.6 + 1.3 s later.
+      ...pressAt(2_400 + 2 * 2_600 + 1_300),
+      { type: 'TOGGLE_LIGHT' },
+      { type: 'THEO_LIGHT' },
+      { type: 'END' },
+    ]).state;
+    expect(s.finaleFails).toBe(2);
+    expect(s.hushed).toBe(true);
+    expect(s.phase).toBe('ending');
+  });
+
+  it('sau năm lần hụt khoảng lặng rộng hơn một chút', () => {
+    const s = run([...TO_FINALE, { type: 'FINALE_BEGIN' }]).state;
+    const started = s.finaleStartedAt!;
+    const centre = started + 2_400 + 2 * 2_600 + 1_300;
+    expect(inQuiet(s, centre + 700)).toBe(false);
+    expect(inQuiet({ ...s, finaleFails: 5 }, centre + 700)).toBe(true);
+    expect(inQuiet(s, centre)).toBe(true);
+  });
+
+  it('phải nghe đủ ba bước trước khi tắt được', () => {
+    const s = run([...TO_FINALE, { type: 'FINALE_BEGIN' }]).state;
+    const quietAfterSecond = s.finaleStartedAt! + 2_400 + 2_600 + 1_300;
+    expect(inQuiet(s, quietAfterSecond)).toBe(false);
+  });
+
+  it('hint "hush" chỉ có trước khi tắt radio', () => {
+    expect(hintStage(run([...TO_FINALE, ...FINALE_START]).state)).toBe('hush');
+    expect(hintStage(run([...TO_FINALE, ...FINALE_ALL.slice(0, 4)]).state)).toBeNull();
   });
 
   it('thứ tự khác vẫn tới được ending (J.2 không phải flow bắt buộc)', () => {
@@ -290,7 +334,7 @@ describe('playthrough (doc §J.2)', () => {
       { type: 'RADIO_POWER', on: true },
       { type: 'TUNE', freq: '3.17' }, // guesses straight away
       ...DEDUCTION,
-      ...BRANCH_B,
+      ...FINALE_ALL,
     ]).state;
     expect(s.phase).toBe('ending');
   });

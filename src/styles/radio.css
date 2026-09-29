@@ -357,11 +357,18 @@
   border-radius: 2px;
   background: #e9e2cf;
 }
-.knob.max .knob-cap {
-  rotate: 140deg;
+/* Doc §K: the knob comes off in the player's hand. The cap is gone; only the stub is left. */
+.knob.snapped .knob-cap {
+  rotate: -40deg;
+  translate: 5px 3px;
+  scale: 0.7;
+  opacity: 0.55;
+}
+.knob.snapped {
+  animation: none !important;
 }
 
-/* The choice: the two controls Theo's question is about. */
+/* The closing beat: the power switch (and the knob, until it snaps) draw the eye. */
 .radio-set.choosing .toggle,
 .radio-set.choosing .knob {
   animation: choice-pulse 2.4s ease-in-out infinite;

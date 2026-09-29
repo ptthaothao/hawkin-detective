@@ -274,9 +274,14 @@ export function RadioView({ v }: { v: VisualState }) {
   const voice = subtitle ? voiceAt(subtitle, now) : null;
   const playing = !!voice && voice.phase !== 'done';
   const signal = radioSignal(game);
-  const precall = signal === 'precall' && !game.choice;
-  const choosing = precall && !playing && (!voice || voice.sinceDone >= SILENCE_BEFORE_CHOICE_MS);
-  const controlsOff = playing || precall || game.radio.locked || game.world !== 'normal';
+  const precall = signal === 'precall';
+  // Theo has finished: the footsteps begin and the switch and knob come alive (doc §K).
+  const ready = precall && !playing && (!voice || voice.sinceDone >= SILENCE_BEFORE_CHOICE_MS);
+  useEffect(() => {
+    if (ready) dispatch({ type: 'FINALE_BEGIN' });
+  }, [ready, dispatch]);
+  const finale = game.finaleStartedAt !== null && !game.hushed;
+  const controlsOff = playing || precall || game.deductionSolved || game.world !== 'normal';
   const close = playing || precall ? undefined : () => setUi({ panel: null, subtitle: null });
 
   // Static → silence → voice. The static comes back when the voice is gone.
@@ -311,13 +316,13 @@ export function RadioView({ v }: { v: VisualState }) {
     audio.tune(a + b / 10 + c / 100);
   };
 
-  // After the choice the radio stays in view a moment so the player sees the knob / switch move.
-  const choiceAtOpen = useRef(game.choice);
+  // After the switch-off the radio stays in view a moment so the player sees the lever drop.
+  const hushedAtOpen = useRef(game.hushed);
   useEffect(() => {
-    if (!game.choice || choiceAtOpen.current) return;
+    if (!game.hushed || hushedAtOpen.current) return;
     const id = window.setTimeout(() => setUi({ panel: null, subtitle: null }), CLOSE_AFTER_CHOICE_MS);
     return () => window.clearTimeout(id);
-  }, [game.choice, setUi]);
+  }, [game.hushed, setUi]);
 
   const KIND = { theo: 'voice', radio: 'voice', you: 'you', stage: 'aside' } as const;
   let readout: { kind: LineKind; text: string; who?: string } | null = null;
@@ -326,16 +331,15 @@ export function RadioView({ v }: { v: VisualState }) {
   else if (line) readout = { kind: KIND[line.who], text: line.text, who: line.who };
   else if (precall && subtitle) {
     const last = subtitle.lines[subtitle.lines.length - 1];
-    readout = choosing ? { kind: 'voice', text: last.text, who: last.who } : null;
+    readout = ready ? { kind: 'voice', text: last.text, who: last.who } : null;
   }
   else if (subtitle?.after) readout = { kind: 'thought', text: subtitle.after };
-  else if (signal === 'static' || signal === 'precall') readout = { kind: 'sound', text: 'rè' };
-  else if (signal === 'lure') readout = { kind: 'sound', text: 'rè, hết cỡ' };
+  else if (signal === 'static' || signal === 'precall' || signal === 'steps') readout = { kind: 'sound', text: 'rè' };
   else if (signal.startsWith('echo')) {
     readout = { kind: 'sound', text: ECHOES[freq(game)].line.replace(/^\[[\d.]+\] /, '') };
   }
 
-  const on = game.radio.on && !game.radio.broken;
+  const on = game.radio.on;
   // While a voice is coming through, the signal locks on clean.
   const clarity = voice?.phase === 'speaking' ? 0.9 : v.radio.clarity;
   const style = { '--clarity': clarity, '--dread': v.dread } as CSSProperties;
@@ -347,7 +351,7 @@ export function RadioView({ v }: { v: VisualState }) {
       className={`radio-overlay ${playing ? 'listening' : ''} ${line?.who === 'stage' ? 'looking-around' : ''}`}
     >
       <div
-        className={`radio-set ${on ? 'on' : ''} ${choosing ? 'choosing' : ''} ${phase === 'speaking' ? 'speaking' : ''} ${phase === 'surge' ? 'surging' : ''}`}
+        className={`radio-set ${on ? 'on' : ''} ${finale ? 'choosing' : ''} ${phase === 'speaking' ? 'speaking' : ''} ${phase === 'surge' ? 'surging' : ''}`}
         style={style}
       >
         <div className="radio-cheek" aria-hidden />
@@ -396,13 +400,9 @@ export function RadioView({ v }: { v: VisualState }) {
                 className={`toggle ${game.radio.on ? 'up' : 'down'}`}
                 role="switch"
                 aria-checked={game.radio.on}
-                aria-label={choosing ? 'Tắt radio' : 'Nguồn'}
-                disabled={choosing ? false : controlsOff}
-                onClick={() =>
-                  choosing
-                    ? dispatch({ type: 'CHOOSE', option: 'B' })
-                    : dispatch({ type: 'RADIO_POWER', on: !game.radio.on })
-                }
+                aria-label={finale ? 'Tắt radio' : 'Nguồn'}
+                disabled={finale ? false : controlsOff}
+                onClick={() => dispatch({ type: 'RADIO_POWER', on: !game.radio.on })}
               >
                 <span className="toggle-lever" />
               </button>
@@ -412,10 +412,13 @@ export function RadioView({ v }: { v: VisualState }) {
             </div>
             <div className="control">
               <button
-                className={`knob ${game.radio.volumeMax ? 'max' : ''}`}
-                aria-label="Vặn to hết cỡ"
-                disabled={!choosing}
-                onClick={() => dispatch({ type: 'CHOOSE', option: 'A' })}
+                className={`knob ${game.radio.knobSnapped ? 'snapped' : ''}`}
+                aria-label={game.radio.knobSnapped ? 'Núm âm lượng đã gãy' : 'Núm âm lượng'}
+                disabled={!finale}
+                onClick={() => {
+                  if (!game.radio.knobSnapped) audio.cue('thud');
+                  dispatch({ type: 'KNOB_TRY' });
+                }}
               >
                 <span className="knob-cap" />
               </button>

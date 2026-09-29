@@ -85,23 +85,20 @@ export const DEDUCTION: Step[] = [
   { type: 'SUBMIT_DEDUCTION' },
 ];
 
-export const BRANCH_A: Step[] = [
-  { type: 'CHOOSE', option: 'A' },
-  { type: 'TOGGLE_LIGHT' },
-  { type: 'WAIT', ms: 9_000 },
-  { type: 'INSPECT', id: 'os-wall' },
-  { type: 'END' },
+/** Theo has spoken: the footsteps start. */
+export const FINALE_START: Step[] = [{ type: 'FINALE_BEGIN' }, { type: 'KNOB_TRY' }];
+
+/** Listens to three steps, then switches off in the quiet after the third (FINALE_START costs 2 s of script time). */
+export const FINALE_SWITCH_OFF: Step[] = [
+  { type: 'WAIT', ms: 2_400 + 2 * 2_600 + 1_300 - 2_000 },
+  { type: 'RADIO_POWER', on: false },
 ];
 
-export const BRANCH_B: Step[] = [
-  { type: 'CHOOSE', option: 'B' },
-  { type: 'PLACE_FLASHLIGHT' },
-  { type: 'TOGGLE_LIGHT' },
-  { type: 'THEO_LIGHT' },
-  { type: 'END' },
-];
+export const FINALE_END: Step[] = [{ type: 'TOGGLE_LIGHT' }, { type: 'THEO_LIGHT' }, { type: 'END' }];
 
-export const TO_PRECHOICE: Step[] = [
+export const FINALE_ALL: Step[] = [...FINALE_START, ...FINALE_SWITCH_OFF, ...FINALE_END];
+
+export const TO_FINALE: Step[] = [
   ...OPENING,
   ...EXPLORE_NORMAL,
   ...FIRST_VISIT,
@@ -122,7 +119,6 @@ export const DEBUG_PRESETS: { label: string; steps: Step[] }[] = [
     label: 'Đã liên lạc (mở deduction)',
     steps: [...OPENING, ...EXPLORE_NORMAL, ...FIRST_VISIT, ...DIARY_AND_RULE, ...CONTACT],
   },
-  { label: 'Trước lúc chọn', steps: TO_PRECHOICE },
-  { label: 'Nhánh A (đã chọn)', steps: [...TO_PRECHOICE, { type: 'CHOOSE', option: 'A' }] },
-  { label: 'Nhánh B (đã chọn)', steps: [...TO_PRECHOICE, { type: 'CHOOSE', option: 'B' }] },
+  { label: 'Đã giải deduction (Theo sắp nói)', steps: TO_FINALE },
+  { label: 'Bước chân đang đi (tắt radio đúng nhịp)', steps: [...TO_FINALE, ...FINALE_START] },
 ];

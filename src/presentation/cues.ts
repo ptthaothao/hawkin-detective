@@ -6,7 +6,7 @@ import { MOTHER_VOICE, NARRATION, THEO_CONTACT, THEO_PRECALL, type DialogueLine 
 import type { Action, FxKind } from '../game/types';
 import type { Cue } from '../audio/audio';
 
-export type Transition = 'arrive' | 'lightOff' | 'lightOn' | 'dark' | 'rescue';
+export type Transition = 'arrive' | 'lightOff' | 'lightOn' | 'dark';
 
 export interface RadioVoice {
   lines: DialogueLine[];
@@ -75,9 +75,11 @@ export const PRESENTATION: Record<FxKind, Presentation> = {
   },
   lightOn: { sound: 'switch', transition: { kind: 'lightOn', lockMs: 0, ms: 600 } },
   dark: { sound: 'switch', transition: { kind: 'dark', lockMs: 1_100, ms: 1_900 } },
-  rescue: { sound: 'thud', transition: { kind: 'rescue', lockMs: 500, ms: 1_300 }, glitchMs: 500 },
   movement: { sound: 'thud', glitchMs: 350, beats: [{ atMs: 700, sound: 'creak' }] },
-  turnBack: { sound: 'heartbeat', glitchMs: 600 },
+  // Switched off mid-step: it stops, turns towards the radio, and the radio comes back on by itself.
+  turnBack: { sound: 'heartbeat', glitchMs: 600, beats: [{ atMs: 1_300, sound: 'scratch' }] },
+  // Switched off between two steps: silence, a hand on the door, and it walks on.
+  hush: { sound: 'cut', beats: [{ atMs: 1_100, sound: 'scratch' }] },
   // 3.17 (doc §F): the room goes quiet, Theo answers — and something answers the radio too.
   contact: {
     glitchMs: 450,
@@ -85,5 +87,5 @@ export const PRESENTATION: Record<FxKind, Presentation> = {
   },
   // The truth lands in the Case File first; then the radio crackles on by itself.
   precall: { radioVoice: { lines: THEO_PRECALL, delayMs: 3_400, preRollMs: 1_600 } },
-  theoLight: {},
+  theoLight: { beats: [{ atMs: 1_800, sound: 'whistle' }] },
 };

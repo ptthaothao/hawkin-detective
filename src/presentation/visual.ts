@@ -1,7 +1,7 @@
 // GameState → VisualState. Everything the player sees or hears is derived from here;
 // the reducer never knows about lighting, dread or where the creature is drawn.
 
-import { lureProgress, radioSignal } from '../game/selectors';
+import { radioSignal } from '../game/selectors';
 import type { GameState, RadioSignal, World } from '../game/types';
 
 export type Lighting = 'lamp' | 'flashlight' | 'dark' | 'theo-light';
@@ -25,40 +25,32 @@ export interface VisualState {
     clarity: number;
   };
   wallClock: 'running' | 'stopped';
-  /** Branch A aftermath: the room on this side carries marks from the other side. */
+  /** After the radio is silenced: the door on this side carries a fresh scratch. */
   scarred: boolean;
 }
 
-/** Where the creature stands: middle of the room → desk (branch A) or → door (branch B). */
+/** Where the creature stands: at the desk once it has answered the radio, at the door while it walks past. */
 export const CREATURE_POS = {
   desk: { x: 66, y: 40 },
   middle: { x: 44, y: 44 },
   door: { x: 90, y: 40 },
 };
 
-function creature(s: GameState, now: number): CreatureVisual | null {
-  if (!s.contactMade || s.rescued) return null;
+function creature(s: GameState): CreatureVisual | null {
+  if (!s.contactMade || s.hushed) return null;
   if (!s.deductionSolved) return { ...CREATURE_POS.desk, leaving: false };
-  if (s.choice === 'A') {
-    const p = lureProgress(s, now);
-    const { middle: m, desk: d } = CREATURE_POS;
-    return { x: m.x + (d.x - m.x) * p, y: m.y + (d.y - m.y) * p, leaving: false };
-  }
-  if (s.choice === 'B') return { ...CREATURE_POS.door, leaving: true };
-  return { ...CREATURE_POS.middle, leaving: false };
+  return { ...CREATURE_POS.door, leaving: false };
 }
 
-function dread(s: GameState, now: number): number {
-  if (s.phase !== 'play' || s.rescued) return 0;
-  const hunted = s.contactMade && !s.theoLightSeen;
+function dread(s: GameState): number {
+  if (s.phase !== 'play') return 0;
+  const hunted = s.contactMade && !s.hushed;
   if (s.world === 'normal') {
-    if (s.choice === 'A') return 0.35;
-    return hunted ? 0.12 : 0;
+    if (!hunted) return 0;
+    return s.finaleStartedAt !== null ? 0.3 : 0.12;
   }
-  if (s.flashlightGiven) return s.theoLightSeen ? 0.1 : 0.3;
+  if (s.hushed) return s.theoLightSeen ? 0.1 : 0.3;
   if (!hunted) return 0.2;
-  if (s.choice === 'A') return 0.55 + 0.45 * lureProgress(s, now);
-  if (s.choice === 'B') return 0.3;
   return s.deductionSolved ? 0.6 : 0.45;
 }
 
@@ -69,25 +61,25 @@ const CLARITY: Record<RadioSignal, number> = {
   echo2: 0.45,
   echo3: 0.5,
   precall: 0.85,
-  lure: 0.05,
+  steps: 0.3,
 };
 
 function lighting(s: GameState): Lighting {
   if (s.world === 'normal') return 'lamp';
-  if (!s.flashlightGiven) return 'flashlight';
+  if (!s.hushed) return 'flashlight';
   return s.theoLightSeen ? 'theo-light' : 'dark';
 }
 
-export function deriveVisual(s: GameState, now: number): VisualState {
-  const d = dread(s, now);
+export function deriveVisual(s: GameState): VisualState {
+  const d = dread(s);
   const signal = radioSignal(s);
   return {
     world: s.world,
     lighting: lighting(s),
     dread: d,
-    creature: creature(s, now),
+    creature: creature(s),
     radio: { signal, clarity: CLARITY[signal] * (1 - d * 0.6) },
-    wallClock: s.rescued ? 'stopped' : 'running',
-    scarred: s.rescued,
+    wallClock: s.endingReady ? 'stopped' : 'running',
+    scarred: s.hushed,
   };
 }

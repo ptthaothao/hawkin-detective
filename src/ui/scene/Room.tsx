@@ -678,14 +678,12 @@ function Claws({ fresh, color }: { fresh: boolean; color: string }) {
 /** Where the poster hangs on this side, the other side has the count carved into the wall. */
 function WallMarks({
   id,
-  s,
   count,
   message,
   blur,
   fresh,
 }: {
   id: string;
-  s: GameState;
   count: number;
   message: boolean;
   blur: boolean;
@@ -706,16 +704,6 @@ function WallMarks({
           <TallyStrokes count={count} freshLast={fresh} />
         </g>
       </g>
-      {s.choice === 'A' && !s.rescued && (
-        <g>
-          <path d="M214 486 l10 -40 l-6 -30 l14 -24 l6 34 l-4 36 l8 26 Z" fill="#000" />
-          <path
-            d="M220 470 q-4 -18 2 -34 l4 -2 l2 18 l4 -26 l6 0 l0 24 l4 -26 l6 0 l-2 28 l6 -20 l6 2 l-6 28 q-2 12 -14 14 Z"
-            fill="#caa88a"
-            className="theo-hand"
-          />
-        </g>
-      )}
       {message && (
         <text x="256" y="524" textAnchor="middle" className="carved-text">
           EM ỔN. ĐÊM MAI. CÙNG GIỜ.
@@ -801,14 +789,14 @@ export function Room({
       </svg>
       {other ? <Decay id={id} p={p} /> : <Poster p={p} />}
       {other && (
-        <WallMarks id={id} s={s} count={tally(s)} message={s.theoLightSeen} blur={glimpse} fresh={live && s.lightOffCount > 0} />
+        <WallMarks id={id} count={tally(s)} message={s.theoLightSeen} blur={glimpse} fresh={live && s.lightOffCount > 0} />
       )}
       <Bed id={id} p={p} />
       <Rug p={p} lifted={!other && s.diaryFound} />
       {/* The pried board must stay visible on the other side: it is what sends the player back for the diary. */}
       {(other || s.diaryFound) && <FloorHole p={p} />}
       <Desk p={p} />
-      <Radio id={id} p={p} s={s} broken={!other && s.radio.broken} overgrown={other} surge={surge} />
+      <Radio id={id} p={p} s={s} broken={false} overgrown={other} surge={surge} />
       <Lamp p={p} lit={lit} />
       {!other && <DeskThings p={p} />}
       {!other && <Mic p={p} fallen={false} />}

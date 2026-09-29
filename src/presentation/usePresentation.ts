@@ -1,15 +1,14 @@
 import { useEffect } from 'react';
 import { audio, type AmbienceMode } from '../audio/audio';
 import { useStore } from '../store';
-import { useNow } from '../ui/useNow';
+import { FOOT_LEAD_MS, FOOT_PERIOD_MS } from '../game/selectors';
 import { PRESENTATION, type Beat } from './cues';
 import { deriveVisual, type VisualState } from './visual';
 
-/** Current VisualState. Re-derives on a timer only while something is animating (branch A lure). */
+/** Current VisualState, derived from the game state alone. */
 export function useVisual(): VisualState {
   const game = useStore((s) => s.game);
-  const now = useNow(100, game.lureStartedAt !== null && !game.rescued);
-  return deriveVisual(game, now);
+  return deriveVisual(game);
 }
 
 /** Plays one beat of an event. Returns timers to cancel if the event is superseded. */
@@ -53,6 +52,28 @@ export function usePresentation(): VisualState {
   );
 
   const dispatch = useStore((s) => s.dispatch);
+
+  // Doc §K: the thing walks past on a fixed rhythm while the radio is on. The same clock the reducer judges by.
+  const finaleStartedAt = useStore((s) => s.game.finaleStartedAt);
+  const hushed = useStore((s) => s.game.hushed);
+  useEffect(() => {
+    if (!playing || finaleStartedAt === null || hushed) return;
+    const timers: number[] = [];
+    const first = finaleStartedAt + FOOT_LEAD_MS;
+    let k = Math.max(0, Math.floor((Date.now() - first) / FOOT_PERIOD_MS) + 1);
+    const next = () => {
+      const at = first + k * FOOT_PERIOD_MS;
+      timers.push(
+        window.setTimeout(() => {
+          audio.cue('footstep');
+          k += 1;
+          next();
+        }, Math.max(0, at - Date.now())),
+      );
+    };
+    next();
+    return () => timers.forEach((t) => window.clearTimeout(t));
+  }, [playing, finaleStartedAt, hushed]);
 
   const fxId = fx?.id;
   const fxKind = fx?.kind;

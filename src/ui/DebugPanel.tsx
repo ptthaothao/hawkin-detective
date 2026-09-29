@@ -30,7 +30,7 @@ export function DebugPanel() {
         <br />
         clues={game.clues.join(',') || '—'} contact={String(game.contactMade)}
         <br />
-        hint={hintStage(game) ?? '—'} revealed={game.hintRevealed} choice={game.choice ?? '—'}
+        hint={hintStage(game) ?? '—'} revealed={game.hintRevealed} finale={game.finaleStartedAt === null ? '—' : `${game.finaleFails} hụt`}
       </div>
       <label>
         <input type="checkbox" checked={showHotspots} onChange={(e) => setUi({ showHotspots: e.target.checked })} />{' '}

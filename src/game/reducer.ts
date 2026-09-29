@@ -22,7 +22,7 @@ import {
   hasClue,
   hintStage,
   hintTiersUnlocked,
-  LURE_MS,
+  inQuiet,
   tally,
 } from './selectors';
 import type { Action, ClueId, FxKind, GameState, HotspotId, SlotId } from './types';
@@ -55,7 +55,7 @@ export function initialState(): GameState {
     tallyLog: [],
     diaryFound: false,
     // Doc §R: the radio is on when the player walks in; it is the first thing to check.
-    radio: { on: true, wheels: [...INITIAL_WHEELS], volumeMax: false, broken: false, locked: false },
+    radio: { on: true, wheels: [...INITIAL_WHEELS], knobSnapped: false },
     heardFreqs: [],
     radioLog: [],
     contactMade: false,
@@ -67,10 +67,9 @@ export function initialState(): GameState {
     wrongSubmits: 0,
     deductionFeedback: null,
     deductionSolved: false,
-    choice: null,
-    lureStartedAt: null,
-    rescued: false,
-    flashlightGiven: false,
+    finaleStartedAt: null,
+    finaleFails: 0,
+    hushed: false,
     theoLightSeen: false,
     endingReady: false,
     message: null,
@@ -111,30 +110,29 @@ function logRadio(s: GameState, lines: string[]): GameState {
 
 // --- world ------------------------------------------------------------------
 
-function enterOtherSide(s: GameState, now: number): GameState {
+function enterOtherSide(s: GameState): GameState {
   let next: GameState = { ...s, world: 'other', lightOffCount: s.lightOffCount + 1 };
   if (hasClue(next, 'C5')) next = { ...next, tallyLog: [...next.tallyLog, tally(next)] };
-  if (next.choice === 'A' && !next.rescued) next = { ...next, lureStartedAt: now };
-  if (next.flashlightGiven && !next.theoLightSeen) return fx(next, 'dark');
+  if (next.hushed && !next.theoLightSeen) return fx(next, 'dark');
   if (next.lightOffCount === 1) next = say(next, NARRATION.firstOtherSide);
-  else if (next.contactMade && !next.sawAftermath && !next.choice) next = say(next, NARRATION.somethingAtDesk);
+  else if (next.contactMade && !next.sawAftermath && !next.deductionSolved) next = say(next, NARRATION.somethingAtDesk);
   return fx(next, 'lightOff');
 }
 
-function toggleLight(s: GameState, now: number): GameState {
+function toggleLight(s: GameState): GameState {
   if (s.flicker === 'pending') return s;
   if (s.world === 'other') return fx({ ...s, world: 'normal' }, 'lightOn');
   if (s.flicker === 'none') {
     // Doc §I: the first light-off always comes after the three flickers.
     return fx({ ...s, flicker: 'pending', queuedLightOff: true }, 'flicker');
   }
-  return enterOtherSide(s, now);
+  return enterOtherSide(s);
 }
 
 // --- radio ------------------------------------------------------------------
 
 function afterRadioChange(s: GameState): GameState {
-  if (!s.radio.on || s.radio.broken || s.choice) return s;
+  if (!s.radio.on || s.deductionSolved) return s;
   const f = freq(s);
   const echo = ECHOES[f];
   if (echo) {
@@ -202,7 +200,7 @@ function inspectNormal(s: GameState, id: HotspotId): GameState {
     case 'mic':
       return say(s, HOTSPOT_TEXT.mic);
     case 'wall-clock':
-      return say(s, s.rescued ? HOTSPOT_TEXT.wallClockStopped : HOTSPOT_TEXT.wallClock);
+      return say(s, HOTSPOT_TEXT.wallClock);
     case 'poster':
       return say(s, HOTSPOT_TEXT.poster);
     case 'rug':
@@ -218,10 +216,10 @@ function inspectNormal(s: GameState, id: HotspotId): GameState {
   }
 }
 
-function inspectOther(s: GameState, id: HotspotId, now: number): GameState {
+function inspectOther(s: GameState, id: HotspotId): GameState {
   switch (id) {
     case 'os-wall':
-      return inspectWall(s.contactMade ? { ...s, wallAfterContact: true } : s, now);
+      return inspectWall(s.contactMade ? { ...s, wallAfterContact: true } : s);
     case 'os-clock':
       return inspectClue(s, 'C4');
     case 'os-floor':
@@ -236,11 +234,11 @@ function inspectOther(s: GameState, id: HotspotId, now: number): GameState {
   }
 }
 
-function inspect(s: GameState, id: HotspotId, now: number): GameState {
+function inspect(s: GameState, id: HotspotId): GameState {
   const isNormal = NORMAL_IDS.includes(id);
   if ((s.world === 'normal') !== isNormal) return s;
   const seen = markInspected(s, id);
-  if (!isNormal) return inspectOther(moveOn(seen), id, now);
+  if (!isNormal) return inspectOther(moveOn(seen), id);
 
   const next = inspectNormal(id === 'radio' ? seen : moveOn(seen), id);
   const normalSeen = next.inspected.filter((h) => NORMAL_IDS.includes(h)).length;
@@ -250,24 +248,13 @@ function inspect(s: GameState, id: HotspotId, now: number): GameState {
   return next;
 }
 
-function inspectWall(s: GameState, now: number): GameState {
-  if (s.choice === 'A' && !s.rescued) {
-    const started = s.lureStartedAt ?? now;
-    if (now - started < LURE_MS) {
-      return fx(say({ ...s, lureStartedAt: now }, HOTSPOT_TEXT.turnBack), 'turnBack');
-    }
-    const radio = { ...s.radio, broken: true, on: false };
-    return fx(
-      say({ ...s, rescued: true, world: 'normal', radio, endingReady: true }, HOTSPOT_TEXT.rescue),
-      'rescue',
-    );
-  }
+function inspectWall(s: GameState): GameState {
   let next = s;
   if (!hasClue(next, 'C5')) next = addClue({ ...next, tallyLog: [tally(next)] }, 'C5');
   return say(next, `${CLUES.C5.text} ${tally(next)} vạch.`);
 }
 
-// --- deduction & choice -----------------------------------------------------
+// --- deduction & the closing beat -----------------------------------------------------
 
 function submitDeduction(s: GameState): GameState {
   if (!s.contactMade || s.deductionSolved) return s;
@@ -287,23 +274,25 @@ function submitDeduction(s: GameState): GameState {
   return { ...s, wrongSubmits, deductionFeedback };
 }
 
-function choose(s: GameState, option: 'A' | 'B', now: number): GameState {
-  if (!s.deductionSolved || s.choice) return s;
-  if (option === 'A') {
-    return {
-      ...s,
-      choice: 'A',
-      radio: { ...s.radio, on: true, volumeMax: true, locked: true },
-      lureStartedAt: s.world === 'other' ? now : null,
-    };
-  }
-  return { ...s, choice: 'B', radio: { ...s.radio, on: false, locked: true } };
+/** Doc §K: Theo has finished speaking. The knob snaps when tried, the footsteps start. */
+function beginFinale(s: GameState, now: number): GameState {
+  if (!s.deductionSolved || s.finaleStartedAt !== null) return s;
+  return { ...s, finaleStartedAt: now };
 }
 
-function placeFlashlight(s: GameState): GameState {
-  if (s.world !== 'normal' || !s.diaryFound || s.flashlightGiven) return s;
-  if (s.choice !== 'B') return say(s, HOTSPOT_TEXT.flashlightRefused);
-  return say({ ...s, flashlightGiven: true }, HOTSPOT_TEXT.flashlightGiven);
+function tryKnob(s: GameState): GameState {
+  if (!s.deductionSolved || s.radio.knobSnapped) return s;
+  return say({ ...s, radio: { ...s.radio, knobSnapped: true } }, HOTSPOT_TEXT.knobSnapped);
+}
+
+/** Doc §K: the switch-off. In the quiet between two steps it works; anywhere else the thing turns back. */
+function switchOff(s: GameState, now: number): GameState {
+  if (s.hushed) return s;
+  if (inQuiet(s, now)) {
+    return fx(say({ ...s, hushed: true, radio: { ...s.radio, on: false } }, HOTSPOT_TEXT.hushed), 'hush');
+  }
+  // Nothing is lost: the radio comes on again by itself and the rhythm starts over.
+  return fx(say({ ...s, finaleFails: s.finaleFails + 1, finaleStartedAt: now }, HOTSPOT_TEXT.turnBack), 'turnBack');
 }
 
 // --- main reducer -----------------------------------------------------------
@@ -325,35 +314,36 @@ function step(s: GameState, a: Action): GameState {
 
   switch (a.type) {
     case 'INSPECT':
-      return s.flicker === 'pending' ? s : inspect(s, a.id, a.now);
+      return s.flicker === 'pending' ? s : inspect(s, a.id);
     case 'TOGGLE_LIGHT':
-      return toggleLight(s, a.now);
+      return toggleLight(s);
     case 'FLICKER_DONE': {
       if (s.flicker !== 'pending') return s;
       const next: GameState = { ...s, flicker: 'done', queuedLightOff: false };
-      return s.queuedLightOff ? enterOtherSide(next, a.now) : say(next, NARRATION.glimpse);
+      return s.queuedLightOff ? enterOtherSide(next) : say(next, NARRATION.glimpse);
     }
     case 'NOTICE_DIAL':
       if (!heardMother(s) || s.dialNoticed) return s;
       return say({ ...s, dialNoticed: true }, NARRATION.noticeDial);
     case 'RADIO_POWER':
-      if (s.radio.locked || s.world !== 'normal') return s;
+      if (s.world !== 'normal') return s;
+      if (s.deductionSolved) return !a.on && s.finaleStartedAt !== null ? switchOff(s, a.now) : s;
       return afterRadioChange({ ...s, radio: { ...s.radio, on: a.on } });
     case 'RADIO_WHEEL':
-      if (s.radio.locked || s.world !== 'normal') return s;
+      if (s.deductionSolved || s.world !== 'normal') return s;
       return turnWheel(moveOn(s), a.index, a.delta);
-    case 'PLACE_FLASHLIGHT':
-      return placeFlashlight(s);
+    case 'FINALE_BEGIN':
+      return beginFinale(s, a.now);
+    case 'KNOB_TRY':
+      return s.world === 'normal' ? tryKnob(s) : s;
     case 'FILL_SLOT':
       if (!s.contactMade || s.deductionSolved) return s;
       if (a.chip && !chipAvailable(s, a.chip)) return s;
       return { ...s, slots: { ...s.slots, [a.slot]: a.chip }, deductionFeedback: null };
     case 'SUBMIT_DEDUCTION':
       return submitDeduction(s);
-    case 'CHOOSE':
-      return choose(s, a.option, a.now);
     case 'THEO_LIGHT':
-      if (!s.flashlightGiven || s.world !== 'other' || s.theoLightSeen) return s;
+      if (!s.hushed || s.world !== 'other' || s.theoLightSeen) return s;
       return fx(say({ ...s, theoLightSeen: true, endingReady: true }, HOTSPOT_TEXT.theoLight), 'theoLight');
     case 'REQUEST_HINT': {
       if (s.hintRevealed >= hintTiersUnlocked(s, a.now)) return s;
@@ -376,8 +366,8 @@ function progressKey(s: GameState): string {
     s.dialNoticed,
     s.wallAfterContact,
     s.deductionSolved,
-    s.choice,
-    s.flashlightGiven,
+    s.hushed,
+    s.finaleFails,
   ].join('|');
 }
 

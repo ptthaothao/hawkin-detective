@@ -26,7 +26,7 @@ export const NORMAL_HOTSPOTS: HotspotDef[] = [
   { id: 'watch', rect: { x: 75.5, y: 50, w: 4, h: 3 } },
   { id: 'mic', rect: { x: 57, y: 38, w: 3.5, h: 10 } },
   { id: 'desk-edge', rect: { x: 55, y: 53.5, w: 8, h: 3 }, visible: (s) => s.contactMade },
-  { id: 'door-normal', rect: { x: 89, y: 18, w: 9, h: 62 }, visible: (s) => s.rescued },
+  { id: 'door-normal', rect: { x: 89, y: 18, w: 9, h: 62 }, visible: (s) => s.hushed },
 ];
 
 export const OTHER_HOTSPOTS: HotspotDef[] = [

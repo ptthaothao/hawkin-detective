@@ -73,7 +73,7 @@ export function EndingBeat() {
     };
   }, [game.endingReady, dispatch]);
   if (!show) return null;
-  return <div className="ending-beat">{game.choice === 'A' ? ENDING.beatA : ENDING.beatB}</div>;
+  return <div className="ending-beat">{ENDING.beat}</div>;
 }
 
 function mmss(ms: number) {
@@ -88,12 +88,12 @@ export function EndingScreen() {
   return (
     <div className="screen ending">
       <h1 className="ending-title">{ENDING.title}</h1>
-      <p className="teaser">{game.choice === 'A' ? ENDING.teaserA : ENDING.teaserB}</p>
+      <p className="teaser">{ENDING.teaser}</p>
       <dl className="summary report">
         <dt>Manh mối</dt>
         <dd>{game.clues.length} / 6</dd>
-        <dt>Lựa chọn</dt>
-        <dd>{game.choice === 'A' ? 'Vặn to hết cỡ' : 'Tắt radio'}</dd>
+        <dt>Lần tắt radio hụt</dt>
+        <dd>{game.finaleFails}</dd>
         <dt>Số hint đã dùng</dt>
         <dd>{game.hintsUsed}</dd>
         <dt>Thời gian</dt>

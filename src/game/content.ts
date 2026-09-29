@@ -37,9 +37,7 @@ export type StepId =
   | 'investigate-creature'
   | 'find-count'
   | 'reconstruct'
-  | 'choose'
-  | 'pull-theo'
-  | 'help-theo'
+  | 'hush'
   | 'cross-over'
   | 'resolved';
 
@@ -117,23 +115,13 @@ export const STEPS: Record<StepId, StepText> = {
     action: 'Ghép lại bằng chứng trong hồ sơ.',
     nudge: 'Mình đã có đủ bằng chứng. Hồ sơ đang ở góc.',
   },
-  choose: {
-    question: 'Có nên đưa Theo về không?',
-    action: 'Trả lời Theo trên radio.',
-    nudge: 'Theo đang chờ câu trả lời.',
-  },
-  'pull-theo': {
-    question: 'Làm sao kéo Theo qua khi nó còn ở đó?',
-    action: 'Đợi nó đi về phía radio, rồi kéo Theo qua bức tường.',
-    nudge: 'Nghe tiếng nó di chuyển trong bóng tối.',
-  },
-  'help-theo': {
-    question: 'Theo phải ở trong bóng tối cả đêm sao?',
-    action: 'Tìm cách gửi ánh sáng sang cho Theo.',
-    nudge: '“Bên này nó cũng có”… Theo đã nói về cái hốc dưới sàn.',
+  hush: {
+    question: 'Làm sao để nó không nghe thấy Theo?',
+    action: 'Tắt radio, đúng lúc.',
+    nudge: 'Nó bước rất đều. Nghe cho kỹ nhịp của nó.',
   },
   'cross-over': {
-    question: 'Theo có nhận được không?',
+    question: 'Theo có ổn không?',
     action: 'Sang phía bên kia.',
     nudge: 'Tắt đèn.',
   },
@@ -148,7 +136,7 @@ export const DISCOVERIES: Record<DiscoveryId, string> = {
   'other-side': 'Căn phòng có một phía khác. Nó chỉ hiện ra khi đèn tắt.',
   alive: 'Theo còn sống.',
   followed: 'Nó tới bàn radio ngay sau khi mình bật radio lên.',
-  connected: 'Hai căn phòng thông nhau qua cái hốc dưới sàn.',
+  connected: 'Theo đã nói vào micro. Và thứ đó tìm đến tiếng ấy.',
 };
 
 /** The deduction page asks the chapter's real question. */
@@ -210,15 +198,15 @@ export const CLUE_FOUND: Record<ClueId, string> = {
   C1: 'Cả chồng tờ tìm người chưa kịp dán. Cảnh sát viết: “bỏ nhà đi”.',
   C2: 'Đồng hồ đeo tay của Theo, kèm giấy nhắn của mẹ. Mặt số nứt, chỉ còn đọc được 03.',
   C3: 'Nhật ký của Theo.',
-  C4: 'Đồng hồ ở đây đã dừng. Kim ngắn gãy rơi dưới mặt kính. Chỉ còn kim dài.',
-  C5: 'Ai đó đã khắc vào tường.',
+  C4: 'Đồng hồ quả lắc ở đây đã dừng, con lắc treo lệch. Kim ngắn gãy rơi dưới mặt kính. Chỉ còn kim dài.',
+  C5: 'Ai đó đã vẽ lên tường, bằng bút sáp.',
   C6: 'Radio bị cào nát. Micro rơi dưới sàn, dây kéo căng về phía bức tường.',
 };
 
 /** When the second stopped clock is found, the player notices it matches the first. Observation, not answer. */
 export const CLUE_FOUND_PAIRED: Partial<Record<ClueId, string>> = {
   C2: 'Đồng hồ đeo tay của Theo. Nó cũng đã dừng, như cái đồng hồ bên kia. Mặt số nứt: còn số giờ, mất số phút.',
-  C4: 'Đồng hồ ở đây cũng dừng, như đồng hồ đeo tay của Theo. Kim ngắn gãy rơi dưới mặt kính. Chỉ còn kim dài.',
+  C4: 'Đồng hồ quả lắc ở đây cũng dừng, như đồng hồ đeo tay của Theo. Kim ngắn gãy rơi dưới mặt kính. Chỉ còn kim dài.',
 };
 
 export interface ClueDef {
@@ -231,7 +219,7 @@ export const CLUES: Record<ClueId, ClueDef> = {
   C1: {
     title: 'Tờ tìm người',
     world: 'normal',
-    text: 'THEO NGUYỄN, 12 tuổi. Mất tích đêm 14 rạng sáng 15/11. Cảnh sát cho rằng em bỏ nhà đi.',
+    text: 'THEO HALE, 12 tuổi. Mất tích đêm 14 rạng sáng 15/11. Cảnh sát cho rằng em bỏ nhà đi.',
   },
   C2: {
     title: 'Đồng hồ đeo tay',
@@ -246,17 +234,17 @@ export const CLUES: Record<ClueId, ClueDef> = {
   C4: {
     title: 'Đồng hồ bên kia',
     world: 'other',
-    text: 'Đồng hồ đứng yên. Kim ngắn gãy, nằm dưới đáy mặt kính. Kim dài dừng qua số 3 hai vạch nhỏ.',
+    text: 'Đồng hồ quả lắc đứng yên. Con lắc dừng lệch một bên. Kim ngắn gãy, nằm dưới đáy mặt kính. Kim dài dừng qua số 3 hai vạch nhỏ.',
   },
   C5: {
-    title: 'Bức tường khắc vạch',
+    title: 'Bức tường có vạch',
     world: 'other',
-    text: 'Bức tường có vạch khắc.',
+    text: 'Bức tường có vạch bút sáp.',
   },
   C6: {
     title: 'Bàn radio bên kia',
     world: 'other',
-    text: 'Vết cào sâu bao quanh radio. Đèn bàn ngay bên cạnh không có vết nào. Micro cầm tay rơi dưới sàn, dây kéo căng về phía bức tường cạnh giường. Nút bấm nói bị quấn băng keo cho kẹt xuống.',
+    text: 'Vết cào sâu bao quanh radio. Đèn dầu ngay bên cạnh không có vết nào. Micro cầm tay rơi dưới sàn, dây kéo căng về phía bức tường cạnh giường. Nút bấm nói bị quấn băng keo cho kẹt xuống.',
   },
 };
 
@@ -267,9 +255,9 @@ export const DIARY_PAGES = [
   'Đêm 1 — 01:52. Chỉ có rè. Rồi ba tiếng gõ. Chắc em tưởng tượng.',
   'Đêm 2 — 02:34. Có tiếng thở. Em vặn to lên để nghe rõ. Sáng ra có vết cào ở mặt ngoài cửa phòng em. Mẹ bảo là con chó nhà bên.',
   'Đêm 3 — 02:58. Nó gọi tên em. Bằng giọng của mẹ. Đồng hồ đeo tay em tắt ngấm lúc nó tới, sáng ra mới chạy lại.',
-  'Radio của bố có micro. Em vẫn chưa dám bấm nút.\n\nEm để đèn pin trong hốc dưới sàn. Sáng ra nó biến mất.',
+  'Radio của bố có micro. Em vẫn chưa dám bấm nút.\n\nEm để một mẩu bút sáp trong hốc dưới sàn. Sáng ra nó biến mất.',
   // The last night's time is left blank: that blank is the question the player has to fill in.
-  'Đêm 4 — __:__. Đêm nay nó sẽ đến muộn hơn. Nó tới lúc nào, em sẽ ghi vào đây.\n\nLần này em sẽ không chỉ ngồi nghe.',
+  'Hôm nay em ở nhà Danny tới tối, vẽ cả buổi. Về nhà em nằm lên giường và nghịch radio của bố.\n\nĐêm 4 — __:__. Đêm nay nó sẽ đến muộn hơn. Nó tới lúc nào, em sẽ ghi vào đây.\n\nLần này em sẽ không chỉ ngồi nghe.',
 ];
 
 export const HOTSPOT_TEXT = {
@@ -283,11 +271,10 @@ export const HOTSPOT_TEXT = {
   osFloor: 'Tấm ván bị cạy. Hốc bên dưới trống, chỉ rộng bằng một cuốn sổ.',
   osDoor: 'Bạn không muốn mở cánh cửa đó.',
   osDeskAfter: 'Vết cào mới quanh radio. Có thứ gì vừa ở đây.',
-  flashlightRefused: 'Bạn còn cần nó.',
-  flashlightGiven: 'Bạn đặt đèn pin vào hốc sàn. Đèn pin biến mất.',
-  turnBack: 'Nó quay đầu lại. Tiếng tim đập.',
-  rescue: 'Bàn tay Theo nắm lấy tay bạn. Đèn bật sáng. Theo ở đây.\nTheo: “Nó biết đường sang đây rồi.”',
-  theoLight: 'Một vùng sáng bật lên ở bức tường. Dòng khắc mới: “EM ỔN. ĐÊM MAI. CÙNG GIỜ.”',
+  knobSnapped: 'Bạn vặn núm âm lượng. Nó gãy rời trong tay bạn.',
+  turnBack: 'Nó dừng bước và quay về phía radio. Tiếng tim đập. Radio rè lên lại.',
+  hushed: 'Im lặng. Bước chân dừng ở cửa phòng. Một tiếng cào nhẹ. Rồi nó đi tiếp.',
+  theoLight: 'Một vùng sáng bật lên ở bức tường. Dòng bút sáp mới: “EM ỔN. ĐÊM MAI. CÙNG GIỜ.”',
 };
 
 /** Radio responses (doc §H). Any frequency not listed here, including 3.00, is static only. */
@@ -302,7 +289,7 @@ export const INITIAL_WHEELS: [number, number, number] = [2, 5, 8];
 
 /**
  * First contact at 3.17 (doc §F). Sound crosses between the sides (rule 4), so Theo hears you speak.
- * Theo's lines must not contain "khắc", "vạch", "tường", "micro", "radio".
+ * Theo's lines must not contain "khắc", "vạch", "tường", "micro", "radio", "bút", "màu", "vẽ".
  */
 export const THEO_CONTACT: DialogueLine[] = [
   { who: 'theo', text: '…chị?' },
@@ -320,18 +307,15 @@ export const THEO_CONTACT: DialogueLine[] = [
 ];
 
 /**
- * Doc §K: before choosing, Theo says what each option gives and costs, and tells you the floor
- * hole connects the rooms: the only way to help him if the radio goes silent.
+ * Doc §K: the last thing Theo says before the footsteps. It gives the reason for the microphone rule,
+ * and tells the player to listen for the rhythm. No choice is offered.
  */
 export const THEO_PRECALL: DialogueLine[] = [
-  { who: 'theo', text: 'Em ở ngay chỗ lúc trước em bị kéo qua. Nó đứng giữa phòng, chắn đường.' },
-  { who: 'theo', text: 'Nếu chị vặn radio thật to… nó sẽ bỏ em, đi về phía tiếng động. Em sẽ chạy được qua.' },
-  { who: 'theo', text: 'Nhưng đêm em vặn to, sáng ra cửa phòng có vết cào. Ở phía bên ngoài.' },
-  { who: 'theo', text: 'Mẹ đang ngủ dưới nhà đó chị.' },
-  { who: 'theo', text: 'Còn nếu chị tắt đi… nó mất dấu. Em trốn thêm được một đêm nữa. Nhưng bên này tối lắm.' },
-  { who: 'theo', text: 'Chị có thấy cái hốc dưới sàn không? Bên này nó cũng có.' },
-  { who: 'theo', text: 'Hôm trước em để đèn pin vào đó, sáng ra nó biến mất. Đồ bỏ vào đó… sang được bên này.' },
-  { who: 'theo', text: 'Chị định làm gì?' },
+  { who: 'theo', text: 'Chị. Đừng nói gì vào micro nữa. Nó nghe thấy.' },
+  { who: 'theo', text: 'Đêm em nói vào đó, nó tới.' },
+  { who: 'theo', text: 'Pin đèn của em sắp hết rồi.' },
+  { who: 'theo', text: 'Nó đang đi qua phòng em. Đều như mọi lần.' },
+  { who: 'theo', text: 'Chị nghe cho kỹ nhịp của nó.' },
 ];
 
 export const DEDUCTION_SENTENCE: Record<SlotId, [string, string]> = {
@@ -355,7 +339,7 @@ export const CHIPS: Record<ChipId, ChipDef> = {
   'hoc-duoi-san': { label: 'hốc dưới sàn', slot: 'C', sources: ['C3'] },
   'ban-radio': { label: 'bàn radio', slot: 'C', sources: ['C6'] },
   'cua-phong': { label: 'cửa phòng', slot: 'C', sources: ['C3'] },
-  'buc-tuong': { label: 'bức tường có vạch khắc', slot: 'C', sources: ['C5'] },
+  'buc-tuong': { label: 'bức tường có vạch bút sáp', slot: 'C', sources: ['C5'] },
   'anh-sang': { label: 'ánh sáng', slot: 'D', sources: ['C6'] },
   'tieng-radio': { label: 'tiếng radio', slot: 'D', sources: ['C6'] },
   'canh-cua-phong': { label: 'cánh cửa phòng', slot: 'D', sources: ['C3'] },
@@ -414,20 +398,18 @@ export const HINTS: Record<HintStage, [string, string, string]> = {
   ],
   dedD: [
     'So sánh bàn radio bên kia trước và sau khi mình dò 3.17.',
-    'Đèn bàn và radio nằm cạnh nhau. Cái nào bị cào?',
+    'Đèn dầu và radio nằm cạnh nhau. Cái nào bị cào?',
     'Theo từng vặn to radio, sáng hôm sau có vết cào. Còn mình vừa bật radio lên…',
   ],
-  branchB: [
-    'Theo đang ở trong bóng tối.',
-    'Nhật ký: đồ để trong hốc sàn thì biến mất.',
-    'Mình đang cầm thứ gì mà Theo cần?',
+  hush: [
+    'Nó bước rất đều.',
+    'Radio rú lên mỗi lần nó bước. Giữa hai bước thì sao?',
+    'Tắt radio đúng lúc nó nhấc chân, giữa hai bước.',
   ],
 };
 
 export const ENDING = {
-  beatA: 'Đồng hồ treo tường vẫn đứng yên.',
-  beatB: 'Đồng hồ treo tường điểm… rồi đứng lại.',
+  beat: 'Đồng hồ treo tường điểm… rồi đứng lại.',
   title: 'HẾT CHƯƠNG 0',
-  teaserA: 'Theo đã về nhà. Nhưng nó biết đường sang đây rồi.',
-  teaserB: 'Theo vẫn ở phía bên kia. Đêm mai, cùng giờ.',
+  teaser: 'Theo vẫn ở phía bên kia. Đêm mai, cùng giờ.',
 };

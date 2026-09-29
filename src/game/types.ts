@@ -34,8 +34,6 @@ export type OtherHotspotId = 'os-wall' | 'os-clock' | 'os-floor' | 'os-desk' | '
 
 export type HotspotId = NormalHotspotId | OtherHotspotId;
 
-export type Choice = 'A' | 'B';
-
 export type HintStage =
   | 'flip'
   | 'diary'
@@ -47,7 +45,8 @@ export type HintStage =
   | 'dedA'
   | 'dedC'
   | 'dedD'
-  | 'branchB';
+  /** Doc §K: the closing beat, turning the radio off between two footsteps. */
+  | 'hush';
 
 /** Presentation cue emitted by the reducer; the UI plays it and never feeds it back as logic. */
 export type FxKind =
@@ -60,20 +59,18 @@ export type FxKind =
   | 'contact'
   | 'precall'
   | 'turnBack'
-  | 'rescue'
+  | 'hush'
   | 'dark'
   | 'theoLight';
 
-export type RadioSignal = 'off' | 'static' | 'echo1' | 'echo2' | 'echo3' | 'precall' | 'lure';
+export type RadioSignal = 'off' | 'static' | 'echo1' | 'echo2' | 'echo3' | 'precall' | 'steps';
 
 export interface RadioState {
   on: boolean;
   /** [x, y, z] → x.yz MHz. x ∈ 1..4, y/z ∈ 0..9. */
   wheels: [number, number, number];
-  volumeMax: boolean;
-  broken: boolean;
-  /** Controls are frozen once the choice has been made. */
-  locked: boolean;
+  /** The volume knob snapped off in the player's hand once 3.17 went live (doc §K). */
+  knobSnapped: boolean;
 }
 
 export interface GameState {
@@ -113,10 +110,12 @@ export interface GameState {
   deductionFeedback: string | null;
   deductionSolved: boolean;
 
-  choice: Choice | null;
-  lureStartedAt: number | null;
-  rescued: boolean;
-  flashlightGiven: boolean;
+  /** When the footstep rhythm of the closing beat started (doc §K). Null until Theo has finished speaking. */
+  finaleStartedAt: number | null;
+  /** Times the radio was switched off mid-step. The thing turns back, the radio comes on again. */
+  finaleFails: number;
+  /** The radio was switched off between two steps. */
+  hushed: boolean;
   theoLightSeen: boolean;
   endingReady: boolean;
 
@@ -141,10 +140,12 @@ export type Action =
   | { type: 'RADIO_POWER'; on: boolean; now: number }
   /** One wheel turned by `delta` notches. A drag or a spin lands as one turn: only where it stops is heard. */
   | { type: 'RADIO_WHEEL'; index: 0 | 1 | 2; delta: number; now: number }
-  | { type: 'PLACE_FLASHLIGHT'; now: number }
   | { type: 'FILL_SLOT'; slot: SlotId; chip: ChipId | null; now: number }
   | { type: 'SUBMIT_DEDUCTION'; now: number }
-  | { type: 'CHOOSE'; option: Choice; now: number }
+  /** Theo has finished speaking: the footsteps start and the radio can be switched off. */
+  | { type: 'FINALE_BEGIN'; now: number }
+  /** The player tried to turn the volume up; the knob comes off. */
+  | { type: 'KNOB_TRY'; now: number }
   | { type: 'THEO_LIGHT'; now: number }
   | { type: 'END'; now: number }
   | { type: 'REQUEST_HINT'; now: number };

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CLUE_FOUND_PAIRED, DIARY_PAGES, NARRATION, STEPS, THEO_CONTACT, THEO_PRECALL } from './content';
-import { run, TO_PRECHOICE, type Step } from './scripts';
+import { FINALE_ALL, FINALE_START, run, TO_FINALE, type Step } from './scripts';
 import { reducer } from './reducer';
 import { currentStep, discoveries, evidenceReady, freq } from './selectors';
 
@@ -104,19 +104,15 @@ describe('guidance spine (doc §R)', () => {
     expect(currentStep(early).id).toBe('find-minutes');
   });
 
-  it('the truth lands, then the choice, then each branch has its own next action', () => {
-    const s = at(TO_PRECHOICE);
+  it('the truth lands, then Theo warns, then the only thing left is to switch off between steps', () => {
+    const s = at(TO_FINALE);
     expect(s.message?.text).toBe(NARRATION.truth);
-    expect(currentStep(s)).toMatchObject({ id: 'choose', target: 'radio' });
-    expect(currentStep(at([...TO_PRECHOICE, { type: 'CHOOSE', option: 'A' }])).id).toBe('pull-theo');
+    expect(currentStep(s)).toMatchObject({ id: 'hush', target: 'radio' });
     expect(discoveries(s)).toContain('connected');
-    expect(THEO_PRECALL.some((l) => l.text.includes('hốc dưới sàn'))).toBe(true);
-    expect(currentStep(at([...TO_PRECHOICE, { type: 'CHOOSE', option: 'B' }]))).toMatchObject({
-      id: 'help-theo',
-      target: 'rug',
-    });
-    const given = at([...TO_PRECHOICE, { type: 'CHOOSE', option: 'B' }, { type: 'PLACE_FLASHLIGHT' }]);
-    expect(currentStep(given)).toMatchObject({ id: 'cross-over', target: 'switch' });
+    expect(THEO_PRECALL.some((l) => l.text.includes('micro'))).toBe(true);
+    expect(THEO_PRECALL.some((l) => /hốc|mẹ đang ngủ/i.test(l.text))).toBe(false);
+    expect(currentStep(at([...TO_FINALE, ...FINALE_START])).id).toBe('hush');
+    expect(currentStep(at([...TO_FINALE, ...FINALE_ALL.slice(0, 4)]))).toMatchObject({ id: 'cross-over', target: 'switch' });
   });
 });
 
@@ -140,7 +136,8 @@ describe('the dial under the hand (brief §14)', () => {
 describe('the way to the night Theo vanished', () => {
   it('the diary logs every night with its time, and leaves the last one blank', () => {
     const last = DIARY_PAGES[DIARY_PAGES.length - 1];
-    expect(last).toMatch(/^Đêm 4 — __:__\./);
+    expect(last).toMatch(/Đêm 4 — __:__\./);
+    expect(last).toMatch(/nhà Danny/);
     expect(last).toMatch(/muộn hơn/);
   });
 

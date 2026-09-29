@@ -222,118 +222,25 @@ export function InspectView() {
   );
 }
 
-/** When the flashlight is let go into the hole: it tips in, its light sinks and goes out, a pause. */
-const SEND_MS = { tip: 900, dark: 1_700, done: 2_900 };
-
 /**
  * This side, after the diary is found: kneeling at the hole under the loose board. The board shifts
- * aside as you look; cold air comes up out of it. In branch B the flashlight lies on the boards,
- * switched on: drag it into the hole (or tap it) and let it go.
+ * aside as you look; cold air comes up out of it. Only the diary is in it.
  */
 export function FloorView() {
   const game = useStore((s) => s.game);
-  const dispatch = useStore((s) => s.dispatch);
   const setUi = useStore((s) => s.setUi);
-  const boardsRef = useRef<HTMLDivElement>(null);
-  const holeRef = useRef<HTMLDivElement>(null);
-  const [held, setHeld] = useState<{ x: number; y: number } | null>(null);
-  const [sent, setSent] = useState<{ x: number; y: number; stage: 'tip' | 'lit' | 'dark' } | null>(null);
-  const grab = useRef<{ x0: number; y0: number; moved: boolean } | null>(null);
-  /** A drag ends in a click too; that click must not count as a tap. */
-  const dragged = useRef(false);
-  const timers = useRef<number[]>([]);
-  useEffect(() => () => timers.current.forEach((t) => window.clearTimeout(t)), []);
-
-  // Only once Theo has said the hole reaches his side, and the radio has gone silent.
-  const giving = game.choice === 'B' && !game.flashlightGiven;
-
-  /** Where the torch rests, in % of the boards. */
-  const REST = { x: 82, y: 76 };
-  const sending = useRef(false);
-  const send = (at: { x: number; y: number }) => {
-    if (sending.current) return;
-    sending.current = true;
-    setHeld(null);
-    setSent({ ...at, stage: 'tip' });
-    const t = timers.current;
-    t.push(window.setTimeout(() => setSent((s) => s && { ...s, stage: 'lit' }), 350));
-    t.push(window.setTimeout(() => audio.cue('drop'), SEND_MS.tip - 450));
-    t.push(window.setTimeout(() => setSent((s) => s && { ...s, stage: 'dark' }), SEND_MS.dark));
-    t.push(
-      window.setTimeout(() => {
-        dispatch({ type: 'PLACE_FLASHLIGHT' });
-        setUi({ panel: null });
-      }, SEND_MS.done),
-    );
-  };
-
-  const toBoards = (e: React.PointerEvent) => {
-    const r = boardsRef.current!.getBoundingClientRect();
-    return { x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 };
-  };
-  const overHole = (e: React.PointerEvent) => {
-    const h = holeRef.current!.getBoundingClientRect();
-    return e.clientX > h.left - 20 && e.clientX < h.right + 20 && e.clientY > h.top - 20 && e.clientY < h.bottom + 20;
-  };
-
   return (
-    <Overlay label="Hốc dưới ván sàn" onClose={sent ? undefined : () => setUi({ panel: null })} className="floor-overlay">
+    <Overlay label="Hốc dưới ván sàn" onClose={() => setUi({ panel: null })} className="floor-overlay">
       <div className="closeup floor-closeup">
-        <div ref={boardsRef} className={`floorboards ${held ? 'holding' : ''}`}>
-          <div ref={holeRef} className={`floor-hole ${sent?.stage === 'lit' ? 'lit' : ''} ${game.deductionSolved ? 'drafty' : ''}`}>
+        <div className="floorboards">
+          <div className={`floor-hole ${game.deductionSolved ? 'drafty' : ''}`}>
             <span className="hole-draft" aria-hidden />
-            <button
-              className="floor-item diary-item"
-              disabled={!!sent}
-              onClick={() => setUi({ panel: 'inspect', inspect: 'diary', diaryPage: 0 })}
-            >
+            <button className="floor-item diary-item" onClick={() => setUi({ panel: 'inspect', inspect: 'diary', diaryPage: 0 })}>
               <span className="diary-cover" aria-hidden />
               <span className="item-label">Đọc</span>
             </button>
           </div>
           <span className="loose-board" aria-hidden />
-          {giving && (
-            <button
-              className={`floor-item torch-item ${held ? 'held' : ''} ${sent ? 'sending' : ''}`}
-              style={
-                {
-                  left: `${sent?.x ?? held?.x ?? REST.x}%`,
-                  top: `${sent?.y ?? held?.y ?? REST.y}%`,
-                } as React.CSSProperties
-              }
-              aria-label="Thả đèn pin xuống hốc"
-              onPointerDown={(e) => {
-                if (sent) return;
-                grab.current = { x0: e.clientX, y0: e.clientY, moved: false };
-                e.currentTarget.setPointerCapture(e.pointerId);
-              }}
-              onPointerMove={(e) => {
-                const g = grab.current;
-                if (!g) return;
-                if (!g.moved && Math.hypot(e.clientX - g.x0, e.clientY - g.y0) < 6) return;
-                g.moved = true;
-                setHeld(toBoards(e));
-              }}
-              onPointerUp={(e) => {
-                const g = grab.current;
-                grab.current = null;
-                if (!g?.moved) return;
-                dragged.current = true;
-                if (overHole(e)) send(toBoards(e));
-                else setHeld(null);
-              }}
-              // A tap (or Enter) lowers it in without the drag.
-              onClick={() => {
-                if (dragged.current) dragged.current = false;
-                else send(REST);
-              }}
-            >
-              <span className="torch" aria-hidden>
-                <span className="torch-beam" />
-              </span>
-              <span className="item-label">Thả xuống hốc</span>
-            </button>
-          )}
         </div>
       </div>
     </Overlay>

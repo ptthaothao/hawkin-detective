@@ -442,36 +442,45 @@ function Radio({
         <ellipse cx="1088" cy="424" rx="140" ry="74" fill={`url(#${id}pool)`} className={`radio-halo ${surge ? 'surging' : ''}`} />
       )}
       {on && surge && <ellipse cx="1088" cy="430" rx="300" ry="170" fill={`url(#${id}pool)`} className="radio-flare" />}
+      {/* Dad's aerial, run up the wall. */}
       <line x1="1172" y1="388" x2="1236" y2="236" stroke={p.metal} strokeWidth="3" />
       <circle cx="1236" cy="236" r="3.5" fill={p.metal} />
-      <rect x="990" y="384" width="196" height="88" rx="5" fill={p.metalDark} />
-      <rect x="990" y="384" width="14" height="88" rx="3" fill={p.wood} />
-      <rect x="1172" y="384" width="14" height="88" rx="3" fill={p.wood} />
-      <rect x="1008" y="392" width="160" height="72" fill={p.metalDark} stroke={p.metal} strokeWidth="1" opacity="0.95" />
-      {/* signal meter */}
-      <rect x="1014" y="398" width="48" height="30" rx="2" fill={on ? '#e4b262' : p.metalDark} stroke={p.metal} strokeWidth="1" />
-      <line x1="1038" y1="426" x2={on ? 1046 : 1022} y2="403" stroke="#1a1208" strokeWidth="1.5" />
+      {/* A ~1920 receiving set from the garage: a wooden cabinet with a lid and a black front panel. */}
+      <rect x="982" y="374" width="212" height="10" rx="2" fill={p.woodTop} />
+      <rect x="986" y="382" width="204" height="92" rx="3" fill={p.wood} />
+      <rect x="996" y="390" width="184" height="76" rx="2" fill="#120f0c" stroke={p.brass} strokeWidth="1" />
+      {/* The set's own dials, brass-rimmed. */}
+      {[1022, 1052].map((cx, i) => (
+        <g key={cx}>
+          <circle cx={cx} cy="414" r="12" fill="#1c1813" stroke={p.brass} strokeWidth="1.5" />
+          <line x1={cx} y1="414" x2={cx + (i ? 5 : -2)} y2="404" stroke={p.brass} strokeWidth="1.5" />
+        </g>
+      ))}
+      <rect x="1006" y="434" width="62" height="24" rx="10" fill={`url(#${id}grille)`} stroke={p.woodDark} strokeWidth="2" />
+      {/* Dad's retrofit: a grey plate screwed on, with the signal needle, the readout and the speaker. */}
+      <rect x="1074" y="394" width="100" height="68" rx="2" fill={p.metalDark} stroke={p.metal} strokeWidth="1" />
+      {[[1078, 398], [1170, 398], [1078, 458], [1170, 458]].map(([x, y]) => (
+        <circle key={`${x}-${y}`} cx={x} cy={y} r="1.4" fill={p.metal} />
+      ))}
+      <rect x="1082" y="400" width="18" height="24" rx="2" fill={on ? '#e4b262' : p.metalDark} stroke={p.metal} strokeWidth="1" />
+      <line x1="1091" y1="422" x2={on ? 1096 : 1086} y2="404" stroke="#1a1208" strokeWidth="1.2" />
       {/* frequency readout */}
-      <rect x="1070" y="398" width="86" height="28" rx="2" fill="#0a0806" />
+      <rect x="1104" y="400" width="64" height="24" rx="2" fill="#0a0806" />
       {!broken && !overgrown && (
-        <text x="1113" y="420" textAnchor="middle" className={`radio-digits ${on ? 'on' : ''}`}>
+        <text x="1136" y="418" textAnchor="middle" className={`radio-digits ${on ? 'on' : ''}`}>
           {`${a}.${b}${c}`}
         </text>
       )}
-      {broken && <path d="M1074 402 l30 22 l12 -14 l34 16" stroke={p.metal} strokeWidth="1.2" fill="none" />}
+      {broken && <path d="M1106 404 l22 16 l10 -12 l28 14" stroke={p.metal} strokeWidth="1.2" fill="none" />}
       <rect
-        x="1070"
-        y="432"
+        x="1082"
+        y="430"
         width="86"
-        height="28"
+        height="26"
         fill={`url(#${id}grille)`}
         className={on ? `speaker-live ${surge ? 'surging' : ''}` : undefined}
       />
-      <circle cx="1024" cy="446" r="8" fill={p.metal} />
-      <circle cx="1050" cy="446" r="8" fill={p.metal} />
-      <line x1="1024" y1="446" x2="1024" y2="439" stroke={p.metalDark} strokeWidth="2" />
-      <line x1="1050" y1="446" x2="1055" y2="440" stroke={p.metalDark} strokeWidth="2" />
-      <circle cx="1162" cy="404" r="2.4" fill={on ? '#ff5a3c' : '#3a1a14'} className={on ? 'rx-blink' : undefined} />
+      <circle cx="1166" cy="398" r="2.4" fill={on ? '#ff5a3c' : '#3a1a14'} className={on ? 'rx-blink' : undefined} />
       <rect x="1000" y="470" width="176" height="6" fill={p.shadow} opacity="0.5" />
     </g>
   );

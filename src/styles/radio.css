@@ -1,4 +1,5 @@
-/* Theo's father's shortwave transceiver, seen up close on the desk. */
+/* A ~1920 receiving set dad found in the garage and repaired: a wooden cabinet, a black
+   front panel with brass trim, and dad's grey plate screwed on with the meter, readout and scope. */
 
 .radio-overlay .overlay-content {
   display: flex;
@@ -42,10 +43,29 @@
   gap: 18px;
   padding: clamp(12px, 2.4vw, 22px) clamp(12px, 2.6vw, 26px);
   background:
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 3px),
-    linear-gradient(#302c27, #1c1a17);
-  border-top: 3px solid #8d877b;
-  border-bottom: 3px solid #4b4740;
+    radial-gradient(ellipse at 30% 0%, rgba(255, 240, 210, 0.06), transparent 60%),
+    linear-gradient(#1a1612, #0e0c0a);
+  border-top: clamp(10px, 2vw, 18px) solid #5b3a22;
+  border-bottom: clamp(10px, 2vw, 18px) solid #4b2f1b;
+  box-shadow:
+    inset 0 0 0 2px #b58f4a,
+    inset 0 0 0 4px #0e0c0a,
+    inset 0 3px 0 4px rgba(0, 0, 0, 0.4);
+}
+/* Dad's retrofit: a grey crinkle plate, screwed on a little crooked. */
+.radio-row:first-child {
+  position: relative;
+  padding: 12px 14px;
+  border-radius: 3px;
+  rotate: -0.4deg;
+  background:
+    radial-gradient(circle, #8d877b 1.6px, transparent 2px) 6px 6px / 4px 4px no-repeat,
+    radial-gradient(circle, #8d877b 1.6px, transparent 2px) calc(100% - 6px) 6px / 4px 4px no-repeat,
+    radial-gradient(circle, #8d877b 1.6px, transparent 2px) 6px calc(100% - 6px) / 4px 4px no-repeat,
+    radial-gradient(circle, #8d877b 1.6px, transparent 2px) calc(100% - 6px) calc(100% - 6px) / 4px 4px no-repeat,
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 3px),
+    linear-gradient(#3a3631, #24211d);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7), inset 0 0 0 1px #57524a;
 }
 .radio-row {
   display: flex;
@@ -268,27 +288,32 @@
 .brand {
   font-family: var(--f-display);
   font-weight: 700;
-  font-size: 0.95rem;
-  letter-spacing: 0.3em;
-  color: #cfc6b2;
-  text-shadow: 0 -1px 0 #000;
+  font-size: 0.85rem;
+  letter-spacing: 0.24em;
+  color: #2a1c0a;
+  padding: 5px 10px;
+  border-radius: 2px;
+  background: linear-gradient(#d8b670, #9c7638);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35), 0 1px 2px #000;
 }
 .brand em {
+  display: block;
   font-family: var(--f-type);
   font-style: normal;
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  color: #c2463a;
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+  color: #3d2a12;
 }
 .speaker {
   flex: 1;
   min-width: 90px;
   height: 54px;
-  border-radius: 4px;
+  border-radius: 40px 40px 4px 4px;
   background:
-    radial-gradient(circle, #0c0b0a 1.3px, transparent 1.7px) 0 0 / 7px 7px,
-    #2a2723;
-  box-shadow: inset 0 2px 6px #000;
+    repeating-linear-gradient(90deg, transparent 0 9px, #4b2f1b 9px 13px),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px),
+    #6b5a3e;
+  box-shadow: inset 0 2px 6px #000, 0 0 0 3px #4b2f1b, 0 0 0 4px #b58f4a;
 }
 .toggle {
   position: relative;
@@ -333,16 +358,17 @@
   width: 62px;
   height: 62px;
   border-radius: 50%;
-  background: repeating-conic-gradient(#1b1916 0 5deg, #34302b 5deg 10deg);
+  background: repeating-conic-gradient(#2a1a10 0 5deg, #3f2a1b 5deg 10deg);
   box-shadow:
     0 4px 8px rgba(0, 0, 0, 0.7),
+    0 0 0 3px #b58f4a,
     inset 0 0 0 1px #000;
 }
 .knob-cap {
   position: absolute;
   inset: 8px;
   border-radius: 50%;
-  background: radial-gradient(circle at 38% 32%, #6e6a62, #26231f 70%);
+  background: radial-gradient(circle at 38% 32%, #6a4a30, #23160d 70%);
   rotate: -110deg;
   transition: rotate 0.9s cubic-bezier(0.3, 0.8, 0.3, 1);
 }

@@ -392,7 +392,7 @@ export function RadioView({ v }: { v: VisualState }) {
           </div>
           <div className="radio-row controls">
             <span className="brand" aria-hidden>
-              KESTREL <em>SW-3</em>
+              ASHBY <em>RECEIVING SET</em>
             </span>
             <div className="speaker" aria-hidden />
             <div className="control">

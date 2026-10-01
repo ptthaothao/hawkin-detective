@@ -38,8 +38,6 @@ const HOTSPOT_NAMES: Record<string, string> = {
   flyer: 'Tờ tìm người',
   watch: 'Đồng hồ đeo tay',
   mic: 'Micro',
-  'desk-edge': 'Mép bàn',
-  'door-normal': 'Cửa phòng',
   'os-clock': 'Đồng hồ',
   'os-wall': 'Bức tường',
   'os-floor': 'Sàn nhà',

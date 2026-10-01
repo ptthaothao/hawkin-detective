@@ -413,7 +413,8 @@ function UnderDoor({ id, other, presence }: { id: string; other: boolean; presen
           <rect x="1430" y="672" width="132" height="4" fill="#ffc77a" opacity="0.8" className="door-gap-warm" />
         </>
       )}
-      {presence && <rect x="1430" y="671" width="40" height="6" fill="#000" className="door-shadow" />}
+      {/* It only walks the held night: its shadow crosses the gap on the other side, never here. */}
+      {presence && other && <rect x="1430" y="671" width="40" height="6" fill="#000" className="door-shadow" />}
     </g>
   );
 }
@@ -576,7 +577,7 @@ function Switch({ p, down }: { p: Palette; down: boolean }) {
   );
 }
 
-function Door({ p, clawed, other }: { p: Palette; clawed: boolean; other: boolean }) {
+function Door({ p, other }: { p: Palette; other: boolean }) {
   return (
     <g>
       <rect x="1414" y="152" width="164" height="524" fill={p.trim} />
@@ -596,15 +597,6 @@ function Door({ p, clawed, other }: { p: Palette; clawed: boolean; other: boolea
       <circle cx="1446" cy="420" r="8" fill={p.brass} />
       <circle cx="1444" cy="418" r="3" fill="#fff" opacity="0.25" />
       {other && <rect x="1430" y="672" width="132" height="4" fill="#7a1810" className="door-gap" />}
-      {clawed && (
-        <path
-          d="M1456 250 l40 120 M1470 244 l42 124 M1484 240 l40 126 M1498 238 l36 118 M1450 470 l52 110 M1466 466 l50 112 M1482 462 l46 110"
-          stroke="#c9a676"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          opacity="0.75"
-        />
-      )}
     </g>
   );
 }
@@ -818,11 +810,7 @@ export function Room({
       {!other && <DeskThings p={p} crayon={!s.crayonTaken} />}
       {!other && <Mic p={p} fallen={false} />}
       <Switch p={p} down={other} />
-      <Door p={p} clawed={!other && v.scarred} other={other} />
-      {!other && s.contactMade && (
-        <path d="M884 484 l36 10 M896 482 l34 12 M910 481 l30 12" stroke="#2a180c" strokeWidth="1.6" opacity="0.8" />
-      )}
-      {!other && v.scarred && <Claws fresh={false} color="#c9a676" />}
+      <Door p={p} other={other} />
       {other && <Vines p={p} />}
       {other && <Claws fresh={s.contactMade} color="#050605" />}
       {other && <Mic p={p} fallen />}

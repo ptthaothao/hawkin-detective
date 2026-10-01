@@ -25,8 +25,6 @@ export interface VisualState {
     clarity: number;
   };
   wallClock: 'running' | 'stopped';
-  /** After the radio is silenced: the door on this side carries a fresh scratch. */
-  scarred: boolean;
 }
 
 /** Where the creature stands: at the desk once it has answered the radio, at the door while it walks past. */
@@ -80,6 +78,5 @@ export function deriveVisual(s: GameState): VisualState {
     creature: creature(s),
     radio: { signal, clarity: CLARITY[signal] * (1 - d * 0.6) },
     wallClock: s.endingReady ? 'stopped' : 'running',
-    scarred: s.hushed,
   };
 }

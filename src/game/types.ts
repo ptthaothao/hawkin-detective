@@ -27,9 +27,7 @@ export type NormalHotspotId =
   | 'wall-clock'
   | 'poster'
   | 'rug'
-  | 'desk-edge'
-  | 'door-normal'
-  /** A crayon stub of Theo's on the desk. Optional: used to rub the carved name on the wall. */
+  /** A crayon stub of Theo's on the desk. Optional: used to rub the carving under the radio. */
   | 'crayon';
 
 export type OtherHotspotId = 'os-wall' | 'os-clock' | 'os-floor' | 'os-desk' | 'os-door';

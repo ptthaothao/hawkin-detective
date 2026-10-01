@@ -47,10 +47,10 @@ describe('deriveVisual', () => {
     expect(across.dread).toBeGreaterThan(deriveVisual(walking.state).dread);
   });
 
-  it('after the switch-off: it is gone, the door on this side is scarred, the room is calm', () => {
+  it('after the switch-off: it is gone and the room is calm', () => {
     const { state } = run([...TO_FINALE, ...FINALE_ALL.slice(0, 4)]);
     const v = deriveVisual(state);
-    expect(v).toMatchObject({ world: 'normal', wallClock: 'running', scarred: true, dread: 0, creature: null });
+    expect(v).toMatchObject({ world: 'normal', wallClock: 'running', dread: 0, creature: null });
   });
 
   it('then pitch dark on the other side until Theo turns his flashlight on', () => {

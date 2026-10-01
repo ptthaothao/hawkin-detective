@@ -161,9 +161,7 @@ export const VERBS: Record<string, string> = {
   flyer: 'Đọc',
   mic: 'Xem',
   poster: 'Xem',
-  'desk-edge': 'Sờ',
   crayon: 'Nhặt',
-  'door-normal': 'Xem',
   switch: 'Công tắc',
   'os-clock': 'Soi',
   'os-wall': 'Soi',
@@ -254,7 +252,7 @@ export const C6_UPDATE = 'Có thêm vết cào mới quanh radio.';
 /** One night per page (doc §D, §P). */
 export const DIARY_PAGES = [
   'Đêm 1 — 01:52. Radio kêu rè rè. Rồi có ba tiếng cộc cộc cộc. Chắc em nghe nhầm.',
-  'Đêm 2 — 02:34. Có ai thở trong radio. Em vặn to lên nghe cho rõ. Sáng ra có vết cào ở mặt ngoài cửa phòng em. Mẹ bảo con chó nhà bên cào.',
+  'Đêm 2 — 02:34. Có ai thở trong radio. Em vặn to lên nghe cho rõ. Tiếng thở to hơn, nghe như ở ngay sau cửa phòng em. Em trùm chăn kín đầu.',
   'Đêm 3 — 02:58. Nó gọi tên em. Bằng giọng của mẹ. Mà mẹ ngủ rồi mà. Lúc nó tới, đồng hồ đeo tay em tắt ngấm. Sáng ra mới chạy lại.',
   'Radio của bố có cái micro. Em chưa dám bấm nút.\n\nEm để một mẩu bút sáp trong cái hốc dưới sàn. Sáng ra mất tiêu.',
   // The last night's time is left blank: that blank is the question the player has to fill in.
@@ -267,8 +265,6 @@ export const HOTSPOT_TEXT = {
   wallClockStopped: 'Đồng hồ đứng yên.',
   poster: 'Phim Theo thích nhất. Em xem bốn lần, rồi nói sau này sẽ làm phi hành gia.',
   rugFirst: 'Bạn lật tấm thảm lên. Một tấm ván lỏng. Bên dưới là một cuốn sổ.',
-  deskEdge: 'Một vết xước mờ trên mép bàn. Lúc bạn vào phòng, nó chưa có ở đây.',
-  doorNormal: 'Mặt ngoài cửa phòng có vết cào mới.',
   osFloor: 'Tấm ván bị cạy. Hốc bên dưới trống, chỉ rộng bằng một cuốn sổ.',
   osDoor: 'Bạn không muốn mở cánh cửa đó.',
   osDeskAfter: 'Vết cào mới quanh radio. Có thứ gì vừa ở đây.\nBạn nín thở, giữ yên ánh đèn.',
@@ -280,7 +276,7 @@ export const HOTSPOT_TEXT = {
   breathOut: 'Bạn thở ra. Nó khựng lại. Bạn phải chờ.',
   knobSnapped: 'Bạn vặn núm âm lượng. Nó gãy rời trong tay bạn.',
   turnBack: 'Nó dừng bước và quay về phía radio. Tiếng tim đập. Radio rè lên lại.',
-  hushed: 'Im lặng. Bước chân dừng ở cửa phòng. Một tiếng cào nhẹ. Rồi nó đi tiếp.',
+  hushed: 'Im lặng. Phía bên kia, bước chân dừng ở cửa phòng. Một tiếng cào nhẹ. Rồi nó đi tiếp.',
   theoLight: 'Một vùng sáng bật lên ở bức tường. Dòng bút sáp mới: “EM ỔN. ĐÊM MAI. CÙNG GIỜ.”',
 };
 
@@ -406,7 +402,7 @@ export const HINTS: Record<HintStage, [string, string, string]> = {
   dedD: [
     'So sánh bàn radio bên kia trước và sau khi mình dò 3.17.',
     'Đèn dầu và radio nằm cạnh nhau. Cái nào bị cào?',
-    'Theo từng vặn to radio, sáng hôm sau có vết cào. Còn mình vừa bật radio lên…',
+    'Theo vặn to radio thì tiếng thở như ở ngay sau cửa. Còn mình vừa bật radio lên…',
   ],
   hush: [
     'Nó bước rất đều.',

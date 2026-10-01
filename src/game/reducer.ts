@@ -35,8 +35,6 @@ const NORMAL_IDS: HotspotId[] = [
   'wall-clock',
   'poster',
   'rug',
-  'desk-edge',
-  'door-normal',
   'crayon',
 ];
 const FLICKER_AFTER_INSPECTIONS = 3;
@@ -211,10 +209,6 @@ function inspectNormal(s: GameState, id: HotspotId): GameState {
       return say(s.crayonTaken ? s : { ...s, crayonTaken: true }, s.crayonTaken ? HOTSPOT_TEXT.crayonAgain : HOTSPOT_TEXT.crayon);
     case 'rug':
       return s.diaryFound ? s : say(addClue({ ...s, diaryFound: true }, 'C3'), HOTSPOT_TEXT.rugFirst);
-    case 'desk-edge':
-      return say(s, HOTSPOT_TEXT.deskEdge);
-    case 'door-normal':
-      return say(s, HOTSPOT_TEXT.doorNormal);
     case 'radio':
       return listen(s);
     default:

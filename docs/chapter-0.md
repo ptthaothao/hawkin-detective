@@ -32,8 +32,8 @@
 14. **Phía bên kia là quá khứ, phía của chị là hiện tại.** Bên kia có **hai lớp thấy được**: đồ cổ màu nâu là đêm của bà chủ nhà cũ (khoảng năm 1920, nhà chưa có điện); đồ hiện đại màu sáng (micro, bút sáp, đèn pin, phần bố gắn thêm vào radio) là đêm Theo biến mất. Bên kia mục dần **chỉ ở rìa**; ngôi nhà và đồ liên quan tới đứa con của bà vẫn nguyên.
 15. **Theo có sẵn đèn pin và vài mẩu bút sáp trong túi quần** (em thích vẽ). Phía này không còn nội dung gửi đèn pin, không còn "Đèn pin biến mất". Đèn pin của người chơi chỉ để soi phía bên kia.
 16. **Vạch đếm của Theo vẽ bằng bút sáp (sáng, mới); chữ MAR thì khắc dưới đáy radio (cũ).** Hai lớp thời gian nhìn khác nhau.
-17. **Hạt giống mới (không lộ gì):** chữ **MAR khắc dưới đáy radio** (chỉ hiện khi chà bút sáp của Theo lên đó, tùy chọn); hai nốt huýt sáo rất xa; tiếng bước chân đều đặn; vết cào ở cửa là do bà chạm vào cửa phòng của con mình. Không gieo nghĩa địa ở Chapter 0. World Fact (chốt 01/10): chiếc radio vốn là của nhà bà chủ cũ (đời đầu, khoảng 1920), bị bỏ lại trong gara (căn cứ bí mật của Martin). Bố thấy đẹp nên nhặt về và sửa lại; chính Martin đã khắc chữ MAR dưới đáy. Chapter 0 không giải thích.
-18. **Nền truyện** (mốc tuổi chốt 01/10: đêm 1979 chị 5 tuổi, mẹ đang mang bầu Theo, Theo sinh cuối 1979; tháng 11/1986 chị 12, Theo 7; con quái là bố chồng lên bà chủ nhà cũ; 1979; mẹ và chị mất trí nhớ; tuyến đi cố định; nó hại cả người lớn nhưng nhắm trẻ con trước) nằm ở `chapter-0-revision/ke-hoach-sua-cot-truyen-chapter-0-v2.md`. Chapter 0 không nói gì trong số đó ra.
+17. **Hạt giống mới (không lộ gì):** chữ **MAR khắc dưới đáy radio** (chỉ hiện khi chà bút sáp của Theo lên đó, tùy chọn); hai nốt huýt sáo rất xa; tiếng bước chân đều đặn; tiếng thở như ở ngay sau cửa phòng (đêm 2). Không gieo nghĩa địa ở Chapter 0. World Fact (chốt 01/10): chiếc radio vốn là của nhà bà chủ cũ (đời đầu, khoảng 1920), bị bỏ lại trong gara (căn cứ bí mật của Martin). Bố thấy đẹp nên nhặt về và sửa lại; chính Martin đã khắc chữ MAR dưới đáy. Chapter 0 không giải thích.
+18. **Nền truyện** (mốc tuổi chốt 01/10: đêm 1979 chị 5 tuổi, mẹ đang mang bầu Theo, Theo sinh cuối 1979; tháng 11/1986 chị 12, Theo 7; con quái là bố chồng lên bà chủ nhà cũ; đêm 1979 cũng là đêm giỗ Martin 14/11; mẹ và chị mất trí nhớ; tuyến đi cố định; nó hại cả người lớn nhưng nhắm trẻ con trước) nằm ở `chapter-0-revision/ke-hoach-sua-cot-truyen-chapter-0-v2.md`. Chapter 0 không nói gì trong số đó ra.
 
 ---
 
@@ -112,7 +112,7 @@ Clue card chỉ ghi lại **những gì thấy được**. Những chữ **in đ
 **Nội dung C3 — Nhật ký tín hiệu** (mỗi đêm một trang):
 
 > *Đêm 1 — 01:52. Radio kêu rè rè. Rồi có ba tiếng cộc cộc cộc. Chắc em nghe nhầm.*
-> *Đêm 2 — 02:34. Có ai thở trong radio. Em vặn to lên nghe cho rõ. Sáng ra có vết cào ở **mặt ngoài cửa phòng** em. Mẹ bảo con chó nhà bên cào.*
+> *Đêm 2 — 02:34. Có ai thở trong radio. Em vặn to lên nghe cho rõ. Tiếng thở to hơn, nghe như ở ngay sau **cửa phòng** em. Em trùm chăn kín đầu.*
 > *Đêm 3 — 02:58. Nó gọi tên em. Bằng giọng của mẹ. Mà mẹ ngủ rồi mà. Lúc nó tới, đồng hồ đeo tay em tắt ngấm. Sáng ra mới chạy lại.*
 > *Radio của bố có cái **micro**. Em chưa dám bấm nút.*
 > *Em để một mẩu **bút sáp** trong cái **hốc dưới sàn**. Sáng ra mất tiêu.*
@@ -241,7 +241,7 @@ Khoảnh khắc cần đạt: "Mấy vạch đó đang đếm số lần MÌNH s
 
 ```text
 Bằng chứng cần có:
-1. C3 đêm 2: vặn to radio thì sáng ra có vết cào. Chỉ đêm đó có vết cào.
+1. C3 đêm 2: vặn to radio thì tiếng thở như ở ngay sau cửa phòng.
 2. C6: radio bị cào nát, đèn dầu ngay bên cạnh không bị động đến.
 3. Hành động của người chơi (bắt buộc): bật radio ở 3.17 thì ngay sau đó có vết
    cào mới quanh radio, và một cái bóng đứng ở bàn.
@@ -251,12 +251,11 @@ Bằng chứng cần có:
 Đáp án sai nhưng hợp lý, và lý do bị bác bỏ:
 - ánh sáng: đèn dầu nguyên vẹn, đèn pin không thu hút gì.
   Chữ "tắt—" của Theo cũng có thể là "tắt radio".
-- cánh cửa phòng: vết cào ở cửa chỉ xuất hiện sau đêm vặn to radio. Đó là đường nó
-  đi ngang qua tới chỗ phát ra âm thanh, không phải thứ nó tìm. Vết cào mới cũng xuất hiện ở
-  bàn, không phải ở cửa.
+- cánh cửa phòng: tiếng thở chỉ gần cửa khi radio được vặn to. Cửa là đường âm thanh đi
+  qua, không phải thứ nó tìm. Vết cào mới xuất hiện ở bàn radio, không phải ở cửa.
 ```
 
-**Vết cào ở mặt ngoài cửa (World Fact, không hiển thị):** phòng Theo nằm trên tuyến đi của thứ bên kia. Nó chạm vào cửa phòng để nhớ đứa con của mình, nhưng móng vuốt làm xước cửa (vết ở cao ngang một đứa trẻ bảy tuổi). Vặn to radio chỉ làm nó dừng lại ở đó lâu hơn.
+**Tiếng thở sau cửa (World Fact, không hiển thị):** đêm 2 cửa giữa hai phía đã mỏng. Tiếng radio vặn to vọng sang bên kia, và tiếng thở của nó (đang ở gần radio của con nó trong đêm bị giữ lại) vọng ngược về. Nó chưa ra khỏi bên kia; ở phía này không có vết cào nào (xem luật ở mục I).
 
 **Slot D là cái bẫy có chủ đích.** Thể loại kinh dị dạy người chơi rằng "quái vật đi theo ánh sáng". Bằng chứng trong game đi ngược lại quy ước đó, và người chơi tự xác nhận được bằng chính hành động của mình.
 
@@ -377,7 +376,10 @@ Người chơi học dần các luật này và không có tutorial nào nói ra
 **Ghi chú 29/09 (World Fact, không hiển thị):**
 - Phía bên kia là **quá khứ**: hai lớp chồng lên nhau (đêm của bà chủ nhà cũ, đêm Theo biến mất). Phía này là hiện tại, thời gian vẫn chạy.
 - Bên kia mục dần chỉ ở rìa. Nhà và đồ liên quan tới đứa con của bà thì nguyên.
-- Thứ săn Theo đi một **tuyến cố định** (nhà kho, phòng Theo, nghĩa địa), với **nhịp bước đều**. Nó đi tuyến ấy ở **cả hai phía** như một cái bóng và **chạm được vào đồ gắn với con nó** (cửa phòng Martin, chiếc radio của Martin), nên mới có vết cào ở cửa (đêm 2) và quanh radio. Nhưng nó chỉ **bắt được người** khi có ai **nói vào micro lúc 3:17** (đêm 4, Theo). Tiếng radio kéo nó về phía chiếc radio (slot D); giọng nói vào micro mới mở đường cho nó bắt người. (Chốt 01/10.) Nó nhắm trẻ con trước nhưng vẫn hại được người lớn. Không thứ nào trong số này được nói ra ở Chapter 0.
+- **Luật của nó (chốt 01/10, thay mọi bản trước):** Martin mất lúc **3:17 rạng sáng 15/11/1920**. Mỗi năm, chỉ **đêm giỗ** đó nó mới ra, đi một tuyến cố định **từ nghĩa trang tới gara cũ** với **nhịp bước đều**, và **không vào nhà** vì nỗi đau mất con. Phía bên kia chính là đêm giỗ ấy bị giữ lại, nên ở bên kia nó luôn đi lại.
+- Nó chỉ vào nhà khi có người **mở radio của Martin và nói vào micro lúc 3:17 đúng đêm giỗ**: nghe giọng một đứa trẻ qua radio của con mình, nó tưởng Martin đang gọi và **xách đứa trẻ sang bên kia**. Chị gái năm 1979 (5 tuổi) và Theo năm 1986 (7 tuổi, bằng tuổi Martin) đều bị bắt như vậy. Đêm 1979 cũng là 14/11 (lễ hội của thị trấn dời về giữa tháng 11).
+- Đêm 1–3 trong nhật ký là lúc **cửa mỏng dần** khi gần tới đêm giỗ: chỉ có tiếng vọng, tiếng thở, giọng mẹ, nó chưa ra. Đêm 4 là đêm giỗ.
+- Ở phía này **không có vết cào nào** (không ở cửa, không ở bàn thật). Mọi vết cào đều ở phía bên kia, nơi nó đang săn Theo trong đêm bị giữ lại. Nó nhắm trẻ con trước nhưng vẫn hại được người lớn. Không thứ nào trong số này được nói ra ở Chapter 0.
 - Hốc dưới sàn (luật 5) vẫn đúng nhưng **không dùng** trong Chapter 0.
 
 ### Luật đếm vạch
@@ -459,8 +461,8 @@ BEAT 5 — NHẬT KÝ (C3)                                   ★ AHA 2
 
 BEAT 6 — PUZZLE RADIO                                   ★ AHA 4
   03:▯▯ → thử 3.00 → rè → thiếu phút → đồng hồ bên kia → 3.17 → giọng Theo (mục F)
-  Hệ quả: vết cào mới quanh radio (C6 ghi thêm), một cái bóng đứng ở bàn,
-          và một vết xước mờ trên mép bàn thật ở phía này.
+  Hệ quả: vết cào mới quanh radio ở phía bên kia (C6 ghi thêm), một cái bóng đứng ở bàn,
+          Phía này không có vết gì.
   Objective: "Theo còn sống."  → mở tab Kết luận
 
 BEAT 7 — DEDUCTION                                      ★ AHA 5 (đếm vạch), AHA 6 (radio)
@@ -514,7 +516,7 @@ Ký hiệu: 🟢 người chơi chắc chắn tự suy ra được · 🟡 có n
 | 25 | Objective "Theo còn sống.", tab Kết luận mở ra | "Em vẫn ở trong phòng này…" | — | — | 🟢 |
 | 26 | — | "'Mỗi lần bên chị tối đi… em đếm'… mấy vạch đó đang đếm MÌNH? 4 = 3 lần chớp + 1 lần mình tắt?" | Tắt, bật, tắt | 5 → 7 vạch | 🟢 |
 | 27 | Bàn phía bên kia: vết cào mới, một cái bóng đứng cạnh | "Mình vừa bật radio… và nó tới." | Soi | C6 ghi thêm | 🟢 |
-| 28 | Bật đèn về: trên mép bàn thật có một vết xước mờ | "Nó… sang được bên này?" | Xem | — | 🟢 |
+| 28 | Bật đèn về: bàn thật vẫn nguyên, chỉ có tiếng bước chân vọng từ đâu đó | "Nó ở bên kia… nhưng nó nghe được." | — | — | 🟢 |
 | 29 | Slot A | "Tắt đèn? Mình tắt mấy lần rồi có sao đâu. 'Chưa dám bấm nút'… 'không chỉ ngồi nghe'… nút bị quấn băng keo… Em đã nói vào micro." | Điền: nói vào micro | — | 🟢 |
 | 30 | Slot C | "Chỗ em đếm là bức tường." | Điền | — | 🟢 |
 | 31 | Slot D | "Theo nói 'tắt—'… tắt đèn? Nhưng đèn dầu nguyên vẹn, đèn pin mình soi mãi không sao… radio bị cào, và cào thêm ngay sau khi mình bật." | Điền: tiếng radio | — | 🟡 |
@@ -544,7 +546,7 @@ Lời này đặt lý do của luật micro vào truyện ("đêm em nói vào �
 1. **Núm âm lượng gãy** trong tay người chơi ngay lúc kênh 3.17 sống (nó là cánh cửa đang bị đẩy). Không cần chặn bằng UI: người chơi thử vặn và thấy núm rời ra.
 2. **Bước chân đều đặn** vang qua radio, mỗi bước radio rú lên. Nhịp cố định, khoảng cách giữa hai bước không đổi. Nghe được ít nhất 3 bước trước khi có thể tắt.
 3. **Tắt radio giữa hai bước.**
-   - Đúng: im lặng. Bước chân dừng ở cửa, một tiếng cào nhẹ (nó chạm vào cửa phòng của đứa con nó), rồi đi tiếp.
+   - Đúng: im lặng. Bước chân dừng ở cửa phòng bên kia (nghe vọng qua), một tiếng cào nhẹ lên cửa phòng của đứa con nó, rồi đi tiếp. Phía này không có vết nào.
    - Sai (bấm giữa lúc nó đang bước): nó dừng, quay về phía radio, radio **tự rè lên lại** và có ba tiếng cào. Nhịp bắt đầu lại. Không mất gì, không có game over.
 4. **Phía bên kia, một lần cuối.** Tắt đèn: tối đen hoàn toàn, rồi một vùng sáng bật lên ở bức tường (đèn pin của Theo). Dòng bút sáp mới: *"EM ỔN. ĐÊM MAI. CÙNG GIỜ."* Hai nốt huýt sáo rất xa, ngoài cửa.
 5. **Ending:** đồng hồ treo tường phía này điểm… rồi đứng lại. "HẾT CHƯƠNG 0".
@@ -556,7 +558,7 @@ Không có hành động gửi đồ qua hốc sàn. Người chơi không mất
 | Điều người chơi cần hiểu | Bằng chứng |
 |---|---|
 | Tắt là hướng đúng, không phải vặn to | Slot D (nó đi theo tiếng radio) + núm gãy + lời Theo |
-| Nó nghe thấy, phải giữ yên lặng | Lời Theo "nó nghe thấy" + vết cào mới ở bàn sau khi dò 3.17 (C6) + vết xước mờ trên mép bàn thật |
+| Nó nghe thấy, phải giữ yên lặng | Lời Theo "nó nghe thấy" + vết cào mới ở bàn bên kia sau khi dò 3.17 (C6) |
 | Có nhịp để canh | Bước chân đều, radio rú theo từng bước, Theo dặn "nghe cho kỹ nhịp của nó" |
 
 ### Hệ quả cho Chapter 1 (ghi chú, chưa viết)
@@ -582,7 +584,7 @@ Nút **"Nghĩ"** là giọng nội tâm của nhân vật. Hint tầng 1 chỉ m
 | Radio: có cả hai đồng hồ, chưa ghép | "Hai chiếc đồng hồ đều dừng lúc nó tới. Mỗi chiếc chỉ còn lại một nửa." | "Đồng hồ đeo tay còn số giờ. Kim dài là kim phút." | "Đêm 3 là 02:58, và radio để ở 2.58. Đêm 4 thì sao?" |
 | Deduction A | "Đọc lại những trang cuối của nhật ký." | "Ở phía bên kia, micro đang ở trong tình trạng nào?" | "Mình đã tắt đèn bao nhiêu lần rồi? Theo đã làm gì khác mình?" |
 | Deduction C | "Nghe lại lời Theo trên radio." | "'Em đếm từng lần.' Ở phía bên kia, chỗ nào có dấu đếm?" | "Số vạch tăng lên mỗi lần mình tắt đèn. Có người đang đếm, ngay lúc này." |
-| Deduction D | "So sánh bàn radio bên kia trước và sau khi mình dò 3.17." | "Đèn dầu và radio nằm cạnh nhau. Cái nào bị cào?" | "Theo từng vặn to radio, sáng hôm sau có vết cào. Còn mình vừa bật radio lên..." |
+| Deduction D | "So sánh bàn radio bên kia trước và sau khi mình dò 3.17." | "Đèn dầu và radio nằm cạnh nhau. Cái nào bị cào?" | "Theo vặn to radio thì tiếng thở như ở ngay sau cửa. Còn mình vừa bật radio lên..." |
 | Nhịp tắt radio (kết) | "Nó bước đều." | "Radio rú lên mỗi lần nó bước. Giữa hai bước thì sao?" | "Tắt radio ngay lúc nó nhấc chân, giữa hai bước." |
 
 Không tầng hint nào nói ra con số **3.17** hay **17**, không nói "tần số bằng giờ", và không nói thẳng đáp án của slot A, C hoặc D. Số hint đã dùng hiện trong phần tóm tắt cuối game nhưng không bị trừ điểm.
@@ -679,7 +681,7 @@ Mời 5 người, cho chơi kiểu think-aloud (vừa chơi vừa nói ra suy ng
 | Slot A: có chọn "tắt đèn" không, và có tự bác bỏ được không? | Tỉ lệ chọn | Làm cho chi tiết micro ở C6 dễ thấy hơn. |
 | Slot D: có chọn "ánh sáng" trước không, và có hiểu vì sao sai không? | Tỉ lệ chọn, thời gian | Nếu không ai hiểu ra thì bằng chứng ở C6 chưa đủ rõ. |
 | Có brute-force deduction không? | Số lần nộp (48 tổ hợp) | Nếu vượt 5 lần thì bỏ hẳn phản hồi "gần đúng". |
-| Có đọc lướt nhật ký và bỏ sót "mặt ngoài cửa", "chưa dám bấm nút" không? | Nhắc đến trong lúc think-aloud | Tách mỗi đêm ra một trang rõ ràng hơn. |
+| Có đọc lướt nhật ký và bỏ sót "ngay sau cửa phòng", "chưa dám bấm nút" không? | Nhắc đến trong lúc think-aloud | Tách mỗi đêm ra một trang rõ ràng hơn. |
 | **Nhịp tắt radio:** người chơi có nghe ra nhịp không? Thử mấy lần? | Số lần bấm tắt sai. Think-aloud có nhắc "đếm bước" không. | Nếu thử quá 5 lần thì kéo dài khoảng lặng giữa hai bước hoặc nhắc hint. |
 | Bỏ lựa chọn có làm khoảnh khắc kết thành bị động không? | Phỏng vấn sau khi chơi | Nếu có, thêm một hành động phụ nhỏ, không phải lựa chọn hai hướng. |
 | Có nhận ra hai lớp đồ (nâu cổ và sáng màu) ở phía bên kia không? | Nhắc đến trong lúc think-aloud | Tăng tương phản màu hai lớp. |

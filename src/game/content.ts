@@ -275,7 +275,7 @@ export const HOTSPOT_TEXT = {
   crayon: 'Một mẩu bút sáp của Theo, mòn còn nửa. Em lúc nào cũng có vài mẩu trong túi.',
   crayonAgain: 'Mẩu bút sáp của Theo.',
   radioFaint: 'Dưới đáy radio có những nét lõm mờ. Như có ai từng khắc chữ lên vỏ máy.',
-  rubbed: 'Dưới nét bút sáp hiện ra một hàng chữ khắc từ lâu dưới đáy radio: M-A-R-T-I-N.',
+  rubbed: 'Dưới nét bút sáp hiện ra mấy chữ khắc vụng từ lâu dưới đáy radio: M-A-R.',
   glint: 'Có thứ gì loé lên trên bàn tay nó. Rồi nó quay đi.',
   breathOut: 'Bạn thở ra. Nó khựng lại. Bạn phải chờ.',
   knobSnapped: 'Bạn vặn núm âm lượng. Nó gãy rời trong tay bạn.',

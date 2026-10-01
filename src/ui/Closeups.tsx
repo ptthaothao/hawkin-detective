@@ -328,10 +328,10 @@ export function RubView() {
             onPointerUp={() => (last.current = null)}
           />
           <span className="rub-letters" style={{ opacity: progress }} aria-hidden>
-            MARTIN
+            MAR
           </span>
         </div>
-        <p className="rub-hint">{game.rubbed ? 'M-A-R-T-I-N.' : 'Chà bút sáp lên đáy radio.'}</p>
+        <p className="rub-hint">{game.rubbed ? 'M-A-R.' : 'Chà bút sáp lên đáy radio.'}</p>
       </div>
     </Overlay>
   );

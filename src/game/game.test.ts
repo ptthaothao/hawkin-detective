@@ -260,7 +260,7 @@ describe('những thứ tìm thêm (không cái nào chặn tiến trình)', () 
     const s = run([...OPENING, { type: 'INSPECT', id: 'crayon' }]).state;
     const rubbed = run([{ type: 'RUB_DONE' }], 5e5, s).state;
     expect(rubbed.rubbed).toBe(true);
-    expect(rubbed.message?.text).toMatch(/dưới đáy radio: M-A-R-T-I-N/);
+    expect(rubbed.message?.text).toMatch(/dưới đáy radio: M-A-R\./);
     expect(run([{ type: 'RUB_DONE' }], 6e5, rubbed).state).toBe(rubbed);
   });
 

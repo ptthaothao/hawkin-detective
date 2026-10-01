@@ -33,7 +33,7 @@
 15. **Theo có sẵn đèn pin và vài mẩu bút sáp trong túi quần** (em thích vẽ). Phía này không còn nội dung gửi đèn pin, không còn "Đèn pin biến mất". Đèn pin của người chơi chỉ để soi phía bên kia.
 16. **Vạch đếm của Theo vẽ bằng bút sáp (sáng, mới); chữ MAR thì khắc dưới đáy radio (cũ).** Hai lớp thời gian nhìn khác nhau.
 17. **Hạt giống mới (không lộ gì):** chữ **MAR khắc dưới đáy radio** (chỉ hiện khi chà bút sáp của Theo lên đó, tùy chọn); hai nốt huýt sáo rất xa; tiếng bước chân đều đặn; vết cào ở cửa là do bà chạm vào cửa phòng của con mình. Không gieo nghĩa địa ở Chapter 0. World Fact (chốt 01/10): chính Martin, con bà chủ nhà, khắc chữ MAR; Chapter 0 không giải thích.
-18. **Nền truyện** (con quái là bố chồng lên bà chủ nhà cũ; 1979; mẹ và chị mất trí nhớ; tuyến đi cố định; nó hại cả người lớn nhưng nhắm trẻ con trước) nằm ở `chapter-0-revision/ke-hoach-sua-cot-truyen-chapter-0-v2.md`. Chapter 0 không nói gì trong số đó ra.
+18. **Nền truyện** (mốc tuổi chốt 01/10: đêm 1979 chị 5 tuổi, mẹ đang mang bầu Theo, Theo sinh cuối 1979; tháng 11/1986 chị 12, Theo 7; con quái là bố chồng lên bà chủ nhà cũ; 1979; mẹ và chị mất trí nhớ; tuyến đi cố định; nó hại cả người lớn nhưng nhắm trẻ con trước) nằm ở `chapter-0-revision/ke-hoach-sua-cot-truyen-chapter-0-v2.md`. Chapter 0 không nói gì trong số đó ra.
 
 ---
 
@@ -43,7 +43,7 @@
 
 > Mỗi vị trí trong phòng tồn tại ở hai phía. Sự thật bị chia đôi: một nửa ở phía này, một nửa ở phía bên kia. Chỉ bạn mới ghép được hai nửa đó.
 
-Bối cảnh: một thị trấn nhỏ ở nước Mỹ, năm 1986, gia đình Hale. Theo Hale, 12 tuổi, mất tích 3 đêm trước. Cảnh sát cho rằng em bỏ nhà đi. Bạn là chị gái của Theo và bước vào phòng em lúc gần nửa đêm. Khi tắt đèn, căn phòng trở thành *phía bên kia*.
+Bối cảnh: một thị trấn nhỏ ở nước Mỹ, năm 1986, gia đình Hale. Theo Hale, 7 tuổi, mất tích 3 đêm trước. Cảnh sát cho rằng em bỏ nhà đi. Bạn là chị gái của Theo và bước vào phòng em lúc gần nửa đêm. Khi tắt đèn, căn phòng trở thành *phía bên kia*.
 
 Game không tìm cách hù dọa bằng jumpscare. Khoảnh khắc đáng sợ nhất nằm ở sự hiểu ra: *thứ bạn vừa dùng để liên lạc với Theo cũng chính là thứ dẫn con quái vật tới.*
 
@@ -102,7 +102,7 @@ Clue card chỉ ghi lại **những gì thấy được**. Những chữ **in đ
 
 | ID | Tìm ở | Nội dung card (trung tính) |
 |---|---|---|
-| **C1** Tờ tìm người | Phía này, bàn | "THEO HALE, 12 tuổi. Mất tích đêm 14 rạng sáng 15/11. Cảnh sát cho rằng em **bỏ nhà đi**." |
+| **C1** Tờ tìm người | Phía này, bàn | "THEO HALE, 7 tuổi. Mất tích đêm 14 rạng sáng 15/11. Cảnh sát cho rằng em **bỏ nhà đi**." |
 | **C2** Đồng hồ đeo tay | Phía này, bàn | Màn hình LCD nứt: `03:▯▯`. Hai số cuối không hiện. Giấy nhắn của mẹ: *"Mẹ tìm thấy dưới gầm giường. Nó dừng rồi."* |
 | **C3** Nhật ký tín hiệu | Phía này, dưới ván sàn | Xem nội dung đầy đủ bên dưới. |
 | **C4** Đồng hồ bên kia | Phía bên kia | "Đồng hồ quả lắc đứng yên. Con lắc dừng lệch một bên. Kim ngắn gãy, nằm dưới đáy mặt kính. Kim dài dừng qua số 3 hai vạch nhỏ." |
@@ -417,7 +417,7 @@ Người chơi học dần các luật này và không có tutorial nào nói ra
 
 [0:30] OPENING CINEMATIC — nền đen (mục R)
   BA ĐÊM TRƯỚC / THEO BIẾN MẤT.         (tiếng thịch)
-  "Em trai bạn. 12 tuổi."
+  "Em trai bạn. 7 tuổi."
   "Cảnh sát nghĩ em bỏ nhà đi. Bạn thì không."
   "Đêm qua, mẹ tìm thấy đồng hồ đeo tay của em dưới gầm giường.
    Nó dừng lúc 3 giờ. Hai số phút đã vỡ."

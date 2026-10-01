@@ -12,7 +12,7 @@ export interface IntroLine {
 export const INTRO_LINES: IntroLine[] = [
   { kind: 'kicker', text: 'Ba đêm trước' },
   { kind: 'headline', text: 'THEO BIẾN MẤT.' },
-  { kind: 'line', text: 'Em trai bạn. 12 tuổi.' },
+  { kind: 'line', text: 'Em trai bạn. 7 tuổi.' },
   { kind: 'line', text: 'Cảnh sát nghĩ em bỏ nhà đi. Bạn thì không.' },
   // Doc §D: the watch only shows the hour. The minutes live on the other side.
   { kind: 'line', text: 'Đêm qua, mẹ tìm thấy đồng hồ đeo tay của em dưới gầm giường.\nNó dừng lúc 3 giờ. Hai số phút đã vỡ.' },
@@ -220,7 +220,7 @@ export const CLUES: Record<ClueId, ClueDef> = {
   C1: {
     title: 'Tờ tìm người',
     world: 'normal',
-    text: 'THEO HALE, 12 tuổi. Mất tích đêm 14 rạng sáng 15/11. Cảnh sát cho rằng em bỏ nhà đi.',
+    text: 'THEO HALE, 7 tuổi. Mất tích đêm 14 rạng sáng 15/11. Cảnh sát cho rằng em bỏ nhà đi.',
   },
   C2: {
     title: 'Đồng hồ đeo tay',

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CLUE_FOUND_PAIRED, DIARY_PAGES, NARRATION, STEPS, THEO_CONTACT, THEO_PRECALL } from './content';
+import { CHIPS, CLUES, CLUE_FOUND_PAIRED, DIARY_PAGES, NARRATION, STEPS, THEO_CONTACT, THEO_PRECALL } from './content';
 import { FINALE_ALL, FINALE_START, run, TO_FINALE, type Step } from './scripts';
 import { reducer } from './reducer';
 import { currentStep, discoveries, evidenceReady, freq } from './selectors';
@@ -134,6 +134,12 @@ describe('the dial under the hand (brief §14)', () => {
 });
 
 describe('the way to the night Theo vanished', () => {
+  it('Theo is 7, so the police think he got lost, not that he ran away', () => {
+    expect(CLUES.C1.text).toMatch(/7 tuổi/);
+    expect(CLUES.C1.text).toMatch(/đi lạc trong rừng/);
+    expect(CHIPS['di-lac'].label).toBe('đi lạc trong rừng');
+  });
+
   it('the diary logs every night with its time, and leaves the last one blank', () => {
     const last = DIARY_PAGES[DIARY_PAGES.length - 1];
     expect(last).toMatch(/Đêm 4 — __:__\./);

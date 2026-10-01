@@ -3,7 +3,7 @@
 > Vertical slice · 1 phòng · 2 thế giới · 15–20 phút
 > Tài liệu thiết kế gameplay, là **source of truth** cho Chapter 0. Chưa bao gồm architecture.
 > Cập nhật 25/09/2026 sau vòng stress-test và final validation. Thêm mục R (xương sống câu chuyện) sau lần tự chơi thử bản build đầu.
-> **Cập nhật 29/09/2026: viết lại cốt truyện** (bối cảnh Mỹ 1986, nhà Hale, phía bên kia là quá khứ, một kết thúc duy nhất). Xem mục 0, phần "Sau khi viết lại backstory". Chỉ tài liệu truyện đổi, **code (`src/game`) chưa đổi** nên còn lệch tài liệu này.
+> **Cập nhật 29/09/2026: viết lại cốt truyện** (bối cảnh Mỹ 1986, nhà Hale, phía bên kia là quá khứ, một kết thúc duy nhất). Xem mục 0, phần "Sau khi viết lại backstory". Code đã đồng bộ ở PR #2. **Cập nhật 01/10/2026:** bà chủ nhà ~1920, radio của nhà bà (chữ MAR), Theo 7 tuổi, chị 12, "đi lạc trong rừng", luật chạm đồ của con, luật tần số = giờ, nhật ký giọng bé 7 tuổi.
 > Bản trước: [ideas.md](ideas.md)
 
 ---
@@ -29,7 +29,7 @@
 ### Sau khi viết lại backstory (29/09/2026)
 
 13. **Chỉ còn một kết thúc, không còn lựa chọn.** Bỏ nhánh A (vặn to hết cỡ), bỏ nhánh B cũ (gửi đèn pin qua hốc sàn). Khoảnh khắc kết là **một nhịp canh thời điểm**: tắt radio đúng giữa hai bước chân của thứ bên kia. Sai chỉ phải thử lại, không có game over. Mục K viết lại hoàn toàn.
-14. **Phía bên kia là quá khứ, phía của chị là hiện tại.** Bên kia có **hai lớp thấy được**: đồ cổ màu nâu là đêm của bà chủ nhà cũ (khoảng năm 1920, nhà chưa có điện); đồ hiện đại màu sáng (radio, micro, bút sáp, đèn pin) là đêm Theo biến mất. Bên kia mục dần **chỉ ở rìa**; ngôi nhà và đồ liên quan tới đứa con của bà vẫn nguyên.
+14. **Phía bên kia là quá khứ, phía của chị là hiện tại.** Bên kia có **hai lớp thấy được**: đồ cổ màu nâu là đêm của bà chủ nhà cũ (khoảng năm 1920, nhà chưa có điện); đồ hiện đại màu sáng (micro, bút sáp, đèn pin, phần bố gắn thêm vào radio) là đêm Theo biến mất. Bên kia mục dần **chỉ ở rìa**; ngôi nhà và đồ liên quan tới đứa con của bà vẫn nguyên.
 15. **Theo có sẵn đèn pin và vài mẩu bút sáp trong túi quần** (em thích vẽ). Phía này không còn nội dung gửi đèn pin, không còn "Đèn pin biến mất". Đèn pin của người chơi chỉ để soi phía bên kia.
 16. **Vạch đếm của Theo vẽ bằng bút sáp (sáng, mới); chữ MAR thì khắc dưới đáy radio (cũ).** Hai lớp thời gian nhìn khác nhau.
 17. **Hạt giống mới (không lộ gì):** chữ **MAR khắc dưới đáy radio** (chỉ hiện khi chà bút sáp của Theo lên đó, tùy chọn); hai nốt huýt sáo rất xa; tiếng bước chân đều đặn; vết cào ở cửa là do bà chạm vào cửa phòng của con mình. Không gieo nghĩa địa ở Chapter 0. World Fact (chốt 01/10): chiếc radio vốn là của nhà bà chủ cũ (đời đầu, khoảng 1920), bị bỏ lại trong gara (căn cứ bí mật của Martin). Bố thấy đẹp nên nhặt về và sửa lại; chính Martin đã khắc chữ MAR dưới đáy. Chapter 0 không giải thích.
@@ -43,7 +43,7 @@
 
 > Mỗi vị trí trong phòng tồn tại ở hai phía. Sự thật bị chia đôi: một nửa ở phía này, một nửa ở phía bên kia. Chỉ bạn mới ghép được hai nửa đó.
 
-Bối cảnh: một thị trấn nhỏ ở nước Mỹ, năm 1986, gia đình Hale. Theo Hale, 7 tuổi, mất tích 3 đêm trước. Cảnh sát cho rằng em bỏ nhà đi. Bạn là chị gái của Theo và bước vào phòng em lúc gần nửa đêm. Khi tắt đèn, căn phòng trở thành *phía bên kia*.
+Bối cảnh: một thị trấn nhỏ ở nước Mỹ, năm 1986, gia đình Hale. Theo Hale, 7 tuổi, mất tích 3 đêm trước. Cảnh sát cho rằng em đi lạc trong rừng. Bạn là chị gái của Theo và bước vào phòng em lúc gần nửa đêm. Khi tắt đèn, căn phòng trở thành *phía bên kia*.
 
 Game không tìm cách hù dọa bằng jumpscare. Khoảnh khắc đáng sợ nhất nằm ở sự hiểu ra: *thứ bạn vừa dùng để liên lạc với Theo cũng chính là thứ dẫn con quái vật tới.*
 
@@ -90,7 +90,7 @@ Game không tìm cách hù dọa bằng jumpscare. Khoảnh khắc đáng sợ n
 
 - Cửa phòng ở phía bên kia không mở được ("Bạn không muốn mở cánh cửa đó"). Nó chỉ dùng cho âm thanh và bầu không khí.
 - Micro ở phía này không bấm được ("Bạn không dám bấm."). Người chơi không bao giờ phát sóng trong Chapter 0.
-- **Hai lớp thấy được ở phía bên kia:** đồ cổ nâu (giá nến, đồng hồ quả lắc, giấy dán tường, đèn dầu, máy quay đĩa) và đồ sáng màu của Theo (radio, micro, bút sáp, đèn pin). Người chơi không được giải thích; nhìn là hiểu "hai thời gian chồng lên nhau".
+- **Hai lớp thấy được ở phía bên kia:** đồ cổ nâu (giá nến, đồng hồ quả lắc, giấy dán tường, đèn dầu, máy quay đĩa) và đồ sáng màu của Theo (micro, bút sáp, đèn pin). **Radio thuộc cả hai lớp:** vỏ gỗ 1920 là của nhà bà, tấm kim loại xám và micro là đồ bố gắn thêm. Người chơi không được giải thích; nhìn là hiểu "hai thời gian chồng lên nhau".
 - **Mục nát chỉ ở rìa:** góc xa của phòng, mép trần và khe cửa mục dần vào sương. Bàn radio, giường, tường cạnh giường và cửa **không** mục (đồ liên quan tới đứa con của bà).
 - Intro có dòng *"Mẹ đã ngủ ở tầng dưới, sau ba đêm thức trắng."* Đây là lý do giọng mẹ trên radio là điều không thể. Trong truyện, mẹ **chỉ nhớ mang máng** 3:17 có ý nghĩa gì đó (không nói ra ở Chapter 0).
 
@@ -102,7 +102,7 @@ Clue card chỉ ghi lại **những gì thấy được**. Những chữ **in đ
 
 | ID | Tìm ở | Nội dung card (trung tính) |
 |---|---|---|
-| **C1** Tờ tìm người | Phía này, bàn | "THEO HALE, 7 tuổi. Mất tích đêm 14 rạng sáng 15/11. Cảnh sát cho rằng em **bỏ nhà đi**." |
+| **C1** Tờ tìm người | Phía này, bàn | "THEO HALE, 7 tuổi. Mất tích đêm 14 rạng sáng 15/11. Cảnh sát cho rằng em **đi lạc trong rừng**." |
 | **C2** Đồng hồ đeo tay | Phía này, bàn | Màn hình LCD nứt: `03:▯▯`. Hai số cuối không hiện. Giấy nhắn của mẹ: *"Mẹ tìm thấy dưới gầm giường. Nó dừng rồi."* |
 | **C3** Nhật ký tín hiệu | Phía này, dưới ván sàn | Xem nội dung đầy đủ bên dưới. |
 | **C4** Đồng hồ bên kia | Phía bên kia | "Đồng hồ quả lắc đứng yên. Con lắc dừng lệch một bên. Kim ngắn gãy, nằm dưới đáy mặt kính. Kim dài dừng qua số 3 hai vạch nhỏ." |
@@ -111,15 +111,17 @@ Clue card chỉ ghi lại **những gì thấy được**. Những chữ **in đ
 
 **Nội dung C3 — Nhật ký tín hiệu** (mỗi đêm một trang):
 
-> *Đêm 1 — 01:52. Chỉ có rè. Rồi ba tiếng gõ. Chắc em tưởng tượng.*
-> *Đêm 2 — 02:34. Có tiếng thở. Em vặn to lên để nghe rõ. Sáng ra có vết cào ở **mặt ngoài cửa phòng** em. Mẹ bảo là con chó nhà bên.*
-> *Đêm 3 — 02:58. Nó gọi tên em. Bằng giọng của mẹ. Đồng hồ đeo tay em tắt ngấm lúc nó tới, sáng ra mới chạy lại.*
-> *Radio của bố có **micro**. Em vẫn chưa dám bấm nút.*
-> *Em để một mẩu **bút sáp** trong **hốc dưới sàn**. Sáng ra nó biến mất.*
+> *Đêm 1 — 01:52. Radio kêu rè rè. Rồi có ba tiếng cộc cộc cộc. Chắc em nghe nhầm.*
+> *Đêm 2 — 02:34. Có ai thở trong radio. Em vặn to lên nghe cho rõ. Sáng ra có vết cào ở **mặt ngoài cửa phòng** em. Mẹ bảo con chó nhà bên cào.*
+> *Đêm 3 — 02:58. Nó gọi tên em. Bằng giọng của mẹ. Mà mẹ ngủ rồi mà. Lúc nó tới, đồng hồ đeo tay em tắt ngấm. Sáng ra mới chạy lại.*
+> *Radio của bố có cái **micro**. Em chưa dám bấm nút.*
+> *Em để một mẩu **bút sáp** trong cái **hốc dưới sàn**. Sáng ra mất tiêu.*
 >
-> *(trang cuối)* *Hôm nay em ở nhà Danny tới tối, vẽ cả buổi. Về nhà em nằm lên giường và nghịch radio của bố.*
-> *Đêm 4 — ▢▢:▢▢. Đêm nay nó sẽ đến muộn hơn. Nó tới lúc nào, em sẽ ghi vào đây.*
-> *Lần này em sẽ không chỉ ngồi nghe.*
+> *(trang cuối)* *Hôm nay em ở nhà Danny tới tối. Tụi em vẽ cả buổi. Về nhà em leo lên giường nghịch radio của bố.*
+> *Đêm 4 — ▢▢:▢▢. Đêm nay nó tới muộn hơn. Nó tới lúc nào em ghi vào đây.*
+> *Lần này em không chỉ ngồi nghe nữa.*
+
+Giọng nhật ký là của một bé **7 tuổi** (chốt 01/10): câu ngắn, từ đơn giản, chữ to và hơi vụng. Mọi thông tin dùng cho puzzle giữ nguyên.
 
 Trang cuối để **trống giờ** theo đúng mẫu của ba đêm trước. Ô trống đó chính là câu hỏi của puzzle: đêm Theo biến mất, nó tới lúc mấy giờ? Nhật ký không ghi con số nào.
 
@@ -129,7 +131,7 @@ Trang cuối để **trống giờ** theo đúng mẫu của ba đêm trước. 
 
 | Chip | Nguồn |
 |---|---|
-| bỏ nhà đi | C1 |
+| đi lạc trong rừng | C1 |
 | nói vào micro | C3 + C6 ("micro") |
 | tắt đèn | Công tắc đèn (hành động người chơi đã làm) |
 | chui xuống hốc sàn · hốc dưới sàn | C3 |
@@ -148,7 +150,7 @@ Có 4 tầng, và mỗi tầng có một chủ sở hữu khác nhau:
 
 | Tầng | Ai sở hữu | Có hiển thị? | Ví dụ |
 |---|---|---|---|
-| **World Fact** | Tác giả | Không bao giờ | Theo nói vào micro lúc 3:17, bị kéo sang phía bên kia qua bức tường, đang trốn ở đó. Con quái đi theo giọng nói phát trên kênh sống 3.17; tuyến của nó chạy qua phòng Theo. |
+| **World Fact** | Tác giả | Không bao giờ | Theo nói vào micro lúc 3:17, bị kéo sang phía bên kia qua bức tường, đang trốn ở đó. Con quái bị tiếng radio của con nó kéo tới và chạm được vào đồ của con nó ở cả hai phía; chỉ giọng nói vào micro lúc 3:17 mới cho nó bắt người. Tuyến của nó chạy qua phòng Theo. |
 | **Observation** | Game (đánh dấu ẩn) | Không | Người chơi đã xem C4. Người chơi đã thử 2.34. Người chơi đã tắt đèn 3 lần. Dùng cho hint và thống kê. |
 | **Clue** | Game (Case File) | Có, trung tính | "Kim dài dừng qua số 3 hai vạch nhỏ." |
 | **Player Knowledge** | **Đầu người chơi** | Không, game không lưu | "Đồng hồ tắt đúng lúc nó tới, tức 3 giờ mấy phút." |
@@ -166,7 +168,7 @@ CLUE              C3 đêm 3: 02:58, "gọi tên em bằng giọng của mẹ"
 PLAYER            "2.58 ↔ 02:58? Radio phát lại đêm đó?"              (giả thuyết 1)
 VERIFY            Thử tần số của một đêm khác (2.34 hoặc 1.52) → khớp với nhật ký
                           │
-CLUE              C3 "đồng hồ đeo tay tắt ngấm lúc nó tới" + C2 03:▯▯
+CLUE              C3 "lúc nó tới, đồng hồ đeo tay em tắt ngấm" + C2 03:▯▯
 PLAYER            "Đêm đó nó tới lúc 3 giờ mấy"                        (giả thuyết 2)
 VERIFY            Thử 3.00 → chỉ có rè → "thiếu số phút"
                           │
@@ -204,8 +206,8 @@ Lời của Theo trong lần liên lạc đầu không được chứa các ch�
 
 ```text
 Bằng chứng cần có:
-1. C3: "Radio của bố có micro. Em vẫn chưa dám bấm nút."
-2. C3: "Lần này em sẽ không chỉ ngồi nghe."
+1. C3: "Radio của bố có cái micro. Em chưa dám bấm nút."
+2. C3: "Lần này em không chỉ ngồi nghe nữa."
 3. C6 (khoảnh khắc bị giữ nguyên ở phía bên kia): micro rơi, nút bấm nói bị
    quấn băng keo, dây kéo căng về phía bức tường.
 4. Trải nghiệm của chính người chơi: đã tắt đèn và nghe radio nhiều lần mà không bị kéo đi.
@@ -214,7 +216,7 @@ Bằng chứng cần có:
 Đáp án sai nhưng hợp lý, và lý do bị bác bỏ:
 - tắt đèn: người chơi đã tắt đèn nhiều lần mà vẫn ở đây.
 - chui xuống hốc sàn: hốc bên kia "chỉ rộng bằng một cuốn sổ", đang trống.
-- bỏ nhà đi: giọng Theo trên radio nói "em vẫn ở trong phòng".
+- đi lạc trong rừng: giọng Theo trên radio nói "em vẫn ở trong phòng".
 ```
 
 ### Slot C
@@ -361,7 +363,7 @@ RESULT        Giọng Theo
 
 ### 7 luật của phía bên kia
 
-Người chơi học dần các luật này và không có tutorial nào nói ra:
+Người chơi học dần các luật này và không có tutorial nào nói ra (mục đề "7 luật" giữ tên cũ, nay có 8):
 
 1. **Tắt đèn phòng thì sang phía bên kia, bật lại thì về.** Công tắc nằm ở cùng một chỗ ở cả hai phía.
 2. **Đồ vật ở phía bên kia bị giữ nguyên ở khoảnh khắc đêm đó (cả đồ cổ lẫn đồ của Theo). Sinh vật thì không.** (Đồng hồ đứng yên, micro đang rơi, nhưng Theo vẫn vẽ thêm vạch.)
@@ -370,11 +372,12 @@ Người chơi học dần các luật này và không có tutorial nào nói ra
 5. **Hốc dưới sàn nối hai phía.** Đồ đặt vào đó sẽ sang phía bên kia. (Chapter 0 không dùng luật này; để dành cho Chapter 1.)
 6. **Mỗi lần phía này tối đi, Theo vẽ thêm một vạch bút sáp.** Xem luật đếm vạch bên dưới.
 7. **Chỉ tần số của đêm Theo biến mất (3.17) là tín hiệu đang sống.** Các tần số cũ chỉ là tiếng vọng. Chúng không gọi con quái tới và không tạo ra vết cào mới.
+8. **Trên chiếc radio này, tần số chính là giờ.** Mỗi đêm được phát lại ở con số bằng giờ nó tới (02:58 → 2.58). Người chơi tự phát hiện luật này qua tiếng vọng. Chapter 0 không giải thích vì sao; lý do để dành cho chapter sau (dự kiến gắn với giờ Martin mất, 3:17).
 
 **Ghi chú 29/09 (World Fact, không hiển thị):**
 - Phía bên kia là **quá khứ**: hai lớp chồng lên nhau (đêm của bà chủ nhà cũ, đêm Theo biến mất). Phía này là hiện tại, thời gian vẫn chạy.
 - Bên kia mục dần chỉ ở rìa. Nhà và đồ liên quan tới đứa con của bà thì nguyên.
-- Thứ săn Theo đi một **tuyến cố định** (nhà kho, phòng Theo, nghĩa địa), với **nhịp bước đều**. Nó chỉ sang được phía này khi có người **nói vào radio ở 3:17** (đêm 4, Theo). Nó nhắm trẻ con trước nhưng vẫn hại được người lớn. Không thứ nào trong số này được nói ra ở Chapter 0.
+- Thứ săn Theo đi một **tuyến cố định** (nhà kho, phòng Theo, nghĩa địa), với **nhịp bước đều**. Nó đi tuyến ấy ở **cả hai phía** như một cái bóng và **chạm được vào đồ gắn với con nó** (cửa phòng Martin, chiếc radio của Martin), nên mới có vết cào ở cửa (đêm 2) và quanh radio. Nhưng nó chỉ **bắt được người** khi có ai **nói vào micro lúc 3:17** (đêm 4, Theo). Tiếng radio kéo nó về phía chiếc radio (slot D); giọng nói vào micro mới mở đường cho nó bắt người. (Chốt 01/10.) Nó nhắm trẻ con trước nhưng vẫn hại được người lớn. Không thứ nào trong số này được nói ra ở Chapter 0.
 - Hốc dưới sàn (luật 5) vẫn đúng nhưng **không dùng** trong Chapter 0.
 
 ### Luật đếm vạch
@@ -418,7 +421,7 @@ Người chơi học dần các luật này và không có tutorial nào nói ra
 [0:30] OPENING CINEMATIC — nền đen (mục R)
   BA ĐÊM TRƯỚC / THEO BIẾN MẤT.         (tiếng thịch)
   "Em trai bạn. 7 tuổi."
-  "Cảnh sát nghĩ em bỏ nhà đi. Bạn thì không."
+  "Cảnh sát nghĩ em đi lạc trong rừng. Bạn thì không."
   "Đêm qua, mẹ tìm thấy đồng hồ đeo tay của em dưới gầm giường.
    Nó dừng lúc 3 giờ. Hai số phút đã vỡ."
   "Mẹ đã ngủ ở tầng dưới, sau ba đêm thức trắng."
@@ -485,7 +488,7 @@ Ký hiệu: 🟢 người chơi chắc chắn tự suy ra được · 🟡 có n
 | # | Player thấy | Player nghĩ | Player làm | Game phản hồi | |
 |---|---|---|---|---|---|
 | 1 | Màn đen, 4 dòng intro | "Em ấy đi đâu?" | — | Căn phòng áp mái hiện ra, đèn vàng, tiếng tích tắc | 🟢 |
-| 2 | Chồng tờ tìm người trên bàn | "Cảnh sát nghĩ em bỏ nhà đi…" | Xem | C1 | 🟢 |
+| 2 | Chồng tờ tìm người trên bàn | "Cảnh sát nghĩ em đi lạc trong rừng…" | Xem | C1 | 🟢 |
 | 3 | Radio, bánh xe ở 2.58 | "Radio của Theo." | Bật lên | Tiếng rè… rồi giọng đàn bà thì thầm "Theo…" | 🟢 |
 | 4 | — | "Giọng… mẹ? Radio bắt được cái gì vậy?" | Xoay bánh xe | Chỉ còn rè. Xoay về 2.58 lại nghe giọng đó. | 🟢 |
 | 5 | Đồng hồ đeo tay `03:▯▯` + giấy của mẹ | "Nó dừng lúc 3 giờ mấy." | Xem | C2 | 🟢 |

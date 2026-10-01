@@ -13,7 +13,7 @@ export const INTRO_LINES: IntroLine[] = [
   { kind: 'kicker', text: 'Ba đêm trước' },
   { kind: 'headline', text: 'THEO BIẾN MẤT.' },
   { kind: 'line', text: 'Em trai bạn. 7 tuổi.' },
-  { kind: 'line', text: 'Cảnh sát nghĩ em bỏ nhà đi. Bạn thì không.' },
+  { kind: 'line', text: 'Cảnh sát nghĩ em đi lạc trong rừng. Bạn thì không.' },
   // Doc §D: the watch only shows the hour. The minutes live on the other side.
   { kind: 'line', text: 'Đêm qua, mẹ tìm thấy đồng hồ đeo tay của em dưới gầm giường.\nNó dừng lúc 3 giờ. Hai số phút đã vỡ.' },
   { kind: 'line', text: 'Mẹ đã ngủ ở tầng dưới, sau ba đêm thức trắng.' },
@@ -181,7 +181,7 @@ export const NARRATION = {
   firstOtherSide: 'Vẫn là phòng của Theo.\nNhưng như thể bị bỏ lại ở một đêm nào đó.',
   somethingAtDesk: 'Có thứ gì đó đang đứng ở bàn radio.',
   evidenceReady: 'Mình đã có đủ bằng chứng. Mở hồ sơ.',
-  truth: 'Theo không bỏ nhà đi. Em vẫn ở đây.\nVà thứ đang săn em nghe được mọi âm thanh.',
+  truth: 'Theo không đi lạc. Em vẫn ở đây.\nVà thứ đang săn em nghe được mọi âm thanh.',
   contactAfter: '“Không phải phòng của chị”… Căn phòng mình thấy mỗi khi đèn tắt?',
 };
 
@@ -196,7 +196,7 @@ export const MOTHER_VOICE: DialogueLine[] = [{ who: 'radio', text: '“Theo…�
 
 /** Reaction when a clue is first found; the card itself goes into the Case File. */
 export const CLUE_FOUND: Record<ClueId, string> = {
-  C1: 'Cả chồng tờ tìm người chưa kịp dán. Cảnh sát viết: “bỏ nhà đi”.',
+  C1: 'Cả chồng tờ tìm người chưa kịp dán. Cảnh sát viết: “đi lạc trong rừng”.',
   C2: 'Đồng hồ đeo tay của Theo, kèm giấy nhắn của mẹ. Mặt số nứt, chỉ còn đọc được 03.',
   C3: 'Nhật ký của Theo.',
   C4: 'Đồng hồ quả lắc ở đây đã dừng, con lắc treo lệch. Kim ngắn gãy rơi dưới mặt kính. Chỉ còn kim dài.',
@@ -220,7 +220,7 @@ export const CLUES: Record<ClueId, ClueDef> = {
   C1: {
     title: 'Tờ tìm người',
     world: 'normal',
-    text: 'THEO HALE, 7 tuổi. Mất tích đêm 14 rạng sáng 15/11. Cảnh sát cho rằng em bỏ nhà đi.',
+    text: 'THEO HALE, 7 tuổi. Mất tích đêm 14 rạng sáng 15/11. Cảnh sát cho rằng em đi lạc trong rừng.',
   },
   C2: {
     title: 'Đồng hồ đeo tay',
@@ -253,12 +253,12 @@ export const C6_UPDATE = 'Có thêm vết cào mới quanh radio.';
 
 /** One night per page (doc §D, §P). */
 export const DIARY_PAGES = [
-  'Đêm 1 — 01:52. Chỉ có rè. Rồi ba tiếng gõ. Chắc em tưởng tượng.',
-  'Đêm 2 — 02:34. Có tiếng thở. Em vặn to lên để nghe rõ. Sáng ra có vết cào ở mặt ngoài cửa phòng em. Mẹ bảo là con chó nhà bên.',
-  'Đêm 3 — 02:58. Nó gọi tên em. Bằng giọng của mẹ. Đồng hồ đeo tay em tắt ngấm lúc nó tới, sáng ra mới chạy lại.',
-  'Radio của bố có micro. Em vẫn chưa dám bấm nút.\n\nEm để một mẩu bút sáp trong hốc dưới sàn. Sáng ra nó biến mất.',
+  'Đêm 1 — 01:52. Radio kêu rè rè. Rồi có ba tiếng cộc cộc cộc. Chắc em nghe nhầm.',
+  'Đêm 2 — 02:34. Có ai thở trong radio. Em vặn to lên nghe cho rõ. Sáng ra có vết cào ở mặt ngoài cửa phòng em. Mẹ bảo con chó nhà bên cào.',
+  'Đêm 3 — 02:58. Nó gọi tên em. Bằng giọng của mẹ. Mà mẹ ngủ rồi mà. Lúc nó tới, đồng hồ đeo tay em tắt ngấm. Sáng ra mới chạy lại.',
+  'Radio của bố có cái micro. Em chưa dám bấm nút.\n\nEm để một mẩu bút sáp trong cái hốc dưới sàn. Sáng ra mất tiêu.',
   // The last night's time is left blank: that blank is the question the player has to fill in.
-  'Hôm nay em ở nhà Danny tới tối, vẽ cả buổi. Về nhà em nằm lên giường và nghịch radio của bố.\n\nĐêm 4 — __:__. Đêm nay nó sẽ đến muộn hơn. Nó tới lúc nào, em sẽ ghi vào đây.\n\nLần này em sẽ không chỉ ngồi nghe.',
+  'Hôm nay em ở nhà Danny tới tối. Tụi em vẽ cả buổi. Về nhà em leo lên giường nghịch radio của bố.\n\nĐêm 4 — __:__. Đêm nay nó tới muộn hơn. Nó tới lúc nào em ghi vào đây.\n\nLần này em không chỉ ngồi nghe nữa.',
 ];
 
 export const HOTSPOT_TEXT = {
@@ -342,7 +342,7 @@ export const CHIPS: Record<ChipId, ChipDef> = {
   'tat-den': { label: 'tắt đèn', slot: 'A', sources: [] },
   'noi-vao-micro': { label: 'nói vào micro', slot: 'A', sources: ['C3', 'C6'] },
   'chui-hoc-san': { label: 'chui xuống hốc sàn', slot: 'A', sources: ['C3'] },
-  'bo-nha-di': { label: 'bỏ nhà đi', slot: 'A', sources: ['C1'] },
+  'di-lac': { label: 'đi lạc trong rừng', slot: 'A', sources: ['C1'] },
   'hoc-duoi-san': { label: 'hốc dưới sàn', slot: 'C', sources: ['C3'] },
   'ban-radio': { label: 'bàn radio', slot: 'C', sources: ['C6'] },
   'cua-phong': { label: 'cửa phòng', slot: 'C', sources: ['C3'] },

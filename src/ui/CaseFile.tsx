@@ -185,7 +185,7 @@ export function CaseFile({ v }: { v: VisualState }) {
     <Overlay label="Hồ sơ" onClose={() => setUi({ panel: null })} className="casefile-overlay">
       <div className="casebook">
         <header className="case-question">
-          <s className="pencil struck">Theo bỏ nhà đi?</s>
+          <s className="pencil struck">Theo đi lạc trong rừng?</s>
           <span className="pencil">{objective(game) || TRUTH_QUESTION}</span>
         </header>
         <nav className="index-tabs" role="tablist">

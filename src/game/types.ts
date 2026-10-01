@@ -10,7 +10,7 @@ export type ChipId =
   | 'tat-den'
   | 'noi-vao-micro'
   | 'chui-hoc-san'
-  | 'bo-nha-di'
+  | 'di-lac'
   | 'hoc-duoi-san'
   | 'ban-radio'
   | 'cua-phong'

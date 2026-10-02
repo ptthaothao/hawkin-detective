@@ -150,55 +150,6 @@
   justify-content: center;
 }
 
-.ch11-spots {
-  position: absolute;
-  inset: 0;
-  transform-origin: 0 0;
-  pointer-events: none;
-}
-.ch11-spot {
-  pointer-events: auto;
-  position: absolute;
-  background: transparent;
-  border: 0;
-  padding: 0;
-}
-.ch11-spot span {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  white-space: nowrap;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 4px 8px;
-  border: 1px solid rgba(232, 223, 200, 0.35);
-  opacity: 0;
-  transition: opacity 0.25s;
-}
-.ch11-spot:hover span,
-.ch11-spot:focus-visible span,
-.ch11-spot.hint span {
-  opacity: 1;
-}
-.ch11-spot.hint::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 34px;
-  height: 34px;
-  margin: -17px 0 0 -17px;
-  border: 1px solid rgba(232, 200, 140, 0.7);
-  border-radius: 50%;
-  animation: ch11-ping 1.8s ease-out infinite;
-  pointer-events: none;
-}
-.ch11-spot.hint span {
-  top: calc(50% + 34px);
-}
 @keyframes ch11-ping {
   from {
     transform: scale(0.6);
@@ -280,4 +231,64 @@
   .ch11 *::after {
     animation-duration: 0.01s !important;
   }
+}
+
+/* 3D stage overlay: eyelids and labels on the things he can use. */
+.ch11-3d-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ch11-lid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  background: #000;
+}
+.ch11-lid.top {
+  top: 0;
+}
+.ch11-lid.bottom {
+  bottom: 0;
+}
+.ch11-label {
+  position: absolute;
+  transform: translate(-50%, -140%);
+  white-space: nowrap;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: #e8dfc8;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+  border: 1px solid rgba(232, 223, 200, 0.35);
+}
+.ch11-label.hint::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 10px);
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  border: 1px solid rgba(232, 200, 140, 0.8);
+  border-radius: 50%;
+  animation: ch11-ping 1.8s ease-out infinite;
+}
+.ch11-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.75) 100%);
+}
+/* The text layer sits over the 3D stage: only its buttons take the pointer. */
+.ch11-frame {
+  pointer-events: none;
+}
+.ch11-frame button,
+.ch11-end,
+.ch11-breath {
+  pointer-events: auto;
 }

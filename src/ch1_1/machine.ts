@@ -87,6 +87,9 @@ export const NEAR_MS = 6_500;
 export const BREATH_MS = 8_000;
 /** Breathing this long while it is close: it hears him. */
 export const HEARD_MS = 1_400;
+/** In the garage: its steps pass outside the doors, on its own route, while the second line is up. */
+export const PASS_AT_MS = 2_300;
+export const PASS_STEPS = 5;
 
 const NEXT: Partial<Record<Beat, Beat>> = {
   back: 'bark',

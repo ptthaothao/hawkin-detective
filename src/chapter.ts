@@ -29,9 +29,12 @@ export function markFinished(id: ChapterId) {
   }
 }
 
+/** Fixed targets only: the destination never comes from the current URL. */
+const CHAPTER_URL: Record<ChapterId, string> = {
+  '0': './',
+  '1.1': './?chapter=1.1',
+};
+
 export function goToChapter(id: ChapterId) {
-  const url = new URL(window.location.href);
-  if (id === '0') url.searchParams.delete('chapter');
-  else url.searchParams.set('chapter', id);
-  window.location.assign(url.toString());
+  window.location.assign(CHAPTER_URL[id]);
 }

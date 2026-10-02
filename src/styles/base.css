@@ -200,6 +200,11 @@ button:focus-visible {
   color: var(--tungsten);
   animation: breathe 2.6s ease-in-out infinite;
 }
+.press.quiet {
+  margin-top: 0.8rem;
+  color: var(--ink-dim);
+  animation: none;
+}
 .screen.intro {
   cursor: pointer;
   gap: 0.5rem;

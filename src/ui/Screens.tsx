@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { audio } from '../audio/audio';
+import { goToChapter, markFinished } from '../chapter';
 import { ENDING, INTRO_LINES, type IntroLine } from '../game/content';
 import { useStore } from '../store';
 
@@ -85,6 +86,7 @@ export function EndingScreen() {
   const game = useStore((s) => s.game);
   const reset = useStore((s) => s.reset);
   const elapsed = (game.endedAt ?? 0) - (game.startedAt ?? 0);
+  useEffect(() => markFinished('0'), []);
   return (
     <div className="screen ending">
       <h1 className="ending-title">{ENDING.title}</h1>
@@ -101,7 +103,10 @@ export function EndingScreen() {
         <dt>Thời gian</dt>
         <dd>{mmss(elapsed)}</dd>
       </dl>
-      <button className="press" onClick={reset}>
+      <button className="press" onClick={() => goToChapter('1.1')}>
+        Sang Chương 1.1
+      </button>
+      <button className="press quiet" onClick={reset}>
         Chơi lại
       </button>
     </div>

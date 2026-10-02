@@ -1,0 +1,289 @@
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { markFinished } from '../chapter';
+import { useQuality } from '../ui/quality';
+import { AFTER, END, FAINT, FOUND, FOUND_AFTER, HIDE_LABEL, HIDE_LINES, MMM, NARRATION, PROMPT } from './content';
+import { AUTO_MS, BREATH_MS, DOOR_OPENS_MS, NEAR_AT_MS, STEP_MS, isNear, type Beat, type Ch11State, type HideSpot } from './machine';
+import { Stage } from './pixi/stage';
+import { sound } from './sound';
+import { clock, useCh11 } from './store';
+import '../styles/ch11.css';
+
+/** Hotspots in % of the 16:9 frame (same design space as the Pixi scenes). */
+const SPOTS = {
+  torch: { x: 28.2, y: 64.4, w: 5, h: 4.5 },
+  door: { x: 87.5, y: 20, w: 10, h: 64.4 },
+  radio: { x: 61.4, y: 41.6, w: 13.3, h: 11.1 },
+  wardrobe: { x: 0.5, y: 13.3, w: 10.8, h: 73 },
+  bed: { x: 12.3, y: 52.2, w: 26.9, h: 33.3 },
+} as const;
+
+const AUTO_BEATS: Beat[] = ['back', 'answer', 'hide', 'mmm', 'found', 'faint', 'carried'];
+const LINE_MS = 2_300;
+
+/** `?beat=hide&spot=bed` jumps straight to a beat, for testing and sharing a preview. */
+function jumpFromUrl(): { beat: Beat; spot?: HideSpot } | undefined {
+  const q = new URLSearchParams(window.location.search);
+  const beat = q.get('beat') as Beat | null;
+  const spot = q.get('spot') === 'bed' ? 'bed' : q.get('spot') === 'wardrobe' ? 'wardrobe' : undefined;
+  return beat ? { beat, spot } : undefined;
+}
+
+function useNow(active: boolean) {
+  const [now, setNow] = useState(clock);
+  useEffect(() => {
+    if (!active) return;
+    let raf = 0;
+    const loop = () => {
+      setNow(clock());
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [active]);
+  return now;
+}
+
+/** Plays the sounds that belong to each beat, and keeps the continuous ones in step with the state. */
+function useSoundDriver(s: Ch11State, started: boolean) {
+  const prev = useRef<Ch11State | null>(null);
+  const steps = useRef(-1);
+  const radioBack = useRef(false);
+  useEffect(() => {
+    if (!started) return;
+    const p = prev.current;
+    prev.current = s;
+    if (p?.beat !== s.beat) {
+      steps.current = -1;
+      radioBack.current = false;
+      if (s.beat === 'back') sound.setRoom(0.6);
+      if (s.beat === 'bark') sound.play('bark');
+      if (s.beat === 'answer') sound.play('surge');
+      if (s.beat === 'look') sound.play('torch');
+      if (s.beat === 'shut') sound.heart(110);
+      if (s.beat === 'hide') sound.play('rustle');
+      if (s.beat === 'mmm') sound.play('mmm');
+      if (s.beat === 'found') sound.play(s.outcome === 'gasped' ? 'gasp' : 'rip');
+      if (s.beat === 'faint') {
+        sound.play('inhale');
+        window.setTimeout(() => sound.silence(true), 350);
+      }
+      if (s.beat === 'carried') {
+        sound.silence(false);
+        sound.setRoom(0.3);
+      }
+      if (s.beat === 'awake') sound.setRoom(0.5);
+    }
+    if (p && !p.doorShut && s.doorShut) sound.play('slam');
+    if (p && !p.radioOff && s.radioOff) {
+      sound.play('click');
+      sound.play('drop');
+    }
+    if (p && p.holdingSince === null && s.holdingSince !== null) sound.play('inhale');
+    const radio = s.radioOff ? 0 : s.beat === 'answer' ? 0.3 : 0.06;
+    sound.setRadio(radio);
+  }, [s, started]);
+
+  // Things on a clock inside a beat: the door, its steps, the heart, the radio coming back on.
+  const now = useNow(started && (s.beat === 'hide' || s.beat === 'carried'));
+  useEffect(() => {
+    if (!started) return;
+    const t = now - s.beatAt;
+    if (s.beat === 'hide') {
+      if (t >= DOOR_OPENS_MS && steps.current < 0) {
+        sound.play('creak');
+        steps.current = 0;
+      }
+      const k = Math.floor((t - DOOR_OPENS_MS) / STEP_MS) + 1;
+      if (t < NEAR_AT_MS && k > steps.current && k > 0) {
+        steps.current = k;
+        sound.play('step');
+      }
+      sound.heart(isNear(s, now) ? 150 : 120);
+    }
+    if (s.beat === 'carried' && !radioBack.current && t > AUTO_MS.carried! * 0.7) {
+      radioBack.current = true;
+      sound.play('radioOn');
+    }
+    if (s.beat !== 'hide' && s.beat !== 'shut' && s.beat !== 'choose') sound.heart(0);
+  }, [now, s, started]);
+}
+
+function PixiHost() {
+  const ref = useRef<HTMLDivElement>(null);
+  const quality = useQuality();
+  const low = useRef(quality === 'low');
+  low.current = quality === 'low';
+  useEffect(() => {
+    const stage = new Stage();
+    void stage.mount(ref.current!, {
+      state: () => useCh11.getState().s,
+      now: clock,
+      low: () => low.current,
+      onFrame: () => {
+        const { s, dispatch } = useCh11.getState();
+        if (AUTO_BEATS.includes(s.beat)) dispatch({ type: 'tick' });
+      },
+    });
+    return () => stage.destroy();
+  }, []);
+  return <div className="ch11-stage" ref={ref} />;
+}
+
+function Spot({ at, label, onClick, hint }: { at: keyof typeof SPOTS; label: string; onClick: () => void; hint: boolean }) {
+  const r = SPOTS[at];
+  const style = { left: `${r.x}%`, top: `${r.y}%`, width: `${r.w}%`, height: `${r.h}%` } as CSSProperties;
+  return (
+    <button className={`ch11-spot ${hint ? 'hint' : ''}`} style={style} onClick={onClick} aria-label={label}>
+      <span>{label}</span>
+    </button>
+  );
+}
+
+/** Lines appear one after another from the start of a beat. */
+function Lines({ lines, since, every = LINE_MS }: { lines: string[]; since: number; every?: number }) {
+  const shown = Math.min(lines.length, Math.floor(since / every) + 1);
+  return (
+    <div className="ch11-lines">
+      {lines.slice(0, shown).map((l) => (
+        <p key={l}>{l}</p>
+      ))}
+    </div>
+  );
+}
+
+function BreathButton({ s, now }: { s: Ch11State; now: number }) {
+  const dispatch = useCh11((st) => st.dispatch);
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => e.code === 'Space' && !e.repeat && dispatch({ type: 'breath', holding: true });
+    const up = (e: KeyboardEvent) => e.code === 'Space' && dispatch({ type: 'breath', holding: false });
+    window.addEventListener('keydown', down);
+    window.addEventListener('keyup', up);
+    return () => {
+      window.removeEventListener('keydown', down);
+      window.removeEventListener('keyup', up);
+      dispatch({ type: 'breath', holding: false });
+    };
+  }, [dispatch]);
+  const holding = s.holdingSince !== null;
+  const left = holding ? Math.max(0, 1 - (now - s.holdingSince!) / BREATH_MS) : 1;
+  return (
+    <div className={`ch11-breath ${isNear(s, now) ? 'urgent' : ''} ${holding ? 'holding' : ''}`}>
+      <button
+        onPointerDown={() => dispatch({ type: 'breath', holding: true })}
+        onPointerUp={() => dispatch({ type: 'breath', holding: false })}
+        onPointerLeave={() => holding && dispatch({ type: 'breath', holding: false })}
+      >
+        {PROMPT.hold}
+      </button>
+      <div className="ch11-lungs">
+        <i style={{ width: `${left * 100}%` }} />
+      </div>
+      <small>{PROMPT.holdKey}</small>
+    </div>
+  );
+}
+
+function Play() {
+  const s = useCh11((st) => st.s);
+  const dispatch = useCh11((st) => st.dispatch);
+  const now = useNow(true);
+  const t = now - s.beatAt;
+  const hint = t > 5_000;
+  useSoundDriver(s, true);
+
+  useEffect(() => {
+    if (s.beat === 'end') markFinished('1.1');
+  }, [s.beat]);
+
+  const narration = NARRATION[s.beat] ?? [];
+  return (
+    <div className={`ch11-frame beat-${s.beat}`}>
+      {/* What the player can do in the room */}
+      {s.beat === 'torch' && <Spot at="torch" label={PROMPT.torch} hint={hint} onClick={() => dispatch({ type: 'grabTorch' })} />}
+      {s.beat === 'look' && <Spot at="door" label={PROMPT.look} hint={hint} onClick={() => dispatch({ type: 'shineDoor' })} />}
+      {s.beat === 'shut' && !s.doorShut && t > 1_700 && (
+        <Spot at="door" label={PROMPT.slam} hint onClick={() => dispatch({ type: 'slamDoor' })} />
+      )}
+      {s.beat === 'shut' && !s.radioOff && t > 1_700 && (
+        <Spot at="radio" label={PROMPT.radio} hint onClick={() => dispatch({ type: 'radioOff' })} />
+      )}
+      {s.beat === 'choose' &&
+        (['wardrobe', 'bed'] as const).map((spot) => (
+          <Spot key={spot} at={spot} label={HIDE_LABEL[spot]} hint onClick={() => dispatch({ type: 'hide', spot })} />
+        ))}
+
+      <div className="ch11-text">
+        {s.beat !== 'shut' && s.beat !== 'mmm' && s.beat !== 'found' && s.beat !== 'faint' && s.beat !== 'hide' && (
+          <Lines lines={narration} since={t} every={s.beat === 'carried' ? AUTO_MS.carried! / 4 : LINE_MS} />
+        )}
+        {s.beat === 'shut' && (
+          <Lines lines={[...narration, ...(s.doorShut ? [AFTER.slam] : []), ...(s.radioOff ? [AFTER.radio] : [])]} since={t} every={700} />
+        )}
+        {s.beat === 'hide' && s.hideSpot && <Lines lines={[AFTER.pocket, ...HIDE_LINES[s.hideSpot]]} since={t} every={1_800} />}
+        {s.beat === 'mmm' && <p className="ch11-mmm">{MMM}</p>}
+        {s.beat === 'found' && s.hideSpot && s.outcome && (
+          <Lines lines={[FOUND[s.outcome], ...FOUND_AFTER[s.hideSpot]]} since={t} every={1_700} />
+        )}
+        {s.beat === 'faint' && <Lines lines={[FAINT]} since={t} />}
+      </div>
+
+      {s.beat === 'bark' && t > 2_000 && (
+        <button className="ch11-say" onClick={() => dispatch({ type: 'call' })}>
+          {PROMPT.call}
+        </button>
+      )}
+      {s.beat === 'choose' && (
+        <div className="ch11-choices">
+          {(['wardrobe', 'bed'] as const).map((spot) => (
+            <button key={spot} onClick={() => dispatch({ type: 'hide', spot })}>
+              {HIDE_LABEL[spot]}
+            </button>
+          ))}
+        </div>
+      )}
+      {s.beat === 'hide' && <BreathButton s={s} now={now} />}
+      {s.beat === 'awake' && t > (NARRATION.awake!.length + 1) * LINE_MS && (
+        <button className="ch11-say" onClick={() => dispatch({ type: 'finish' })}>
+          {PROMPT.finish}
+        </button>
+      )}
+      {s.beat === 'end' && (
+        <div className="ch11-end">
+          <h1>{END.title}</h1>
+          <p>{END.teaser}</p>
+          <button onClick={() => useCh11.getState().start()}>{END.replay}</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Title() {
+  const start = useCh11((st) => st.start);
+  return (
+    <div className="ch11-title">
+      <p className="ch11-kicker">STATIC</p>
+      <h1>Chương 1.1</h1>
+      <p className="ch11-sub">Đêm thứ tư</p>
+      <button
+        onClick={() => {
+          sound.unlock();
+          start(jumpFromUrl());
+        }}
+      >
+        NHẤN ĐỂ BẮT ĐẦU
+      </button>
+      <small>Nên đeo tai nghe.</small>
+    </div>
+  );
+}
+
+export default function Chapter11() {
+  const started = useCh11((st) => st.started);
+  return (
+    <div className="ch11">
+      <PixiHost />
+      {started ? <Play /> : <Title />}
+    </div>
+  );
+}

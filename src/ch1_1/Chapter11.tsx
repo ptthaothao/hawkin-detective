@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { markFinished } from '../chapter';
 import { useQuality } from '../ui/quality';
 import { FilmGrain } from '../ui/scene/Atmosphere';
-import { AFTER, END, FAINT, FOUND, FOUND_AFTER, HIDE_LABEL, HIDE_LINES, MMM, NARRATION, PROMPT } from './content';
+import { AFTER, END, FAINT, FOUND, FOUND_AFTER, HIDE_LABEL, HIDE_LINES, MMM, NARRATION, OBJECTIVE, PROMPT } from './content';
 import { AUTO_MS, BREATH_MS, DOOR_OPENS_MS, NEAR_AT_MS, PASS_AT_MS, PASS_STEPS, STEP_MS, isNear, type Beat, type Ch11State, type HideSpot } from './machine';
-import { Stage3D, type Target, type TargetSpec } from './three/stage3d';
+import { PanoStage, type SpotId, type SpotSpec, type ViewId } from './pano/stage';
+import { Stage3D } from './three/stage3d';
 import { sound } from './sound';
 import { clock, useCh11 } from './store';
 import '../styles/ch11.css';
@@ -116,9 +117,28 @@ function useSoundDriver(s: Ch11State, started: boolean) {
   }, [now, s, started]);
 }
 
+/** The beats played in the PixiJS panoramas of Theo's room; the rest is still the 3D stage for now. */
+const ROOM_BEATS: Beat[] = ['back', 'bark', 'answer', 'torch', 'look', 'shut', 'choose'];
+
+export function viewFor(s: Ch11State): ViewId {
+  switch (s.beat) {
+    case 'look':
+      return 'room-torch';
+    case 'shut':
+      if (!s.doorShut) return 'door-it';
+      return s.radioOff ? 'room-quiet' : 'room-shut';
+    case 'choose':
+      return 'room-quiet';
+    default:
+      return 'room-start';
+  }
+}
+
+const torchOn = (s: Ch11State) => s.beat === 'look' || s.beat === 'shut' || s.beat === 'choose';
+
 /** What the player can use right now, and whether to point it out (stuck for a while). */
-export function targetsFor(s: Ch11State, t: number): TargetSpec[] {
-  const stuck = t > 5_000;
+export function spotsFor(s: Ch11State, t: number): SpotSpec[] {
+  const stuck = t > 4_000;
   switch (s.beat) {
     case 'torch':
       return [{ id: 'torch', label: PROMPT.torch, hint: stuck }];
@@ -126,23 +146,51 @@ export function targetsFor(s: Ch11State, t: number): TargetSpec[] {
       return [{ id: 'door', label: PROMPT.look, hint: stuck }];
     case 'shut':
       if (t < 1_700) return [];
-      return [
-        ...(s.doorShut ? [] : [{ id: 'door' as const, label: PROMPT.slam, hint: true }]),
-        ...(s.radioOff ? [] : [{ id: 'radio' as const, label: PROMPT.radio, hint: true }]),
-      ];
+      if (!s.doorShut) return [{ id: 'door', label: PROMPT.slam, hint: true }];
+      return s.radioOff ? [] : [{ id: 'radio', label: PROMPT.radio, hint: true }];
     case 'choose':
-      return (['wardrobe', 'bed'] as const).map((id) => ({ id, label: HIDE_LABEL[id], hint: true }));
+      return (['wardrobe', 'bed'] as const).map((id) => ({ id, label: HIDE_LABEL[id], hint: stuck }));
     default:
       return [];
   }
 }
 
-function act(s: Ch11State, id: Target) {
+function act(s: Ch11State, id: SpotId) {
   const { dispatch } = useCh11.getState();
   if (id === 'torch') dispatch({ type: 'grabTorch' });
   if (id === 'door') dispatch({ type: s.beat === 'look' ? 'shineDoor' : 'slamDoor' });
   if (id === 'radio') dispatch({ type: 'radioOff' });
   if (id === 'wardrobe' || id === 'bed') dispatch({ type: 'hide', spot: id });
+}
+
+function tickAuto() {
+  const { s, dispatch } = useCh11.getState();
+  if (AUTO_BEATS.includes(s.beat)) dispatch({ type: 'tick' });
+}
+
+function PanoHost() {
+  const ref = useRef<HTMLDivElement>(null);
+  const quality = useQuality();
+  const low = useRef(quality === 'low');
+  low.current = quality === 'low';
+  useEffect(() => {
+    const stage = new PanoStage();
+    void stage.mount(ref.current!, {
+      state: () => useCh11.getState().s,
+      now: clock,
+      low: () => low.current,
+      onFrame: tickAuto,
+      view: viewFor,
+      torchOn,
+      spots: () => {
+        const { s, started } = useCh11.getState();
+        return started ? spotsFor(s, clock() - s.beatAt) : [];
+      },
+      onSpot: (id) => act(useCh11.getState().s, id),
+    });
+    return () => stage.destroy();
+  }, []);
+  return <div className="ch11-stage" ref={ref} />;
 }
 
 function ThreeHost() {
@@ -156,19 +204,32 @@ function ThreeHost() {
       state: () => useCh11.getState().s,
       now: clock,
       low: () => low.current,
-      onFrame: () => {
-        const { s, dispatch } = useCh11.getState();
-        if (AUTO_BEATS.includes(s.beat)) dispatch({ type: 'tick' });
-      },
-      targets: () => {
-        const { s, started } = useCh11.getState();
-        return started ? targetsFor(s, clock() - s.beatAt) : [];
-      },
-      onTarget: (id) => act(useCh11.getState().s, id),
+      onFrame: tickAuto,
     });
     return () => stage.destroy();
   }, []);
   return <div className="ch11-stage" ref={ref} />;
+}
+
+/** The room is panoramas; hiding and after are still the 3D stage until they are baked too. */
+function StageHost() {
+  const inRoom = useCh11((st) => !st.started || ROOM_BEATS.includes(st.s.beat));
+  return inRoom ? <PanoHost /> : <ThreeHost />;
+}
+
+/** The note in the corner, as in Chapter 0: where Theo is, what he is wondering, what to do. */
+function Objective({ s, t }: { s: Ch11State; t: number }) {
+  const o = OBJECTIVE[s.beat];
+  if (!o) return null;
+  // as in Chapter 0: a new note is written in at full strength, then settles into a quiet pencil line
+  return (
+    <div className={`objective ch11-objective ${t < 4_500 ? 'fresh' : ''}`} key={s.beat}>
+      <span className="location">{o.where}</span>
+      <span className="objective-kicker">Câu hỏi</span>
+      <p>{o.goal}</p>
+      {o.action && <span className="objective-action">→ {o.action}</span>}
+    </div>
+  );
 }
 
 /** Lines appear one after another from the start of a beat. */
@@ -230,6 +291,7 @@ function Play() {
   const narration = NARRATION[s.beat] ?? [];
   return (
     <div className={`ch11-frame beat-${s.beat}`}>
+      <Objective s={s} t={t} />
       <div className="ch11-text">
         {s.beat !== 'shut' && s.beat !== 'mmm' && s.beat !== 'found' && s.beat !== 'faint' && s.beat !== 'hide' && (
           <Lines lines={narration} since={t} />
@@ -300,7 +362,7 @@ export default function Chapter11() {
   const started = useCh11((st) => st.started);
   return (
     <div className="ch11">
-      <ThreeHost />
+      <StageHost />
       <div className="ch11-vignette" />
       <FilmGrain />
       {started ? <Play /> : <Title />}

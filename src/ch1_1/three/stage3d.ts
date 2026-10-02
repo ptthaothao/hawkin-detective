@@ -5,7 +5,6 @@ import {
   Object3D,
   PCFSoftShadowMap,
   PerspectiveCamera,
-  Raycaster,
   Scene,
   SpotLight,
   Vector2,
@@ -17,22 +16,11 @@ import { DOOR_OPENS_MS, NEAR_AT_MS, PASS_AT_MS, PASS_STEPS, STEP_MS, AUTO_MS, ty
 import { Creature3D, Hand3D } from './creature3d';
 import { BG, DOOR, GARAGE, HALL, buildWorld, type World } from './world';
 
-export type Target = 'torch' | 'door' | 'radio' | 'wardrobe' | 'bed';
-
-export interface TargetSpec {
-  id: Target;
-  label: string;
-  /** Show the label without hovering (the player has been stuck a while). */
-  hint: boolean;
-}
-
 export interface Stage3DInput {
   state: () => Ch11State;
   now: () => number;
   low: () => boolean;
   onFrame: () => void;
-  targets: () => TargetSpec[];
-  onTarget: (id: Target) => void;
 }
 
 interface Pose {
@@ -118,9 +106,6 @@ export class Stage3D {
   private lastKey = '';
   private lastFrame = 0;
   private cutAt = -1e9;
-  private raycaster = new Raycaster();
-  private hover: Target | null = null;
-  private labels = new Map<Target, HTMLDivElement>();
   private lids: HTMLDivElement[] = [];
   private overlay!: HTMLDivElement;
   private raf = 0;
@@ -173,8 +158,8 @@ export class Stage3D {
     }
     el.appendChild(this.overlay);
 
-    el.addEventListener('pointermove', this.onMove);
-    el.addEventListener('click', this.onClick);
+    // looking around follows the pointer anywhere on the page, buttons included
+    window.addEventListener('pointermove', this.onMove);
     window.addEventListener('resize', this.resize);
     this.resize();
     const loop = () => {
@@ -202,32 +187,6 @@ export class Stage3D {
     const r = this.el.getBoundingClientRect();
     this.pointer.set(((e.clientX - r.left) / r.width) * 2 - 1, -(((e.clientY - r.top) / r.height) * 2 - 1));
   };
-
-  private pick(): Target | null {
-    const active = this.input.targets();
-    if (!active.length) return null;
-    this.raycaster.setFromCamera(this.pointer, this.camera);
-    const meshes = active.map((t) => this.world.hits[t.id]) as Mesh[];
-    const hit = this.raycaster.intersectObjects(meshes, false)[0];
-    return (hit?.object.userData.action as Target) ?? null;
-  }
-
-  private onClick = (e: MouseEvent) => {
-    this.onMove(e as PointerEvent);
-    const t = this.pick();
-    if (t) this.input.onTarget(t);
-  };
-
-  private label(id: Target): HTMLDivElement {
-    let l = this.labels.get(id);
-    if (!l) {
-      l = document.createElement('div');
-      l.className = 'ch11-label';
-      this.overlay.appendChild(l);
-      this.labels.set(id, l);
-    }
-    return l;
-  }
 
   private setLids(open: number) {
     const gap = clamp01(open) * 50;
@@ -401,28 +360,6 @@ export class Stage3D {
     this.torch.intensity = torchOn ? 9 * battery : 0;
     this.torch.castShadow = !low;
 
-    // ---- labels on the things he can use ----
-    const specs = this.input.targets();
-    this.hover = this.pick();
-    this.el.style.cursor = this.hover ? 'pointer' : 'default';
-    const shown = new Set<Target>();
-    const r = this.el.getBoundingClientRect();
-    for (const spec of specs) {
-      if (!(spec.hint || this.hover === spec.id)) continue;
-      const p = new Vector3();
-      w.anchors[spec.id].getWorldPosition(p);
-      p.project(this.camera);
-      if (p.z > 1) continue;
-      const l = this.label(spec.id);
-      l.textContent = spec.label;
-      l.classList.toggle('hint', spec.hint);
-      l.style.left = `${((p.x + 1) / 2) * r.width}px`;
-      l.style.top = `${((1 - p.y) / 2) * r.height}px`;
-      l.style.display = 'block';
-      shown.add(spec.id);
-    }
-    for (const [id, l] of this.labels) if (!shown.has(id)) l.style.display = 'none';
-
     renderer.render(this.scene, this.camera);
   }
 
@@ -432,8 +369,7 @@ export class Stage3D {
   destroy() {
     cancelAnimationFrame(this.raf);
     window.removeEventListener('resize', this.resize);
-    this.el?.removeEventListener('pointermove', this.onMove);
-    this.el?.removeEventListener('click', this.onClick);
+    window.removeEventListener('pointermove', this.onMove);
     this.renderer?.dispose();
     this.renderer?.domElement.remove();
     this.overlay?.remove();

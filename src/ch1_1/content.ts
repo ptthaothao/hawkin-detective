@@ -13,7 +13,7 @@ export const NARRATION: Partial<Record<Beat, string[]>> = {
 
 export const PROMPT = {
   call: '“Mom?”',
-  torch: 'Mò đèn pin trên giường',
+  torch: 'Lấy đèn pin',
   look: 'Soi đèn ra cửa',
   slam: 'Đóng sập cửa',
   radio: 'Tắt radio',
@@ -21,6 +21,23 @@ export const PROMPT = {
   holdKey: 'giữ phím Space hoặc giữ nút',
   finish: 'Hết chương 1.1',
 } as const;
+
+/**
+ * The note in the corner, as in Chapter 0: where Theo is, what he is wondering, and what to do.
+ */
+export type Objective = { where: string; goal: string; action?: string };
+const ROOM = 'Phòng Theo';
+export const OBJECTIVE: Partial<Record<Beat, Objective>> = {
+  back: { where: `${ROOM} · 3:16`, goal: 'Có tiếng gì ngoài kia?', action: 'Đưa chuột ra mép màn hình (hoặc phím ← →) để nhìn quanh' },
+  bark: { where: `${ROOM} · 3:16`, goal: 'Chó nhà bên sủa. Mẹ về rồi à?', action: 'Gọi mẹ' },
+  answer: { where: `${ROOM} · 3:17`, goal: 'Không ai trả lời.' },
+  torch: { where: `${ROOM} · 3:17`, goal: 'Có ai đó ngoài hành lang. Tối quá.', action: 'Tìm đèn pin trên giường' },
+  look: { where: `${ROOM} · 3:17`, goal: 'Ai đứng ngoài đó vậy?', action: 'Soi đèn ra cửa' },
+  shut: { where: `${ROOM} · 3:17`, goal: 'Không phải mẹ. Không được để nó vào!', action: 'Đóng cửa và tắt radio' },
+  choose: { where: `${ROOM} · 3:17`, goal: 'Nó sắp vào rồi. Phải trốn đi!', action: 'Chọn chỗ trốn' },
+  hide: { where: '???', goal: 'Đừng để nó nghe thấy em thở.', action: 'Khi nó tới gần, giữ Space để nín thở' },
+  awake: { where: 'Gara cũ', goal: 'Đây là đâu?' },
+};
 
 export const AFTER = {
   slam: 'Cửa đóng sập.',

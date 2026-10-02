@@ -253,29 +253,91 @@
 .ch11-lid.bottom {
   bottom: 0;
 }
-.ch11-label {
+/* Panorama click areas: invisible over the thing itself, the name shows on hover or when hinted. */
+.ch11-pano-overlay {
   position: absolute;
-  transform: translate(-50%, -140%);
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ch11-hot {
+  position: absolute;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.ch11-hot span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   white-space: nowrap;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.06em;
   color: #e8dfc8;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 4px 8px;
-  border: 1px solid rgba(232, 223, 200, 0.35);
+  background: rgba(0, 0, 0, 0.65);
+  padding: 5px 10px;
+  border: 1px solid rgba(232, 223, 200, 0.4);
+  opacity: 0;
+  transition: opacity 0.25s;
 }
-.ch11-label.hint::after {
+.ch11-hot:hover span,
+.ch11-hot:focus-visible span,
+.ch11-hot.hint span {
+  opacity: 1;
+}
+.ch11-hot:hover {
+  outline: 1px dashed rgba(232, 200, 140, 0.35);
+  outline-offset: -6px;
+}
+.ch11-hot.hint::after {
   content: '';
   position: absolute;
   left: 50%;
-  top: calc(100% + 10px);
-  width: 22px;
-  height: 22px;
-  margin-left: -11px;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  margin: 22px 0 0 -17px;
   border: 1px solid rgba(232, 200, 140, 0.8);
   border-radius: 50%;
   animation: ch11-ping 1.8s ease-out infinite;
+}
+/* A hinted thing is off screen: an arrow on that side says which way to look. */
+.ch11-turn {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  font-family: 'Crimson Pro', serif;
+  font-size: 64px;
+  color: rgba(232, 200, 140, 0.85);
+  text-shadow: 0 0 12px #000;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.ch11-turn.left {
+  left: 18px;
+}
+.ch11-turn.right {
+  right: 18px;
+}
+.ch11-turn.on {
+  opacity: 1;
+  animation: ch11-nudge 1.2s ease-in-out infinite;
+}
+@keyframes ch11-nudge {
+  50% {
+    opacity: 0.4;
+  }
+}
+.ch11-objective {
+  pointer-events: none;
+}
+/* the room is darker than Chapter 0's: keep the resting note readable */
+.ch11-objective:not(.fresh) {
+  opacity: 0.75;
 }
 .ch11-vignette {
   position: absolute;

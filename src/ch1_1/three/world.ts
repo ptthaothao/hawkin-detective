@@ -53,14 +53,6 @@ function cyl(r: number, h: number, mat: Material, x: number, y: number, z: numbe
 }
 
 /** A thin invisible box used only for clicking. */
-function hitBox(w: number, h: number, d: number, x: number, y: number, z: number, parent: Object3D, action: string): Mesh {
-  const m = new Mesh(new BoxGeometry(w, h, d), new MeshBasicMaterial({ visible: false }));
-  m.position.set(x, y, z);
-  m.userData.action = action;
-  parent.add(m);
-  return m;
-}
-
 export interface World {
   root: Group;
   wallMat: MeshStandardMaterial;
@@ -80,9 +72,8 @@ export interface World {
   garageMoon: SpotLight;
   doorMist: Mesh;
   watch: Mesh;
-  hits: Record<'torch' | 'door' | 'radio' | 'wardrobe' | 'bed', Mesh>;
-  /** Where each hit target's label should float. */
-  anchors: Record<'torch' | 'door' | 'radio' | 'wardrobe' | 'bed', Object3D>;
+  /** The things Theo can use, for placing click areas on the baked pictures. */
+  spots: Record<'torch' | 'door' | 'radio' | 'wardrobe' | 'bed', Object3D>;
 }
 
 export function buildWorld(): World {
@@ -489,17 +480,6 @@ export function buildWorld(): World {
   watch.visible = false;
   root.add(watch);
 
-  // click targets
-  const hits = {
-    torch: hitBox(0.35, 0.2, 0.3, torch.position.x, torch.position.y, torch.position.z, root, 'torch'),
-    door: hitBox(0.2, DOOR.h, DOOR.z1 - DOOR.z0 + 0.2, x1 - 0.05, DOOR.h / 2, (DOOR.z0 + DOOR.z1) / 2, root, 'door'),
-    radio: hitBox(0.6, 0.4, 0.45, radioG.position.x, radioG.position.y + 0.12, radioG.position.z, root, 'radio'),
-    wardrobe: hitBox(0.2, 1.9, 1.0, wd.x + 0.3, 1.0, wd.z, root, 'wardrobe'),
-    bed: hitBox(1.0, 0.7, 1.9, bx, 0.35, -2.5, root, 'bed'),
-  };
-  // labels float at the centre of each click target, so clicking the label's point always hits it
-  const anchors = hits;
-
   root.traverse((o) => {
     if ((o as Mesh).isMesh && !(o as Mesh).userData.action) (o as Mesh).receiveShadow = true;
   });
@@ -522,9 +502,8 @@ export function buildWorld(): World {
     hallMoon,
     garageMoon,
     doorMist,
+    spots: { torch, door: doorPivot, radio: radioG, wardrobe: louvres, bed },
     watch,
-    hits,
-    anchors,
   };
 }
 

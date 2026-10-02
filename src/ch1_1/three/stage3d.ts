@@ -12,8 +12,8 @@ import {
   WebGLRenderer,
   type Mesh,
 } from 'three';
-import { DOOR_OPENS_MS, NEAR_AT_MS, PASS_AT_MS, PASS_STEPS, STEP_MS, AUTO_MS, type Beat, type Ch11State, type HideSpot } from '../machine';
-import { Creature3D, Hand3D } from './creature3d';
+import { DOOR_OPENS_MS, PASS_AT_MS, PASS_STEPS, ROUTE, STEP_MS, AUTO_MS, searchAt, type Beat, type Ch11State, type HideSpot, type Stop } from '../machine';
+import { Creature2D, Hand2D } from './creature2d';
 import { BG, DOOR, GARAGE, HALL, buildWorld, type World } from './world';
 
 export interface Stage3DInput {
@@ -56,6 +56,11 @@ const PASS_TO = GARAGE.z - 4;
 /** Where it stands while it looks for him, facing the hiding place. */
 const STAND: Record<HideSpot, Vector3> = { wardrobe: v(-0.72, 0, -0.8), bed: v(-0.45, 0, -1.9) };
 const ENTER = v(2.4, 0, -1.3);
+/** The stops of its search, for each hiding place. */
+const STOPS: Record<HideSpot, Record<Stop, Vector3>> = {
+  wardrobe: { desk: v(1.15, 0, -2.45), other: STAND.bed, spot: STAND.wardrobe, door: v(1.75, 0, -1.3) },
+  bed: { desk: v(1.15, 0, -2.45), other: STAND.wardrobe, spot: STAND.bed, door: v(1.75, 0, -1.3) },
+};
 const HALL_END = v(HALL.x1 - 0.8, 0, -1.3);
 
 /** The carried glimpses: [time 0..1, camera position, look-at point, roll]. Over its shoulder, facing back. */
@@ -76,18 +81,21 @@ function sceneKey(s: Ch11State) {
   return 'room';
 }
 
-/** Where it is during the visit: walks in from the door in steps, stops at the hiding place. */
-function walk(t: number, to: Vector3) {
-  const since = t - DOOR_OPENS_MS;
-  const walkMs = NEAR_AT_MS - DOOR_OPENS_MS;
-  const k = clamp01(since / walkMs);
-  const steps = walkMs / STEP_MS;
-  const stepK = (Math.floor(k * steps) + ease((k * steps) % 1)) / steps;
+/** Where it is during the visit: walks in from the door in steps, stops at each place it searches. */
+function walk(t: number, spot: HideSpot) {
+  const stops = STOPS[spot];
+  const at = searchAt(t);
+  if (at.leg < 0) return { visible: t >= DOOR_OPENS_MS, pos: ENTER.clone(), stride: 0, arrived: false };
+  const leg = ROUTE[at.leg];
+  const from = at.leg === 0 ? ENTER : stops[ROUTE[at.leg - 1].stop];
+  const to = stops[leg.stop];
+  const steps = (leg.arrive - leg.from) / STEP_MS;
+  const stepK = (Math.floor(at.k * steps) + ease((at.k * steps) % 1)) / steps;
   return {
-    visible: since >= 0,
-    pos: ENTER.clone().lerp(to, Math.min(1, stepK)),
-    stride: (((since / STEP_MS) % 1) + 1) % 1,
-    arrived: k >= 1,
+    visible: true,
+    pos: from.clone().lerp(to, at.walking ? Math.min(1, stepK) : 1),
+    stride: at.walking ? ((((t - leg.from) / STEP_MS) % 1) + 1) % 1 : 0,
+    arrived: !at.walking,
   };
 }
 
@@ -96,8 +104,8 @@ export class Stage3D {
   private scene = new Scene();
   private camera = new PerspectiveCamera(62, 16 / 9, 0.03, 120);
   private world!: World;
-  private it = new Creature3D();
-  private hand = new Hand3D();
+  private it = new Creature2D();
+  private hand = new Hand2D();
   private torch = new SpotLight(0xffe2b0, 0, 14, 0.42, 0.55, 1.6);
   private hemi = new HemisphereLight(0x22304a, 0x0c0a08, 0.55);
   private pointer = new Vector2(0, 0);
@@ -146,7 +154,6 @@ export class Stage3D {
     this.hand.visible = false;
     this.camera.add(this.hand);
     this.it.visible = false;
-    this.it.traverse((o) => (o.castShadow = true));
 
     this.overlay = document.createElement('div');
     this.overlay.className = 'ch11-3d-overlay';
@@ -258,17 +265,15 @@ export class Stage3D {
     if ((s.beat === 'look' || s.beat === 'shut') && !s.doorShut) {
       this.it.visible = true;
       this.it.position.copy(HALL_END);
-      this.it.rotation.y = -Math.PI / 2;
       this.it.pose(0, Math.sin(now / 1400) * 0.3);
     } else if ((key === 'wardrobe' || key === 'bed') && s.hideSpot) {
-      const to = STAND[s.hideSpot];
-      const wk = s.beat === 'hide' ? walk(t, to) : { visible: true, pos: to, stride: 0, arrived: true };
+      const wk = s.beat === 'hide' ? walk(t, s.hideSpot) : { visible: true, pos: STAND[s.hideSpot], stride: 0, arrived: true };
       this.it.visible = wk.visible;
-      this.it.position.copy(wk.pos);
-      const dir = wk.arrived ? -Math.PI / 2 : Math.atan2(to.x - ENTER.x, to.z - ENTER.z);
-      this.it.rotation.y = lerp(this.it.rotation.y, dir, 0.08);
+      // when it hears him it comes back to the hiding place from wherever it was
+      if (s.beat === 'hide') this.it.position.copy(wk.pos);
+      else this.it.position.lerp(wk.pos, 1 - Math.exp(-dt * 6));
       const lean = s.beat === 'mmm' ? ease(t / 1500) * 0.6 : s.beat === 'found' && key === 'wardrobe' ? 1 : 0;
-      const crouch = key === 'bed' && (s.beat === 'mmm' || s.beat === 'found') ? (s.beat === 'found' ? 1 : ease((t - 1800) / 1600) * 0.6) : 0;
+      const crouch = key === 'bed' && (s.beat === 'mmm' || s.beat === 'found') ? (s.beat === 'found' ? 1 : ease((t - 1800) / 1600)) : 0;
       this.it.pose(wk.arrived ? 0 : wk.stride, wk.arrived ? Math.sin(now / 1600) * 0.5 : 0, lean, crouch);
     }
     w.doorMist.visible = key === 'garage';
@@ -278,7 +283,6 @@ export class Stage3D {
       if (k > 0 && k < 1) {
         this.it.visible = true;
         this.it.position.set(PASS_X, 0, lerp(PASS_FROM, PASS_TO, k));
-        this.it.rotation.y = Math.PI;
         this.it.pose((((t - PASS_AT_MS) / STEP_MS) % 1 + 1) % 1, 0.3);
       }
     }
@@ -287,7 +291,7 @@ export class Stage3D {
     if (this.hand.visible) {
       const k = ease((t - (key === 'bed' ? 500 : 250)) / 900);
       this.hand.position.set(lerp(0.9, 0.12, k), lerp(0.35, -0.02, k), lerp(-0.9, -0.38, k));
-      this.hand.rotation.set(0.2, key === 'bed' ? 0.4 : -0.3, lerp(0.6, 0.15, k));
+      this.hand.rotation.set(0, 0, lerp(0.6, 0.15, k) + (key === 'bed' ? 0.5 : 0));
     }
 
     // ---- camera ----
@@ -360,6 +364,7 @@ export class Stage3D {
     this.torch.intensity = torchOn ? 9 * battery : 0;
     this.torch.castShadow = !low;
 
+    if (this.it.visible) this.it.face(this.camera.getWorldPosition(new Vector3()));
     renderer.render(this.scene, this.camera);
   }
 

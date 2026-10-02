@@ -3,7 +3,7 @@ import { markFinished } from '../chapter';
 import { useQuality } from '../ui/quality';
 import { FilmGrain } from '../ui/scene/Atmosphere';
 import { AFTER, END, FAINT, FOUND, FOUND_AFTER, HIDE_LABEL, HIDE_LINES, MMM, NARRATION, OBJECTIVE, PROMPT } from './content';
-import { AUTO_MS, BREATH_MS, DOOR_OPENS_MS, NEAR_AT_MS, PASS_AT_MS, PASS_STEPS, STEP_MS, isNear, type Beat, type Ch11State, type HideSpot } from './machine';
+import { AUTO_MS, BREATH_MS, DOOR_OPENS_MS, PASS_AT_MS, PASS_STEPS, ROUTE, STEP_MS, isNear, stepsBy, type Beat, type Ch11State, type HideSpot } from './machine';
 import { PanoStage, type SpotId, type SpotSpec, type ViewId } from './pano/stage';
 import { Stage3D } from './three/stage3d';
 import { sound } from './sound';
@@ -42,6 +42,7 @@ function useNow(active: boolean) {
 function useSoundDriver(s: Ch11State, started: boolean) {
   const prev = useRef<Ch11State | null>(null);
   const steps = useRef(-1);
+  const touched = useRef(0);
   const radioBack = useRef(false);
   useEffect(() => {
     if (!started) return;
@@ -49,6 +50,7 @@ function useSoundDriver(s: Ch11State, started: boolean) {
     prev.current = s;
     if (p?.beat !== s.beat) {
       steps.current = -1;
+      touched.current = 0;
       radioBack.current = false;
       if (s.beat === 'back') sound.setRoom(0.6);
       if (s.beat === 'bark') sound.play('bark');
@@ -88,10 +90,16 @@ function useSoundDriver(s: Ch11State, started: boolean) {
         sound.play('creak');
         steps.current = 0;
       }
-      const k = Math.floor((t - DOOR_OPENS_MS) / STEP_MS) + 1;
-      if (t < NEAR_AT_MS && k > steps.current && k > 0) {
+      const k = stepsBy(t);
+      if (k > steps.current && steps.current >= 0) {
         steps.current = k;
         sound.play('step');
+      }
+      // at the desk and the other hiding place it touches things: paper, the blanket, a door
+      const searched = ROUTE.filter((l) => l.stop !== 'door' && t >= l.arrive).length;
+      if (searched > touched.current) {
+        touched.current = searched;
+        sound.play('rustle');
       }
       sound.heart(isNear(s, now) ? 150 : 120);
       // Breathing is the thing he must stop: loud and quick while it is close, gone while he holds it.

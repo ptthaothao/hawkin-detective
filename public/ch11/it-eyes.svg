@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="220 160 480 940" width="480" height="940">
+<!-- Its eyes, drawn on their own so they glow in the dark. Same frame as it-body.svg. -->
+<defs>
+    <radialGradient id="moon" cx="50%" cy="38%" r="60%">
+      <stop offset="0" stop-color="#3a4a63"/>
+      <stop offset="0.45" stop-color="#1a2232"/>
+      <stop offset="1" stop-color="#05070b"/>
+    </radialGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#121722"/>
+      <stop offset="1" stop-color="#030406"/>
+    </linearGradient>
+    <radialGradient id="eye" cx="45%" cy="42%" r="60%">
+      <stop offset="0" stop-color="#fbf8ea"/>
+      <stop offset="0.6" stop-color="#e2dcc4"/>
+      <stop offset="0.9" stop-color="#a99f80"/>
+      <stop offset="1" stop-color="#5b4a3a"/>
+    </radialGradient>
+    <radialGradient id="vig" cx="50%" cy="45%" r="75%">
+      <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.9"/>
+    </radialGradient>
+    <!-- inky, smoky edges -->
+    <filter id="ink" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="smoke" x="-50%" y="-50%" width="200%" height="200%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.06" numOctaves="4" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="60" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="6"/>
+    </filter>
+    <filter id="hair" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="10" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <clipPath id="lidL"><path d="M300 254 C340 250 410 256 456 280 V400 H300 Z"/></clipPath>
+    <clipPath id="lidR"><path d="M458 280 C490 262 520 254 560 252 V400 H458 Z"/></clipPath>
+    <radialGradient id="blank" cx="50%" cy="50%" r="55%">
+      <stop offset="0" stop-color="#b9b8ad"/>
+      <stop offset="0.6" stop-color="#97968c"/>
+      <stop offset="0.9" stop-color="#5f5e57"/>
+      <stop offset="1" stop-color="#2a2a27"/>
+    </radialGradient>
+    <filter id="bloom" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur stdDeviation="10" result="a"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="28" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="a"/></feMerge>
+    </filter>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11"/>
+      <feColorMatrix values="0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0.09 0"/>
+    </filter>
+  </defs>
+  <!-- the eyes: large, round, blank, a dull milky white with no pupils, a little light seeping into the black -->
+  <g transform="rotate(-16 452 300)">
+    <g filter="url(#bloom)" opacity="0.35">
+      <ellipse cx="410" cy="284" rx="36" ry="39" fill="url(#blank)"/>
+      <ellipse cx="497" cy="278" rx="31" ry="34" fill="url(#blank)"/>
+    </g>
+    <ellipse cx="410" cy="284" rx="36" ry="39" fill="url(#blank)"/>
+    <ellipse cx="497" cy="278" rx="31" ry="34" fill="url(#blank)"/>
+  </g>
+
+</svg>

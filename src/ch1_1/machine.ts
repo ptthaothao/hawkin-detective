@@ -4,6 +4,10 @@
  *
  * There is no game over. Both hiding places end with Theo found; what the player does while
  * hiding only changes how it finds him (`outcome`), which Chapter 1.2 can read.
+ *
+ * It hunts by sound. It heard a child on the radio, so it knows one is in the room, not where:
+ * it searches (the desk, the other hiding place, his), gives up and turns for the door, and only
+ * then does Theo let the breath go. It hears that.
  */
 
 export type Beat =
@@ -21,7 +25,7 @@ export type Beat =
   | 'shut'
   /** Wardrobe or under the bed. */
   | 'choose'
-  /** Seen from the hiding place: it comes in. Hold your breath while it is close. */
+  /** Seen from the hiding place: it comes in and searches. Hold your breath while it is close. */
   | 'hide'
   /** The choked "Mmm…". */
   | 'mmm'
@@ -36,8 +40,11 @@ export type Beat =
 
 export type HideSpot = 'wardrobe' | 'bed';
 
-/** How it found him. `held`: he held his breath the whole time and it found him anyway. */
-export type Outcome = 'held' | 'heard' | 'gasped';
+/**
+ * How it found him. `heard`: he was breathing while it was close. `gasped`: he held on until it
+ * gave up and turned to go, and the breath came out of him (or he ran out of air).
+ */
+export type Outcome = 'heard' | 'gasped';
 
 export interface Ch11State {
   beat: Beat;
@@ -79,14 +86,53 @@ export const AUTO_MS: Partial<Record<Beat, number>> = {
 /** Hide beat timeline (ms from the start of the beat). Same step period as Chapter 0's closing beat. */
 export const STEP_MS = 2_600;
 export const DOOR_OPENS_MS = 2_000;
-/** It reaches the hiding place: from here the player must not breathe. */
-export const NEAR_AT_MS = 9_800;
-/** How long it stands there before it makes its sound. */
-export const NEAR_MS = 6_500;
+
+/** Where it goes while it searches: Theo's desk, the other hiding place, Theo's, and back to the door. */
+export type Stop = 'desk' | 'other' | 'spot' | 'door';
+export interface Leg {
+  stop: Stop;
+  /** It sets off from the last place at `from`, arrives at `arrive`, stands there until `leave`. */
+  from: number;
+  arrive: number;
+  leave: number;
+  /** Close enough to hear him breathe while it stands there. */
+  near: boolean;
+}
+export const ROUTE: Leg[] = [
+  { stop: 'desk', from: DOOR_OPENS_MS, arrive: DOOR_OPENS_MS + 2 * STEP_MS, leave: 10_200, near: false },
+  { stop: 'other', from: 10_200, arrive: 10_200 + 2 * STEP_MS, leave: 18_900, near: true },
+  { stop: 'spot', from: 18_900, arrive: 18_900 + STEP_MS, leave: 27_500, near: true },
+  { stop: 'door', from: 27_500, arrive: 27_500 + 2 * STEP_MS, leave: Infinity, near: false },
+];
+/** It gives up and turns for the door: any breath let go from here on, it hears. */
+export const GIVE_UP_MS = ROUTE[3].from;
+/** It is at the door. He cannot hold it any longer; the breath comes out of him. */
+export const AT_DOOR_MS = ROUTE[3].arrive;
+/** Close enough to the hiding place that it would hear him. */
+export const NEAR_AT_MS = ROUTE[1].arrive;
 /** A 7-year-old can't hold it longer than this. */
-export const BREATH_MS = 8_000;
+export const BREATH_MS = 12_000;
 /** Breathing this long while it is close: it hears him. */
 export const HEARD_MS = 1_400;
+
+/** Where it is in its search: walking a leg (k 0..1) or standing at a stop. */
+export function searchAt(t: number): { leg: number; walking: boolean; k: number; near: boolean } {
+  let i = ROUTE.findIndex((l) => t < l.leave);
+  if (i < 0) i = ROUTE.length - 1;
+  const l = ROUTE[i];
+  if (t < l.from) return { leg: -1, walking: false, k: 0, near: false };
+  if (t < l.arrive) return { leg: i, walking: true, k: (t - l.from) / (l.arrive - l.from), near: false };
+  return { leg: i, walking: false, k: 1, near: l.near };
+}
+
+/** How many steps it has taken by `t` (one footstep sound each). */
+export function stepsBy(t: number): number {
+  let n = 0;
+  for (const l of ROUTE)
+    for (let at = l.from; at < l.arrive; at += STEP_MS) if (t >= at) n++;
+  return n;
+}
+
 /** In the garage: its steps pass outside the doors, on its own route, while the second line is up. */
 export const PASS_AT_MS = 2_300;
 export const PASS_STEPS = 5;
@@ -116,20 +162,32 @@ export function initialCh11(now = 0): Ch11State {
 
 const go = (s: Ch11State, beat: Beat, now: number): Ch11State => ({ ...s, beat, beatAt: now });
 
-/** It is standing at the hiding place. */
-export const isNear = (s: Ch11State, now: number) => s.beat === 'hide' && now - s.beatAt >= NEAR_AT_MS;
+/** It is close enough to hear him breathe. */
+export const isNear = (s: Ch11State, now: number) => {
+  if (s.beat !== 'hide') return false;
+  const t = now - s.beatAt;
+  return t >= GIVE_UP_MS || searchAt(t).near;
+};
+
+/** When the stretch of time it has been close began (it stands at one stop, or it is leaving). */
+function nearSince(t: number) {
+  if (t >= GIVE_UP_MS) return GIVE_UP_MS;
+  const leg = ROUTE[searchAt(t).leg];
+  return leg ? leg.arrive : t;
+}
 
 function hideTick(s: Ch11State, now: number): Ch11State {
   const t = now - s.beatAt;
-  if (t < NEAR_AT_MS) return s;
-  const nearStart = s.beatAt + NEAR_AT_MS;
   const found = (outcome: Outcome) => go({ ...s, outcome, holdingSince: null }, 'mmm', now);
-  if (s.holdingSince !== null) {
-    if (now - s.holdingSince >= BREATH_MS) return found('gasped');
-  } else if (now - Math.max(nearStart, s.breathingSince ?? nearStart) >= HEARD_MS) {
-    return found('heard');
+  const holding = s.holdingSince !== null;
+  // no one can hold it for ever
+  if (holding && now - s.holdingSince! >= BREATH_MS) return found('gasped');
+  // it gave up and turned to go: the breath he lets out is what it hears
+  if (t >= GIVE_UP_MS) return !holding || t >= AT_DOOR_MS ? found('gasped') : s;
+  if (!holding && isNear(s, now)) {
+    const since = s.beatAt + nearSince(t);
+    if (now - Math.max(since, s.breathingSince ?? since) >= HEARD_MS) return found('heard');
   }
-  if (t >= NEAR_AT_MS + NEAR_MS) return found('held');
   return s;
 }
 
@@ -176,7 +234,7 @@ export function ch11Reducer(s: Ch11State, a: Ch11Action): Ch11State {
         radioOff: past('shut'),
         hideSpot: past('choose') ? (a.spot ?? 'wardrobe') : null,
         breathingSince: a.beat === 'hide' ? now : null,
-        outcome: past('hide') ? 'held' : null,
+        outcome: past('hide') ? 'gasped' : null,
       };
     }
   }

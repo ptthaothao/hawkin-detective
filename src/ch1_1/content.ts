@@ -35,7 +35,7 @@ export const OBJECTIVE: Partial<Record<Beat, Objective>> = {
   look: { where: `${ROOM} · 3:17`, goal: 'Ai đứng ngoài đó vậy?', action: 'Soi đèn ra cửa' },
   shut: { where: `${ROOM} · 3:17`, goal: 'Không phải mẹ. Không được để nó vào!', action: 'Đóng cửa và tắt radio' },
   choose: { where: `${ROOM} · 3:17`, goal: 'Nó sắp vào rồi. Phải trốn đi!', action: 'Chọn chỗ trốn' },
-  hide: { where: '???', goal: 'Đừng để nó nghe thấy em thở.', action: 'Khi nó tới gần, giữ Space để nín thở' },
+  hide: { where: '???', goal: 'Nó đang tìm em. Đừng để nó nghe thấy em thở.', action: 'Nó lại gần thì giữ Space để nín thở, nó đi xa thì thả ra' },
   awake: { where: 'Gara cũ', goal: 'Đây là đâu?' },
 };
 
@@ -59,7 +59,6 @@ export const MMM = 'Mmmm…';
 
 /** How it found him is told by the sound (a held breath let go, a gasp); no words needed. */
 export const FOUND: Record<Outcome, string | null> = {
-  held: null,
   heard: null,
   gasped: null,
 };

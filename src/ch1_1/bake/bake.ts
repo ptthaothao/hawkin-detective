@@ -10,7 +10,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
-import { Creature3D } from '../three/creature3d';
+import { Creature2D, creatureReady } from '../three/creature2d';
 import { BG, buildWorld } from '../three/world';
 
 /**
@@ -41,7 +41,7 @@ export interface SetSpec {
   micOnFloor: boolean;
   torchOnBed: boolean;
   /** Where it stands, if it is in the picture. */
-  it?: { pos: [number, number, number]; rotY: number; look?: number; lean?: number };
+  it?: { pos: [number, number, number]; look?: number; lean?: number };
   /** The version the flashlight reveals: a warm light from Theo's hand. */
   lit: boolean;
 }
@@ -67,8 +67,7 @@ document.body.appendChild(renderer.domElement);
 const scene = new Scene();
 scene.fog = new FogExp2(0x0b0f16, 0.055);
 const world = buildWorld();
-const it = new Creature3D();
-it.traverse((o) => (o.castShadow = true));
+const it = new Creature2D();
 const hemi = new HemisphereLight(0x22304a, 0x0c0a08, 0.55);
 const hand = new PointLight(0xffe2b0, 0, 0, 1.6);
 scene.add(world.root, it, hemi, hand);
@@ -91,8 +90,8 @@ function dress(set: SetSpec, at: Vector3) {
   it.visible = !!set.it;
   if (set.it) {
     it.position.set(...set.it.pos);
-    it.rotation.y = set.it.rotY;
     it.pose(0, set.it.look ?? 0, set.it.lean ?? 0);
+    it.face(at);
   }
   hand.intensity = set.lit ? 6 : 0;
   // dark enough to need the torch, light enough to make out the shapes of the room
@@ -110,7 +109,8 @@ function project(view: ViewSpec, f: number, height: number, p: Vector3) {
   return { x: (view.yawFrom - yaw) * f, y: height / 2 - (f * dy) / flat };
 }
 
-export function bake(view: ViewSpec, set: SetSpec): Baked {
+export async function bake(view: ViewSpec, set: SetSpec): Promise<Baked> {
+  await creatureReady;
   const H = view.height;
   const f = H / 2 / Math.tan(((view.vfov / 2) * Math.PI) / 180);
   const W = Math.round((view.yawFrom - view.yawTo) * f);

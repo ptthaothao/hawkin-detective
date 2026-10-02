@@ -12,7 +12,7 @@ const only = process.argv[2];
 const ROOM = { pos: [0.3, 1.1, -0.3], yawFrom: 1.75, yawTo: -1.6, vfov: 64, height: 1080 };
 const DOOR = { pos: [0.75, 1.12, -1.25], yawFrom: -Math.PI / 2 + 1.05, yawTo: -Math.PI / 2 - 1.05, vfov: 64, height: 1080 };
 // head cocked over, leaning toward the door
-const IT_IN_HALL = { pos: [5.4, 0, -1.3], rotY: -Math.PI / 2, look: 0.55, lean: 0.25 };
+const IT_IN_HALL = { pos: [5.4, 0, -1.3], look: 0.55, lean: 0.25 };
 
 const base = { door: 1, radioOn: true, micOnFloor: false, torchOnBed: true };
 const SHOTS = [

@@ -5,6 +5,12 @@ import { TORCH_SPAN, lights, softBeam } from './textures';
 export const W = 1600;
 export const H = 900;
 
+/**
+ * Where the room camera is looking, in design units, so the DOM hotspots can follow it.
+ * A design point p lands on screen at p * scale + (x, y).
+ */
+export const cameraView = { x: 0, y: 0, scale: 1 };
+
 export interface Frame {
   s: Ch11State;
   now: number;
@@ -31,8 +37,8 @@ export class Layer extends Container {
     const ny = f.py / H - 0.5;
     // Breathing: a slow rise and fall, stronger for near layers.
     const breathe = Math.sin(f.now / 900) * 3 * sway;
-    this.x = -nx * 28 * this.depth;
-    this.y = -ny * 16 * this.depth + breathe * this.depth;
+    this.x = -nx * 14 * this.depth;
+    this.y = -ny * 8 * this.depth + breathe * this.depth;
   }
 }
 

@@ -101,6 +101,9 @@ export class WardrobeScene implements SceneNode {
     const sway = s.holdingSince !== null ? 0.1 : 1;
     this.back.drift(f, sway);
     this.slats.drift(f, sway);
+    // Peeking: the eye moves against the louvres, so moving the pointer up and down shows other strips.
+    this.slats.y += (f.py / H - 0.5) * 40;
+    this.back.x += (f.px / W - 0.5) * -60;
     this.dark.set(0.45, null);
   }
 }

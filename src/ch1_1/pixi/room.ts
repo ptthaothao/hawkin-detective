@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { Creature } from './creature';
-import { Dark, Layer, W, beam, clamp01, ease, glow, type Frame, type SceneNode } from './common';
+import { Dark, H, Layer, W, beam, cameraView, clamp01, ease, glow, type Frame, type SceneNode } from './common';
 
 /** The door on the right wall, in design space. Exported so the UI can place its hotspot. */
 export const DOOR = { x: 1400, y: 180, w: 160, h: 580 };
@@ -180,6 +180,8 @@ export class RoomScene implements SceneNode {
   private hallway = new Creature(0.35);
   private lastMinute = -1;
   private camera = new Container();
+  /** Smoothed look direction, -0.5..0.5 each way. */
+  private look = { x: 0, y: 0 };
 
   constructor() {
     this.back.addChild(backWall(), this.hands, this.doorG);
@@ -229,14 +231,27 @@ export class RoomScene implements SceneNode {
     this.hallway.visible = (s.beat === 'look' || s.beat === 'shut') && !s.doorShut;
     this.hallway.pose(0, Math.sin(now / 1400) * 0.3);
 
-    // Camera: shake on the surge and the slam. When he sees it, a jolt toward the door and back
-    // (back in place before the hotspots appear, so they line up with the room).
+    // Camera: the room is a little wider than the screen and he looks around it with the pointer.
+    // When he sees it, a jolt toward the door and back (back in place before the hotspots appear).
     const sawFor = s.beat === 'shut' ? ease(t / 700) * (1 - ease((t - 1100) / 600)) : 0;
-    const zoom = 1 + sawFor * 0.22;
-    this.camera.scale.set(zoom);
+    const zoom = 1.12 * (1 + sawFor * 0.2);
+    this.look.x += (f.px / W - 0.5 - this.look.x) * 0.05;
+    this.look.y += (f.py / H - 0.5 - this.look.y) * 0.05;
+    const spareX = W * (zoom - 1);
+    const spareY = H * (zoom - 1);
+    let camX = -spareX / 2 - this.look.x * spareX * 0.9;
+    let camY = -spareY / 2 - this.look.y * spareY * 0.9;
     const fx = DOOR.x + 30;
     const fy = DOOR.y + 260;
-    this.camera.position.set(-(fx * zoom - fx) * sawFor, -(fy * zoom - fy) * sawFor);
+    camX += (W / 2 - fx * zoom - camX) * sawFor;
+    camY += (H / 2 - fy * zoom - camY) * sawFor;
+    camX = Math.min(0, Math.max(W - W * zoom, camX));
+    camY = Math.min(0, Math.max(H - H * zoom, camY));
+    this.camera.scale.set(zoom);
+    this.camera.position.set(camX, camY);
+    cameraView.x = camX;
+    cameraView.y = camY;
+    cameraView.scale = zoom;
     const shake = surge * 10 + (s.doorShut && s.beat === 'shut' ? Math.max(0, 1 - t / 400) * 6 : 0);
     this.camera.x += (Math.random() - 0.5) * shake;
     this.camera.y += (Math.random() - 0.5) * shake;

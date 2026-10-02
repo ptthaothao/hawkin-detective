@@ -1,24 +1,14 @@
 import type { Beat, HideSpot, Outcome } from './machine';
 
-/** Narration shown at the start of each beat, one line after another. */
+/**
+ * Narration, kept to the minimum: the room, the sounds and the player's own actions tell the rest.
+ * A line is here only when nothing on screen or in the sound can say it.
+ */
 export const NARRATION: Partial<Record<Beat, string[]>> = {
-  back: [
-    'Đêm 4. 3 giờ 16 phút.',
-    'Theo đi vệ sinh về, mắt nhắm mắt mở.',
-    'Mẹ đi làm ca đêm. Chị đi dã ngoại với lớp. Cả nhà chỉ còn mình em.',
-  ],
-  bark: ['Ngoài sân, con chó nhà bên sủa ầm lên.', 'Mẹ về rồi hả?'],
-  answer: ['3 giờ 17.', 'Radio của bố rè lên một tiếng thật to.'],
-  torch: ['Tối om. Đèn pin để đâu rồi…'],
-  look: ['Có tiếng gì ở ngoài hành lang.'],
-  shut: ['Cuối hành lang có một cái bóng. Cao lắm. Gầy lắm.', 'Nó đang nhìn em.'],
-  choose: ['Trốn đi đâu bây giờ?'],
-  carried: ['…đung đưa…', '…hành lang dài ra…', '…sương lạnh…', '…sau lưng, radio tự bật lại…'],
-  awake: [
-    'Theo tỉnh dậy trên nền đất lạnh. Mùi dầu máy và gỗ mục.',
-    'Không phải phòng em. Là một cái gara cũ.',
-    'Bên ngoài, bước chân đi ngang qua. Đều đều. Theo một nhịp.',
-  ],
+  back: ['3:16. Mẹ đi ca đêm, chị đi dã ngoại. Nhà chỉ còn mình Theo.'],
+  answer: ['3:17.'],
+  shut: ['Nó đang nhìn em.'],
+  awake: ['Không phải phòng em.', 'Bên ngoài, bước chân đi ngang qua. Theo một nhịp.'],
 };
 
 export const PROMPT = {
@@ -44,21 +34,22 @@ export const HIDE_LABEL: Record<HideSpot, string> = {
 };
 
 export const HIDE_LINES: Record<HideSpot, string[]> = {
-  wardrobe: ['Cánh cửa phòng mở ra. Thật chậm.', 'Qua khe tủ, ánh đèn ngủ chuyển thành ánh nến.'],
-  bed: ['Cánh cửa phòng mở ra. Thật chậm.', 'Dưới gầm giường, sàn nhà sáng lên ánh nến.'],
+  wardrobe: [],
+  bed: [],
 };
 
 export const MMM = 'Mmmm…';
 
-export const FOUND: Record<Outcome, string> = {
-  held: 'Nó đứng yên rất lâu. Rồi nó cúi xuống, như thể ngửi thấy em.',
-  heard: 'Theo lỡ thở ra. Nó quay phắt lại.',
-  gasped: 'Hết hơi rồi. Theo há miệng hớp không khí.',
+/** How it found him is told by the sound (a held breath let go, a gasp); no words needed. */
+export const FOUND: Record<Outcome, string | null> = {
+  held: null,
+  heard: null,
+  gasped: null,
 };
 
 export const FOUND_AFTER: Record<HideSpot, string[]> = {
-  wardrobe: ['Cánh tủ bật tung. Một bàn tay dài, gầy guộc thò vào.', 'Chiếc đồng hồ tuột khỏi tay em khi nó lôi em qua giường.'],
-  bed: ['Một bàn tay dài, gầy guộc thò xuống gầm giường.', 'Chiếc đồng hồ tuột khỏi tay em, nằm lại dưới gầm giường.'],
+  wardrobe: ['Chiếc đồng hồ tuột khỏi tay em khi nó lôi em qua giường.'],
+  bed: [],
 };
 
 export const FAINT = 'Theo hét lên. Nhưng không có tiếng nào thoát ra.';

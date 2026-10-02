@@ -25,6 +25,8 @@ class Ch11Sound {
   private roomGain: GainNode | null = null;
   private heartTimer: number | null = null;
   private heartRate = 0;
+  private breathTimer: number | null = null;
+  private breathRate = 0;
 
   /** Must run inside a user gesture. */
   unlock() {
@@ -99,7 +101,10 @@ class Ch11Sound {
   /** Everything at once falls silent (the scream that makes no sound). */
   silence(on: boolean) {
     this.ramp(this.master, on ? 0 : 1, on ? 0.05 : 1.5);
-    if (on) this.heart(0);
+    if (on) {
+      this.heart(0);
+      this.breathing(0);
+    }
   }
 
   /** Heartbeats per minute; 0 stops. */
@@ -116,6 +121,41 @@ class Ch11Sound {
       this.heartTimer = window.setTimeout(beat, 60_000 / this.heartRate);
     };
     beat();
+  }
+
+  /** Theo's own breathing, close to the ear. Breaths per minute; 0 holds it (silence). */
+  breathing(bpm: number) {
+    if (bpm === this.breathRate) return;
+    this.breathRate = bpm;
+    if (this.breathTimer !== null) window.clearTimeout(this.breathTimer);
+    this.breathTimer = null;
+    if (!bpm || !this.ctx) return;
+    const breath = () => {
+      const t = this.ctx!.currentTime;
+      const cycle = 60 / this.breathRate;
+      const fast = this.breathRate > 30;
+      this.airflow(t, cycle * 0.4, fast ? 1500 : 1100, fast ? 0.07 : 0.035, true);
+      this.airflow(t + cycle * 0.45, cycle * 0.5, fast ? 900 : 700, fast ? 0.08 : 0.04, false);
+      this.breathTimer = window.setTimeout(breath, cycle * 1000);
+    };
+    breath();
+  }
+
+  private airflow(t: number, dur: number, freq: number, gain: number, rising: boolean) {
+    const ctx = this.ctx!;
+    const src = ctx.createBufferSource();
+    src.buffer = this.noise;
+    const f = ctx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.frequency.value = freq;
+    f.Q.value = 0.8;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(gain, t + dur * (rising ? 0.8 : 0.2));
+    g.gain.linearRampToValueAtTime(0.0001, t + dur);
+    src.connect(f).connect(g).connect(this.master!);
+    src.start(t, Math.random());
+    src.stop(t + dur + 0.05);
   }
 
   private noiseBurst(t: number, dur: number, freq: number, gain: number, type: BiquadFilterType = 'bandpass') {

@@ -150,7 +150,14 @@
   justify-content: center;
 }
 
+.ch11-spots {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
 .ch11-spot {
+  pointer-events: auto;
   position: absolute;
   background: transparent;
   border: 0;

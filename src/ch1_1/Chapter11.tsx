@@ -3,6 +3,7 @@ import { markFinished } from '../chapter';
 import { useQuality } from '../ui/quality';
 import { AFTER, END, FAINT, FOUND, FOUND_AFTER, HIDE_LABEL, HIDE_LINES, MMM, NARRATION, PROMPT } from './content';
 import { AUTO_MS, BREATH_MS, DOOR_OPENS_MS, NEAR_AT_MS, STEP_MS, isNear, type Beat, type Ch11State, type HideSpot } from './machine';
+import { cameraView } from './pixi/common';
 import { Stage } from './pixi/stage';
 import { sound } from './sound';
 import { clock, useCh11 } from './store';
@@ -101,12 +102,19 @@ function useSoundDriver(s: Ch11State, started: boolean) {
         sound.play('step');
       }
       sound.heart(isNear(s, now) ? 150 : 120);
+      // Breathing is the thing he must stop: loud and quick while it is close, gone while he holds it.
+      sound.breathing(s.holdingSince !== null ? 0 : isNear(s, now) ? 48 : 34);
     }
     if (s.beat === 'carried' && !radioBack.current && t > AUTO_MS.carried! * 0.7) {
       radioBack.current = true;
       sound.play('radioOn');
     }
     if (s.beat !== 'hide' && s.beat !== 'shut' && s.beat !== 'choose') sound.heart(0);
+    if (s.beat === 'back' || s.beat === 'bark' || s.beat === 'answer' || s.beat === 'torch') sound.breathing(14);
+    if (s.beat === 'look') sound.breathing(22);
+    if (s.beat === 'shut' || s.beat === 'choose') sound.breathing(40);
+    if (s.beat === 'mmm' || s.beat === 'found' || s.beat === 'carried' || s.beat === 'end') sound.breathing(0);
+    if (s.beat === 'awake') sound.breathing(20);
   }, [now, s, started]);
 }
 
@@ -142,7 +150,8 @@ function Spot({ at, label, onClick, hint }: { at: keyof typeof SPOTS; label: str
 }
 
 /** Lines appear one after another from the start of a beat. */
-function Lines({ lines, since, every = LINE_MS }: { lines: string[]; since: number; every?: number }) {
+function Lines({ lines, since, every = LINE_MS, fade }: { lines: string[]; since: number; every?: number; fade?: number }) {
+  if (since < 0 || (fade !== undefined && since > fade)) return null;
   const shown = Math.min(lines.length, Math.floor(since / every) + 1);
   return (
     <div className="ch11-lines">
@@ -200,31 +209,36 @@ function Play() {
   const narration = NARRATION[s.beat] ?? [];
   return (
     <div className={`ch11-frame beat-${s.beat}`}>
-      {/* What the player can do in the room */}
-      {s.beat === 'torch' && <Spot at="torch" label={PROMPT.torch} hint={hint} onClick={() => dispatch({ type: 'grabTorch' })} />}
-      {s.beat === 'look' && <Spot at="door" label={PROMPT.look} hint={hint} onClick={() => dispatch({ type: 'shineDoor' })} />}
-      {s.beat === 'shut' && !s.doorShut && t > 1_700 && (
-        <Spot at="door" label={PROMPT.slam} hint onClick={() => dispatch({ type: 'slamDoor' })} />
-      )}
-      {s.beat === 'shut' && !s.radioOff && t > 1_700 && (
-        <Spot at="radio" label={PROMPT.radio} hint onClick={() => dispatch({ type: 'radioOff' })} />
-      )}
-      {s.beat === 'choose' &&
-        (['wardrobe', 'bed'] as const).map((spot) => (
-          <Spot key={spot} at={spot} label={HIDE_LABEL[spot]} hint onClick={() => dispatch({ type: 'hide', spot })} />
-        ))}
+      {/* What the player can do in the room. The layer follows the room camera so spots stay on their objects. */}
+      <div
+        className="ch11-spots"
+        style={{ transform: `translate(${cameraView.x / 16}%, ${cameraView.y / 9}%) scale(${cameraView.scale})` }}
+      >
+        {s.beat === 'torch' && <Spot at="torch" label={PROMPT.torch} hint={hint} onClick={() => dispatch({ type: 'grabTorch' })} />}
+        {s.beat === 'look' && <Spot at="door" label={PROMPT.look} hint={hint} onClick={() => dispatch({ type: 'shineDoor' })} />}
+        {s.beat === 'shut' && !s.doorShut && t > 1_700 && (
+          <Spot at="door" label={PROMPT.slam} hint onClick={() => dispatch({ type: 'slamDoor' })} />
+        )}
+        {s.beat === 'shut' && !s.radioOff && t > 1_700 && (
+          <Spot at="radio" label={PROMPT.radio} hint onClick={() => dispatch({ type: 'radioOff' })} />
+        )}
+        {s.beat === 'choose' &&
+          (['wardrobe', 'bed'] as const).map((spot) => (
+            <Spot key={spot} at={spot} label={HIDE_LABEL[spot]} hint onClick={() => dispatch({ type: 'hide', spot })} />
+          ))}
+      </div>
 
       <div className="ch11-text">
         {s.beat !== 'shut' && s.beat !== 'mmm' && s.beat !== 'found' && s.beat !== 'faint' && s.beat !== 'hide' && (
-          <Lines lines={narration} since={t} every={s.beat === 'carried' ? AUTO_MS.carried! / 4 : LINE_MS} />
+          <Lines lines={narration} since={t} />
         )}
         {s.beat === 'shut' && (
-          <Lines lines={[...narration, ...(s.doorShut ? [AFTER.slam] : []), ...(s.radioOff ? [AFTER.radio] : [])]} since={t} every={700} />
+          <Lines lines={narration} since={t - 600} fade={3_200} />
         )}
-        {s.beat === 'hide' && s.hideSpot && <Lines lines={[AFTER.pocket, ...HIDE_LINES[s.hideSpot]]} since={t} every={1_800} />}
+        {s.beat === 'hide' && s.hideSpot && <Lines lines={[AFTER.pocket, ...HIDE_LINES[s.hideSpot]]} since={t} every={1_800} fade={4_000} />}
         {s.beat === 'mmm' && <p className="ch11-mmm">{MMM}</p>}
         {s.beat === 'found' && s.hideSpot && s.outcome && (
-          <Lines lines={[FOUND[s.outcome], ...FOUND_AFTER[s.hideSpot]]} since={t} every={1_700} />
+          <Lines lines={[FOUND[s.outcome], ...FOUND_AFTER[s.hideSpot]].filter((l): l is string => !!l)} since={t - 2_200} every={1_700} />
         )}
         {s.beat === 'faint' && <Lines lines={[FAINT]} since={t} />}
       </div>

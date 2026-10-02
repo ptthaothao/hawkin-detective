@@ -20,11 +20,13 @@ const SPOTS = {
 const AUTO_BEATS: Beat[] = ['back', 'answer', 'hide', 'mmm', 'found', 'faint', 'carried'];
 const LINE_MS = 2_300;
 
-/** `?beat=hide&spot=bed` jumps straight to a beat, for testing and sharing a preview. */
+const JUMPS: readonly Beat[] = ['back', 'bark', 'answer', 'torch', 'look', 'shut', 'choose', 'hide', 'mmm', 'found', 'faint', 'carried', 'awake'];
+
+/** `?beat=hide&spot=bed` jumps straight to a beat, for testing and sharing a preview. Only known values are taken. */
 function jumpFromUrl(): { beat: Beat; spot?: HideSpot } | undefined {
   const q = new URLSearchParams(window.location.search);
-  const beat = q.get('beat') as Beat | null;
-  const spot = q.get('spot') === 'bed' ? 'bed' : q.get('spot') === 'wardrobe' ? 'wardrobe' : undefined;
+  const beat = JUMPS.find((b) => b === q.get('beat'));
+  const spot = q.get('spot') === 'bed' ? 'bed' : 'wardrobe';
   return beat ? { beat, spot } : undefined;
 }
 

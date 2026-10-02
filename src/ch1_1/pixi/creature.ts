@@ -1,5 +1,4 @@
-import { Container, Graphics, Sprite } from 'pixi.js';
-import { glow } from './common';
+import { Container, Graphics } from 'pixi.js';
 
 const SKIN = 0x070605;
 const RIM = 0xff9a50;
@@ -110,9 +109,8 @@ export class Creature extends Container {
   }
 }
 
-/** Its hand reaching in, long jointed fingers lit along one edge, and the glint on one of them. */
+/** Its hand reaching in, long jointed fingers lit along one edge. */
 export class Hand extends Container {
-  readonly glint: Sprite;
   constructor() {
     super();
     const g = new Graphics();
@@ -147,13 +145,6 @@ export class Hand extends Container {
     });
     // thumb
     g.moveTo(100, 20).lineTo(160, 70).lineTo(170, 130).stroke({ width: 16, color: skin, cap: 'round', join: 'round' });
-    // a band on one finger, catching the light
-    const bx = 34 + Math.cos(1.85) * 55;
-    const by = 84 + Math.sin(1.85) * 55;
-    g.circle(bx, by, 10).stroke({ width: 5, color: 0x9a7a34 });
     this.addChild(g);
-    this.glint = glow(0xfff1c0, bx + 4, by - 4, 110, 0);
-    this.glint.blendMode = 'add';
-    this.addChild(this.glint);
   }
 }

@@ -91,7 +91,6 @@ export class WardrobeScene implements SceneNode {
       const reach = ease((t - 300) / 900);
       this.hand.position.set(1100 - reach * 260, 120 + reach * 300);
       this.hand.scale.set(1.6);
-      this.hand.glint.alpha = clamp01((t - 900) / 300) * (0.7 + 0.3 * Math.sin(now / 60));
     }
 
     // Doors open, the hand fills the view; the body behind it falls out of focus.
@@ -158,7 +157,6 @@ export class UnderBedScene implements SceneNode {
       this.hand.position.set(1000 - reach * 200, 500 + reach * 160);
       this.hand.scale.set(1.8);
       this.hand.rotation = -0.6;
-      this.hand.glint.alpha = clamp01((t - 1100) / 300) * (0.7 + 0.3 * Math.sin(now / 60));
     }
     this.candle.alpha = 0.45 * flicker(now, 2);
     this.wash.alpha = 0.2 * flicker(now, 3);

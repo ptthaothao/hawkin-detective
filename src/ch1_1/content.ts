@@ -57,8 +57,8 @@ export const FOUND: Record<Outcome, string> = {
 };
 
 export const FOUND_AFTER: Record<HideSpot, string[]> = {
-  wardrobe: ['Cánh tủ bật tung. Một bàn tay dài thò vào. Có cái gì lóe lên trên tay nó.', 'Chiếc đồng hồ tuột khỏi tay em khi nó lôi em qua giường.'],
-  bed: ['Một bàn tay dài thò xuống gầm giường. Có cái gì lóe lên trên tay nó.', 'Chiếc đồng hồ tuột khỏi tay em, nằm lại dưới gầm giường.'],
+  wardrobe: ['Cánh tủ bật tung. Một bàn tay dài, gầy guộc thò vào.', 'Chiếc đồng hồ tuột khỏi tay em khi nó lôi em qua giường.'],
+  bed: ['Một bàn tay dài, gầy guộc thò xuống gầm giường.', 'Chiếc đồng hồ tuột khỏi tay em, nằm lại dưới gầm giường.'],
 };
 
 export const FAINT = 'Theo hét lên. Nhưng không có tiếng nào thoát ra.';

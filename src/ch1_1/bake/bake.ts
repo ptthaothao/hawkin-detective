@@ -41,7 +41,7 @@ export interface SetSpec {
   micOnFloor: boolean;
   torchOnBed: boolean;
   /** Where it stands, if it is in the picture. */
-  it?: { pos: [number, number, number]; rotY: number; look?: number };
+  it?: { pos: [number, number, number]; rotY: number; look?: number; lean?: number };
   /** The version the flashlight reveals: a warm light from Theo's hand. */
   lit: boolean;
 }
@@ -92,7 +92,7 @@ function dress(set: SetSpec, at: Vector3) {
   if (set.it) {
     it.position.set(...set.it.pos);
     it.rotation.y = set.it.rotY;
-    it.pose(0, set.it.look ?? 0);
+    it.pose(0, set.it.look ?? 0, set.it.lean ?? 0);
   }
   hand.intensity = set.lit ? 6 : 0;
   // dark enough to need the torch, light enough to make out the shapes of the room

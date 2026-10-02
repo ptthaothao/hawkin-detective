@@ -487,7 +487,11 @@ function Radio({
   );
 }
 
-/** Handheld CB mic: hanging on its hook (this side) or dropped with the cord pulled taut (other side). */
+/**
+ * Handheld CB mic. This side: lying loose on the desk where it always was.
+ * Other side: knocked to the floor with the cord pulled taut, and Theo's drawing book still on it,
+ * its spine jammed on the talk button (that is why the mic was transmitting).
+ */
 function Mic({ p, fallen }: { p: Palette; fallen: boolean }) {
   if (fallen) {
     return (
@@ -496,26 +500,27 @@ function Mic({ p, fallen }: { p: Palette; fallen: boolean }) {
         <g transform="rotate(-80 760 640)">
           <rect x="746" y="612" width="28" height="56" rx="11" fill={p.metalDark} stroke={p.metal} strokeWidth="1.5" />
           <rect x="772" y="626" width="8" height="18" rx="2" fill={p.metal} />
-          <rect x="768" y="622" width="16" height="26" fill="#9a9072" opacity="0.8" />
+        </g>
+        {/* Theo's drawing book, spiral spine down on the talk button */}
+        <g transform="rotate(-6 812 636)">
+          <path d="M774 616 L858 610 L866 650 L780 658 Z" fill="#2f4a6e" stroke="#1a2a40" strokeWidth="1.5" />
+          <path d="M778 622 L852 616 L858 646 L784 652 Z" fill="#e8dfc4" opacity="0.18" />
+          {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+            <circle key={i} cx={776 + i * 0.9} cy={620 + i * 5.6} r="2.2" fill="none" stroke={p.metal} strokeWidth="1.2" />
+          ))}
+          <path d="M800 630 q10 -8 20 0 t20 0" stroke="#d6702e" strokeWidth="2" fill="none" opacity="0.8" />
         </g>
       </g>
     );
   }
   return (
     <g>
-      <rect x="966" y="350" width="10" height="16" fill={p.metal} />
-      <rect x="924" y="354" width="30" height="64" rx="12" fill={p.metalDark} stroke={p.metal} strokeWidth="1.5" />
-      {[364, 370, 376, 382].map((y) => (
-        <line key={y} x1="930" y1={y} x2="948" y2={y} stroke={p.metal} strokeWidth="1" opacity="0.6" />
+      <path d="M1004 466 C990 466 980 458 986 446" stroke="#0d0c0b" strokeWidth="3" fill="none" className="mic-cord" />
+      <rect x="1004" y="458" width="56" height="16" rx="7" fill={p.metalDark} stroke={p.metal} strokeWidth="1.5" />
+      {[1036, 1042, 1048, 1054].map((x) => (
+        <line key={x} x1={x} y1="461" x2={x} y2="471" stroke={p.metal} strokeWidth="1" opacity="0.6" />
       ))}
-      <rect x="952" y="384" width="6" height="18" rx="2" fill={p.metal} />
-      <path
-        d="M939 418 c-10 8 10 10 0 18 c-10 8 10 10 0 18 c-10 8 12 4 22 6 C975 462 985 458 992 452"
-        stroke="#0d0c0b"
-        strokeWidth="3"
-        fill="none"
-        className="mic-cord"
-      />
+      <rect x="1014" y="453" width="16" height="6" rx="2" fill={p.metal} />
     </g>
   );
 }

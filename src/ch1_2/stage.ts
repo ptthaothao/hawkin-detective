@@ -1,7 +1,8 @@
 import { Application, Assets, Container, Graphics, NoiseFilter, Sprite, Texture } from 'pixi.js';
 import VIEWS from '../ch1_1/pano/views.json';
+import VIEWS12 from './pano/views.json';
 import { ItSprite, loadIt } from '../ch1_1/pano/creature';
-import { BLOCK_HINT_MS, STEP_MS, blockedFor, type Ch12State, type HideSpot } from './machine';
+import { STEP_MS, type Ch12State, type HideSpot } from './machine';
 import { SCENE_H, SCENE_W, drawScene, type DrawnScene } from './scenes';
 import { ease, walkAt, type Marks } from './walk';
 
@@ -12,7 +13,7 @@ import { ease, walkAt, type Marks } from './walk';
  * While he hides, the picture is seen through a hole: the tent's doorway or the buggy's window.
  */
 
-export type SceneId = 'black' | 'garage' | 'carried-0' | 'carried-1' | 'carried-2' | 'carried-3' | 'carried-4' | DrawnScene;
+export type SceneId = 'black' | 'garage' | 'yard' | 'out0' | 'out1' | 'out2' | 'glass' | 'carried-0' | 'carried-1' | 'carried-2' | 'carried-3' | 'carried-4' | DrawnScene;
 export type SpotId = 'tent' | 'buggy' | 'cans' | 'wall' | 'door' | 'garage' | 'onward' | 'home' | 'crawl';
 
 export interface SpotSpec {
@@ -39,29 +40,46 @@ interface Rect {
   w: number;
   h: number;
 }
+interface Mark {
+  x: number;
+  y: number;
+  s: number;
+}
 interface PanoData {
   width: number;
   height: number;
   focus?: number;
   roll?: number;
 }
-const DATA = VIEWS as unknown as Record<string, PanoData>;
-const PANO: SceneId[] = ['garage', 'carried-0', 'carried-1', 'carried-2', 'carried-3', 'carried-4'];
-const DRAWN: DrawnScene[] = ['yard', 'out0', 'out1', 'out2', 'glass', 'cloth'];
+/** The pictures this chapter bakes itself (public/ch12, numbers in pano/views.json); the carried ones are 1.1's. */
+const BAKED12 = ['garage', 'yard', 'out0', 'out1', 'out2', 'glass'] as const;
+interface Baked12 extends PanoData {
+  rects?: Partial<Record<SpotId, Rect>>;
+  marks?: Record<string, Mark>;
+}
+const V12: Record<string, Baked12> = {
+  ...(VIEWS12 as unknown as Record<string, Baked12>),
+  garage: (VIEWS12 as unknown as Record<string, Baked12>)['garage-cans'],
+};
+const DATA: Record<string, PanoData> = { ...(VIEWS as unknown as Record<string, PanoData>), ...V12 };
+const PANO: SceneId[] = [...BAKED12, 'carried-0', 'carried-1', 'carried-2', 'carried-3', 'carried-4'];
+const DRAWN: DrawnScene[] = ['cloth'];
+const is12 = (id: SceneId) => (BAKED12 as readonly string[]).includes(id);
+const fileOf = (id: SceneId) => (id === 'garage' ? 'ch12/garage-cans' : is12(id) ? `ch12/${id}` : `ch11/${id}`);
 
 /** Where the click areas are, in each picture's own pixels. */
 const SPOT_RECTS: Partial<Record<SceneId, Partial<Record<SpotId, Rect>>>> = {
   garage: {
     tent: { x: 940, y: 380, w: 620, h: 420 },
     buggy: { x: 0, y: 150, w: 540, h: 620 },
-    cans: { x: 1640, y: 790, w: 280, h: 200 },
+    cans: V12.garage.rects?.cans ?? { x: 1640, y: 790, w: 280, h: 200 },
     wall: { x: 1500, y: 330, w: 330, h: 420 },
     door: { x: 640, y: 230, w: 300, h: 380 },
   },
-  yard: { garage: { x: 1000, y: 430, w: 640, h: 300 } },
-  out0: { onward: { x: 1100, y: 300, w: 700, h: 600 } },
-  out1: { onward: { x: 1100, y: 300, w: 700, h: 600 } },
-  out2: { home: { x: 0, y: 300, w: 800, h: 600 } },
+  yard: { garage: V12.yard.rects!.garage },
+  out0: { onward: V12.out0.rects!.onward },
+  out1: { onward: V12.out1.rects!.onward },
+  out2: { home: { x: 0, y: 300, w: 760, h: 620 } },
   cloth: { crawl: { x: 860, y: 200, w: 300, h: 700 } },
 };
 
@@ -97,7 +115,7 @@ function softTexture(size: number, stops: [number, string][]): Texture {
   return Texture.from(c);
 }
 
-const url = (file: string) => `${import.meta.env.BASE_URL}ch11/${file}.webp`;
+const url = (file: string) => `${import.meta.env.BASE_URL}${file}.webp`;
 const sizeOf = (id: SceneId) => (id === 'black' ? { width: SCENE_W, height: SCENE_H } : id in DATA ? DATA[id] : { width: SCENE_W, height: SCENE_H });
 
 export class Stage12 {
@@ -107,7 +125,6 @@ export class Stage12 {
   private dark = new Sprite();
   private lit = new Sprite();
   private beam = new Sprite();
-  private cans = new Graphics();
   private fog: Sprite[] = [];
   private it: ItSprite | null = null;
   private hand = new Sprite();
@@ -145,14 +162,14 @@ export class Stage12 {
       autoDensity: true,
       preference: 'webgl',
     });
-    const files = PANO.flatMap((id) => (id === 'garage' ? [id, `${id}-lit`] : [id]));
+    const files = PANO.flatMap((id) => (id.startsWith('carried-') ? [fileOf(id)] : [fileOf(id), `${fileOf(id)}-lit`]));
     const [loaded, it] = await Promise.all([Promise.all(files.map((f) => Assets.load<Texture>(url(f)))), loadIt()]);
     if (this.destroyed) {
       this.app.destroy(true, { children: true });
       return;
     }
     const byFile = new Map(files.map((f, i) => [f, loaded[i]]));
-    for (const id of PANO) this.textures.set(id, { dark: byFile.get(id)!, lit: byFile.get(`${id}-lit`) ?? null });
+    for (const id of PANO) this.textures.set(id, { dark: byFile.get(fileOf(id))!, lit: byFile.get(`${fileOf(id)}-lit`) ?? null });
     for (const id of DRAWN) {
       const { dark, lit } = drawScene(id);
       this.textures.set(id, { dark: Texture.from(dark), lit: Texture.from(lit) });
@@ -168,7 +185,6 @@ export class Stage12 {
     ]);
     this.beam.anchor.set(0.5);
     this.lit.mask = this.beam;
-    this.drawCans();
     const fogTex = softTexture(256, [
       [0, 'rgba(150,170,190,0.5)'],
       [1, 'rgba(150,170,190,0)'],
@@ -183,7 +199,7 @@ export class Stage12 {
     this.hand.texture = it.hand;
     this.hand.anchor.set(0.7, 0.7);
     this.hand.visible = false;
-    this.world.addChild(this.dark, this.cans, ...this.fog, this.lit, this.it, this.beam);
+    this.world.addChild(this.dark, ...this.fog, this.lit, this.it, this.beam);
     this.rig.addChild(this.world);
     this.app.stage.addChild(this.rig, this.peep, this.peepRim, this.tint, this.hand, this.lids);
 
@@ -203,27 +219,6 @@ export class Stage12 {
     window.addEventListener('keyup', this.onKey);
     el.addEventListener('pointerleave', this.onLeave);
     this.app.ticker.add(() => this.frame());
-  }
-
-  /** The pile of cans in the far corner: placed on the garage picture, dim, with a rim of moonlight. */
-  private drawCans() {
-    const g = this.cans;
-    const cans: [number, number, number][] = [
-      [1740, 925, 1],
-      [1815, 930, 1.05],
-      [1782, 880, 0.95],
-      [1850, 905, 0.9],
-      [1700, 905, 0.85],
-    ];
-    for (const [x, y, k] of cans) {
-      const w = 54 * k;
-      const h = 74 * k;
-      g.ellipse(x, y, w / 2 + 3, 10 * k).fill({ color: 0x08090b, alpha: 0.8 });
-      g.rect(x - w / 2, y - h, w, h).fill({ color: 0x4a4f55 });
-      g.rect(x - w / 2, y - h, w * 0.22, h).fill({ color: 0x8e98a4, alpha: 0.55 });
-      g.ellipse(x, y - h, w / 2, 9 * k).fill({ color: 0x6d737a });
-      g.ellipse(x, y - h, w / 2 - 6, 5 * k).fill({ color: 0x23272b });
-    }
   }
 
   private onDown = (e: PointerEvent) => {
@@ -332,9 +327,7 @@ export class Stage12 {
     this.rig.rotation = carried ? (('roll' in d && d.roll) || 0.3) * 0.5 + Math.sin(now / 520) * (0.04 + s.struggles * 0.03) : 0;
     this.rig.scale.set(carried ? 1.25 : 1);
 
-    // cans are part of the garage; fog drifts over everything outdoors
-    this.cans.visible = id === 'garage';
-    this.cans.alpha = id === 'garage' && s.round === 2 && blockedFor(s, now) >= BLOCK_HINT_MS ? 0.75 + 0.25 * Math.sin(now / 260) : 0.8;
+    // fog drifts over everything outdoors, on top of the baked ground mist
     const foggy = (id === 'yard' || id.startsWith('out') || id === 'glass') && !input.low();
     this.fog.forEach((f, i) => {
       f.visible = foggy;
@@ -343,7 +336,7 @@ export class Stage12 {
       f.x = ((i * 520 + Math.sin(phase) * 260 + now * 0.012 * (i % 2 ? 1 : -1)) % (d.width + 600)) - 200;
       f.y = d.height * (0.58 + (i % 3) * 0.1);
       f.width = f.height = 760 + i * 70;
-      f.alpha = 0.16 + 0.05 * Math.sin(phase * 1.7);
+      f.alpha = 0.1 + 0.04 * Math.sin(phase * 1.7);
     });
 
     this.placeIt(id, s, t, now, dt);
@@ -461,9 +454,10 @@ export class Stage12 {
     }
     if (id === 'glass' && s.beat === 'glass') {
       const away = ease((t - 5_200) / 4_800);
-      const x = lerp(1180, 1560, away);
-      const y = lerp(770, 690, away);
-      const sc = lerp(170, 105, away);
+      const m = V12.glass.marks!;
+      const x = lerp(m.itFrom.x, m.itTo.x, away);
+      const y = lerp(m.itFrom.y, m.itTo.y, away);
+      const sc = lerp(m.itFrom.s, m.itTo.s, away);
       it.visible = true;
       it.pose({
         x,

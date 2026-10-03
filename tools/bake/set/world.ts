@@ -1,10 +1,12 @@
 import {
   BoxGeometry,
+  BufferGeometry,
   CanvasTexture,
   Color,
   CylinderGeometry,
   DirectionalLight,
   DoubleSide,
+  Float32BufferAttribute,
   Group,
   Mesh,
   MeshBasicMaterial,
@@ -470,81 +472,90 @@ export function buildWorld(): World {
     tex.colorSpace = SRGBColorSpace;
     return tex;
   };
-  const label = (text: string, w: number, h: number, bg: string, fg: string, font: string, rot: number) =>
-    new Mesh(
-      new PlaneGeometry(w, h),
-      new MeshStandardMaterial({
-        roughness: 1,
-        map: paint((x, cw, ch) => {
-          x.fillStyle = bg;
-          x.fillRect(0, 0, cw, ch);
-          x.fillStyle = fg;
-          x.font = font;
-          x.textAlign = 'center';
-          x.textBaseline = 'middle';
-          x.translate(cw / 2, ch / 2);
-          x.rotate(rot);
-          x.fillText(text, 0, 0);
-        }, w, h),
-      }),
-    );
   const fort = new Group();
   fort.position.set(denX, 0, denZ);
   root.add(fort);
-  const linen = std({ color: 0xb8ad94, roughness: 1 });
+  const linen = std({ color: 0x8a8068, roughness: 1 });
   // a worn rug, a pillow, a crumpled blanket
-  box(1.9, 0.03, 1.5, std({ color: 0x4a2a22, roughness: 1 }), -0.05, 0.03, 0, fort, false);
-  box(0.5, 0.12, 0.34, linen, -0.72, 0.1, -0.45, fort, false).rotation.y = 0.3;
-  box(0.6, 0.07, 0.5, std({ color: 0x5a5440, roughness: 1 }), -0.4, 0.07, 0.25, fort, false).rotation.y = 0.4;
-  // an old table standing on its legs is the frame; sheets hang from its top on three sides, one way in at the front
-  const tableWood = std({ map: T.darkWood, color: 0xc4a47a, roughness: 0.8 });
-  const TX = -0.2;
-  box(1.3, 0.07, 1.8, tableWood, TX, 1.0, 0, fort);
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]) box(0.09, 1.0, 0.09, tableWood, TX + sx * 0.6, 0.5, sz * 0.82, fort);
-  for (const sz of [-1, 1]) box(1.15, 0.08, 0.05, tableWood, TX, 0.55, sz * 0.82, fort, false);
-  box(0.05, 0.08, 1.6, tableWood, TX - 0.6, 0.55, 0, fort, false);
-  // sheets: heavy muddy curtains, a little uneven so they look hung, not stood
-  const throwOver = (color: number, map?: CanvasTexture) => std({ color, map, roughness: 1 });
-  // vertical folds: soft dark and light bands across the cloth
-  const folds = paint((x, cw, ch) => {
-    const g = x.createLinearGradient(0, 0, cw, 0);
-    for (let i = 0; i <= 10; i++) g.addColorStop(i / 10, i % 2 ? '#585858' : '#b4b4b4');
-    x.fillStyle = g;
+  box(2.5, 0.03, 2.0, std({ color: 0x4a2a22, roughness: 1 }), 0.6, 0.03, 0, fort, false);
+  box(0.4, 0.09, 0.28, linen, -0.5, 0.08, -0.4, fort, false).rotation.y = 0.3;
+  // the shelter: old blankets and sheets thrown over a hidden frame, so the cloth falls in heavy folds and
+  // makes a low rounded tent with one dark way in at the front (+x). A dome with folds pushed into it.
+  const wool = paint((x, cw, ch) => {
+    x.fillStyle = '#9a9a9a';
     x.fillRect(0, 0, cw, ch);
-    const v = x.createLinearGradient(0, 0, 0, ch);
-    v.addColorStop(0, 'rgba(0,0,0,0.0)');
-    v.addColorStop(1, 'rgba(0,0,0,0.35)');
-    x.fillStyle = v;
-    x.fillRect(0, 0, cw, ch);
-  }, 1, 1);
-  folds.wrapS = folds.wrapT = RepeatWrapping;
-  for (const [x, y, z, w, d, ry, tone] of [
-    [TX - 0.55, 0.5, 0, 0.03, 1.5, 0.0, 0x6a6244],
-    [TX - 0.02, 0.5, -0.74, 1.08, 0.03, 0.03, 0x625a3e],
-    [TX - 0.02, 0.5, 0.74, 1.08, 0.03, -0.03, 0x6a6244],
-  ] as const) {
-    const sheet = box(w, 0.95, d, throwOver(tone, folds), x, y, z, fort);
-    sheet.rotation.set(0, 0, 0);
-    sheet.rotation.x = ry;
-  }
-  // a gathered second layer over the left side, so the cloth has folds
-  box(0.05, 0.9, 0.5, throwOver(0x4e4730, folds), TX - 0.5, 0.5, -0.45, fort, false).rotation.z = 0.04;
-  box(0.05, 0.9, 0.4, throwOver(0x40391f, folds), TX - 0.5, 0.5, 0.35, fort, false).rotation.z = -0.05;
-  // an embroidered blanket thrown over the back right corner, hanging down the side
-  const blanketTex = paint((x, cw, ch) => {
-    x.fillStyle = '#6a5a38';
-    x.fillRect(0, 0, cw, ch);
-    x.strokeStyle = '#8a7650';
-    x.lineWidth = 8;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 9000; i++) {
+      const v = 110 + Math.floor(Math.random() * 90);
+      x.fillStyle = `rgb(${v},${v},${v})`;
+      x.fillRect(Math.random() * cw, Math.random() * ch, 2, 1);
+    }
+    x.strokeStyle = 'rgba(60,60,60,0.35)';
+    x.lineWidth = 1;
+    for (let i = 0; i < cw; i += 6) {
       x.beginPath();
-      for (let j = 0; j <= 12; j++) x.lineTo((j / 12) * cw, ch * (0.3 + i * 0.2) + (j % 2 ? 22 : -22));
+      x.moveTo(i, 0);
+      x.lineTo(i, ch);
       x.stroke();
     }
   }, 1, 1);
-  box(0.95, 0.025, 0.9, throwOver(0xb0a080, blanketTex), TX - 0.1, 1.05, 0.5, fort);
-  const hang = box(0.95, 0.5, 0.025, throwOver(0xb0a080, blanketTex), TX - 0.1, 0.8, 0.95, fort);
-  hang.rotation.x = -0.06;
+  wool.wrapS = wool.wrapT = RepeatWrapping;
+  const smooth = (v: number, a0: number, a1: number) => {
+    const k = Math.max(0, Math.min(1, (v - a0) / (a1 - a0)));
+    return k * k * (3 - 2 * k);
+  };
+  const tent = (() => {
+    const NT = 360;
+    const NH = 90;
+    const Rx = 1.08;
+    const Rz = 1.0;
+    const H = 0.98;
+    const pos: number[] = [];
+    const col: number[] = [];
+    const uv: number[] = [];
+    const idx: number[] = [];
+    const olive = new Color(0x5e5a3c);
+    const grey = new Color(0x48463a);
+    const cream = new Color(0xa89e82);
+    const gold = new Color(0x7a6232);
+    const brown = new Color(0x4a3824);
+    const tmp = new Color();
+    for (let j = 0; j <= NH; j++) {
+      const t = j / NH;
+      for (let i = 0; i <= NT; i++) {
+        // each row starts and ends at the edge of the doorway, so the rim of the arch is a clean curve
+        const open = t < 0.7 ? 0.62 * Math.sqrt(1 - (t / 0.7) ** 2) : 0;
+        const th = open + (i / NT) * (Math.PI * 2 - 2 * open);
+        const fold = 1 + 0.085 * Math.sin(th * 13 + 2.2 * t) * (1 - 0.4 * t) + 0.045 * Math.sin(th * 31 + 5 * t) + 0.035 * Math.sin(th * 5 + 1);
+        const r = Math.sqrt(Math.max(0, 1 - t * t)) * fold * (1 + 0.14 * Math.pow(1 - t, 6));
+        pos.push(Math.cos(th) * Rx * r, H * t + 0.018 * Math.sin(th * 9) * (1 - t), Math.sin(th) * Rz * r);
+        const wCream = smooth(th, 0.45 * Math.PI, 0.6 * Math.PI) * (1 - smooth(th, 0.9 * Math.PI, 1.05 * Math.PI));
+        const wGold = smooth(th, 1.1 * Math.PI, 1.25 * Math.PI) * (1 - smooth(th, 1.6 * Math.PI, 1.75 * Math.PI));
+        tmp.copy(olive).lerp(grey, 0.5 + 0.5 * Math.sin(th * 3));
+        tmp.lerp(cream, wCream);
+        const stripe = Math.sin(t * 46 + th * 6) > 0.2 ? gold : brown;
+        tmp.lerp(stripe, wGold);
+        const shade = 0.5 + 0.5 * Math.min(1, t * 1.8);
+        col.push(tmp.r * shade, tmp.g * shade, tmp.b * shade);
+        uv.push((i / NT) * 8, (j / NH) * 3);
+      }
+    }
+    for (let j = 0; j < NH; j++)
+      for (let i = 0; i < NT; i++) {
+        const k = j * (NT + 1) + i;
+        idx.push(k, k + NT + 1, k + 1, k + 1, k + NT + 1, k + NT + 2);
+      }
+    const g = new BufferGeometry();
+    g.setAttribute('position', new Float32BufferAttribute(pos, 3));
+    g.setAttribute('color', new Float32BufferAttribute(col, 3));
+    g.setAttribute('uv', new Float32BufferAttribute(uv, 2));
+    g.setIndex(idx);
+    g.computeVertexNormals();
+    return g;
+  })();
+  const tentMesh = new Mesh(tent, new MeshStandardMaterial({ map: wool, vertexColors: true, roughness: 1, side: DoubleSide }));
+  tentMesh.castShadow = true;
+  tentMesh.receiveShadow = true;
+  fort.add(tentMesh);
   // his drawings, crayon on paper, pinned to the back blanket; one of them his family, as stick people
   const crayon = ['#b5342a', '#2f4f8a', '#d9a62a', '#3d7a3a', '#6a3a8a'];
   const stick = (x: CanvasRenderingContext2D, cx: number, base: number, h: number, color: string) => {
@@ -574,6 +585,14 @@ export function buildWorld(): World {
       x.beginPath();
       x.arc(w * 0.82, h * 0.2, h * 0.09, 0, Math.PI * 2);
       x.stroke();
+      // his signature, small, in the corner
+      x.save();
+      x.fillStyle = '#7a2a22';
+      x.font = `bold ${Math.round(h * 0.13)}px "Comic Sans MS", "Chalkboard SE", cursive`;
+      x.textAlign = 'right';
+      x.rotate(-0.05);
+      x.fillText('MAR', w * 0.94, h * 0.97);
+      x.restore();
     },
     house: (x, w, h) => {
       x.strokeStyle = crayon[0];
@@ -679,8 +698,8 @@ export function buildWorld(): World {
     );
   // the pile of drawings, spilled over the rug and the floor outside: his family among them, as stick people
   const spill: [string, number, number, number][] = [
-    ['family', 0.2, 0.55, 0.3], ['train', 0.05, 0.62, -0.5], ['horse', 0.3, 0.42, 0.9], ['tree', -0.1, 0.5, -0.2],
-    ['house', 0.45, 0.62, 0.6], ['dog', 0.1, 0.75, 1.2], ['moon', 0.55, 0.35, -0.8], ['car', 0.35, 0.8, 0.1],
+    ['family', 1.45, 0.45, 0.3], ['train', 1.3, -0.35, -0.5], ['horse', 1.75, -0.05, 0.9], ['tree', 1.1, 0.2, -0.2],
+    ['house', 1.85, 0.6, 0.6], ['dog', 1.15, 0.7, 1.2], ['moon', 1.6, -0.65, -0.8], ['car', 1.55, 0.2, 0.1],
   ];
   spill.forEach(([kind, x, z, ry], i) => {
     const m = paper(kind, 0.3, 0.22);
@@ -690,7 +709,7 @@ export function buildWorld(): World {
   });
   // one small tin car, on the rug
   const car = new Group();
-  car.position.set(0.55, 0.045, 0.1);
+  car.position.set(0.95, 0.045, 0.12);
   car.rotation.y = 0.5;
   fort.add(car);
   const tin = std({ color: 0x7a2a22, roughness: 0.5, metalness: 0.35 });
@@ -699,10 +718,10 @@ export function buildWorld(): World {
   for (const wx of [-0.05, 0.05]) for (const wz of [-0.04, 0.04]) cyl(0.022, 0.012, std({ color: 0x15110e, roughness: 0.8 }), wx, 0.022, wz, car, 10).rotation.x = Math.PI / 2;
   // the oil lamp on two bricks: the light everything is arranged around
   const brick = std({ color: 0x6a3a2a, roughness: 1 });
-  box(0.22, 0.07, 0.11, brick, -0.45, 0.065, -0.45, fort, false).rotation.y = 0.2;
-  box(0.2, 0.07, 0.1, brick, -0.45, 0.135, -0.45, fort, false).rotation.y = -0.1;
+  box(0.22, 0.07, 0.11, brick, 0.3, 0.065, -0.1, fort, false).rotation.y = 0.2;
+  box(0.2, 0.07, 0.1, brick, 0.3, 0.135, -0.1, fort, false).rotation.y = -0.1;
   const lamp = new Group();
-  lamp.position.set(-0.45, 0.17, -0.45);
+  lamp.position.set(0.3, 0.17, -0.1);
   fort.add(lamp);
   cyl(0.04, 0.05, std({ color: 0x7a5a2a, metalness: 0.6, roughness: 0.4 }), 0, 0.025, 0, lamp, 12);
   cyl(0.028, 0.1, new MeshBasicMaterial({ color: 0xffd08a, transparent: true, opacity: 0.85 }), 0, 0.1, 0, lamp, 12);
@@ -710,40 +729,32 @@ export function buildWorld(): World {
   lampLight.position.set(0, 0.16, 0);
   lamp.add(lampLight);
   // tin cans with faded labels, wooden blocks, a ball of string, a key, a few coins, his closed notebook
-  const cans: [number, number, number][] = [[0.15, -0.95, 0xa0743a], [0.3, -0.85, 0x7a5a3a], [0.05, -0.8, 0x8a6a40], [0.22, -0.7, 0xb08a4a]];
+  const cans: [number, number, number][] = [[1.2, -0.9, 0xa0743a], [1.35, -0.8, 0x7a5a3a], [1.1, -0.78, 0x8a6a40], [1.28, -0.65, 0xb08a4a]];
   for (const [x, z, c] of cans) {
     cyl(0.055, 0.11, std({ color: c, metalness: 0.5, roughness: 0.55 }), x, 0.055, z, fort, 14);
     cyl(0.056, 0.05, std({ color: 0x7a2a22, roughness: 0.8 }), x, 0.06, z, fort, 14);
   }
-  for (const [x, z, r] of [[0.65, -0.55, 0.4], [0.8, -0.35, 1.0], [0.7, 0.55, 0.2]] as const) {
+  for (const [x, z, r] of [[1.6, -0.6, 0.4], [1.8, -0.4, 1.0], [1.5, 0.75, 0.2]] as const) {
     const blk = box(0.08, 0.08, 0.08, std({ color: 0xa8864e, roughness: 0.8 }), x, 0.04, z, fort, false);
     blk.rotation.y = r;
   }
   const ball = new Mesh(new SphereGeometry(0.06, 14, 10), std({ color: 0xa8905a, roughness: 1 }));
-  ball.position.set(-0.2, 0.08, -0.3);
+  ball.position.set(0.9, 0.08, -0.45);
   fort.add(ball);
   const keyRing = new Mesh(new TorusGeometry(0.03, 0.007, 6, 14), std({ color: 0x9a8a5a, metalness: 0.7, roughness: 0.4 }));
-  keyRing.position.set(0.7, 0.012, 0.3);
+  keyRing.position.set(1.6, 0.012, 0.45);
   keyRing.rotation.x = Math.PI / 2;
   fort.add(keyRing);
-  box(0.09, 0.008, 0.012, std({ color: 0x9a8a5a, metalness: 0.7, roughness: 0.4 }), 0.77, 0.012, 0.3, fort, false);
-  for (const [x, z] of [[0.9, 0.0], [0.95, 0.07], [0.85, 0.12]]) cyl(0.017, 0.004, std({ color: 0xb09a60, metalness: 0.8, roughness: 0.4 }), x, 0.004, z, fort, 12);
-  box(0.2, 0.04, 0.28, std({ color: 0x4a2a1a, roughness: 0.7 }), 0.05, 0.065, 0.45, fort, false).rotation.y = 0.3;
-  const pen = cyl(0.006, 0.12, std({ color: 0x15110e, roughness: 0.5 }), 0.05, 0.095, 0.45, fort, 6);
+  box(0.09, 0.008, 0.012, std({ color: 0x9a8a5a, metalness: 0.7, roughness: 0.4 }), 1.67, 0.012, 0.45, fort, false);
+  for (const [x, z] of [[1.95, 0.0], [2.0, 0.07], [1.9, 0.12]]) cyl(0.017, 0.004, std({ color: 0xb09a60, metalness: 0.8, roughness: 0.4 }), x, 0.004, z, fort, 12);
+  box(0.2, 0.04, 0.28, std({ color: 0x4a2a1a, roughness: 0.7 }), 1.05, 0.065, 0.75, fort, false).rotation.y = 0.3;
+  const pen = cyl(0.006, 0.12, std({ color: 0x15110e, roughness: 0.5 }), 1.05, 0.095, 0.75, fort, 6);
   pen.rotation.set(0, 0, Math.PI / 2);
-  // his name, cut into a plank with a penknife, leaning at the table leg
-  const plank = box(0.42, 0.16, 0.03, std({ color: 0x3a2c1e, roughness: 0.9 }), 0.75, 0.1, 0.9, fort);
-  plank.rotation.set(-0.35, Math.PI / 2, 0, 'YXZ');
-  const mar = label('MAR', 0.38, 0.13, '#3a2c1e', '#120c07', 'bold 150px serif', -0.04);
-  mar.position.set(0.0, 0.0, 0.017);
-  plank.add(mar);
-  // his radio: the old wooden set (no grey plate yet), on a low crate under the table where he listened
-  const crateWood = std({ map: T.darkWood, color: 0xa48c70, roughness: 0.75 });
-  box(0.4, 0.3, 0.5, crateWood, -0.4, 0.15, 0.4, fort);
+  // the old wooden radio stays out in the garage, on the workbench, not in his hideout
   const denRadio = new Group();
-  denRadio.position.set(-0.4, 0.31, 0.4);
-  denRadio.rotation.y = Math.PI / 2 - 0.15;
-  fort.add(denRadio);
+  denRadio.position.set(gx1 - 0.4, 0.93, gz0 + 1.25);
+  denRadio.rotation.y = -Math.PI / 2;
+  root.add(denRadio);
   box(0.36, 0.24, 0.2, std({ color: 0x4a3322, roughness: 0.5 }), 0, 0.12, 0, denRadio);
   box(0.26, 0.16, 0.01, std({ color: 0x0c0a08, roughness: 0.4 }), 0, 0.12, 0.105, denRadio, false);
   for (const kx of [-0.13, 0.13]) {
@@ -764,7 +775,9 @@ export function buildWorld(): World {
   garageMoon.position.set(g.x + 0.8, 2.4, gz0 + 0.12);
   garageMoon.target.position.set(denX, 0, denZ);
   garageMoon.castShadow = true;
-  garageMoon.shadow.mapSize.set(512, 512);
+  garageMoon.shadow.mapSize.set(2048, 2048);
+  garageMoon.shadow.bias = -0.0006;
+  garageMoon.shadow.normalBias = 0.02;
   root.add(garageMoon, garageMoon.target);
   // moonlit ground in front of the doors, so the crack between them glows and its legs can cross it
   const doorMoon = new SpotLight(0x9ab0d0, 24, 9, 0.6, 0.5, 1.2);

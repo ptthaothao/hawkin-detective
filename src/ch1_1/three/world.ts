@@ -1,4 +1,5 @@
 import {
+  TorusGeometry,
   BoxGeometry,
   Color,
   CylinderGeometry,
@@ -420,32 +421,39 @@ export function buildWorld(): World {
   r2.rotation.x = -0.35;
   box(g.w, 0.04, g.d, std({ map: T.dirt }), g.x, 0.0, g.z, root, false);
   box(g.w, 0.05, g.d, std({ color: 0x1a1612 }), g.x, g.h, g.z, root, false);
-  // a 1920 motor car, sheet half pulled off
-  const car = new Group();
-  car.position.set(g.x + 0.4, 0, g.z + 0.6);
-  root.add(car);
-  const paint = std({ color: 0x1a1a1c, roughness: 0.4, metalness: 0.3 });
-  box(2.4, 0.5, 1.2, paint, 0, 0.75, 0, car);
-  box(1.2, 0.7, 1.15, paint, -0.3, 1.35, 0, car);
-  box(0.6, 0.45, 1.1, std({ color: 0x2a2a2a, metalness: 0.5, roughness: 0.3 }), 1.0, 1.05, 0, car);
+  // 1920: a horse-drawn buggy under a half-pulled sheet, barrels and crates (nothing from 1986 on this side)
+  const buggy = new Group();
+  buggy.position.set(g.x + 0.4, 0, g.z + 0.6);
+  buggy.rotation.y = 0.12;
+  root.add(buggy);
+  box(1.7, 0.1, 1.0, darkWood, 0, 0.62, 0, buggy);
+  box(1.7, 0.5, 0.06, darkWood, 0, 0.9, -0.5, buggy);
+  box(1.7, 0.5, 0.06, darkWood, 0, 0.9, 0.5, buggy);
+  box(0.06, 1.1, 0.06, darkWood, -0.8, 1.2, -0.48, buggy);
+  box(0.06, 1.1, 0.06, darkWood, -0.8, 1.2, 0.48, buggy);
+  box(0.9, 0.05, 1.05, std({ color: 0x1e1a14, roughness: 1 }), -0.4, 1.75, 0, buggy);
+  const shaft = box(2.0, 0.05, 0.05, darkWood, 1.7, 0.7, -0.3, buggy);
+  shaft.rotation.z = -0.06;
+  box(2.0, 0.05, 0.05, darkWood, 1.7, 0.7, 0.3, buggy).rotation.z = -0.06;
   const sheet = std({ color: 0x8a8478, roughness: 1 });
-  const sh = box(1.8, 0.04, 1.4, sheet, -0.4, 1.72, 0, car);
-  sh.rotation.z = 0.05;
-  box(0.04, 0.9, 1.4, sheet, -1.3, 1.25, 0, car).rotation.z = -0.08;
-  const tyre = std({ color: 0x0e0e0e, roughness: 0.9 });
-  for (const [x, z] of [
-    [-0.85, -0.62],
-    [-0.85, 0.62],
-    [0.85, -0.62],
-    [0.85, 0.62],
-  ]) {
-    const w = cyl(0.36, 0.1, tyre, x, 0.36, z, car, 20);
-    w.rotation.x = Math.PI / 2;
-    for (let a = 0; a < 12; a++) {
-      const sp = box(0.012, 0.6, 0.012, std({ color: 0x5a4a32 }), x, 0.36, z + (z > 0 ? 0.06 : -0.06), car, false);
-      sp.rotation.z = (a / 12) * Math.PI;
+  box(1.0, 0.04, 1.1, sheet, 0.5, 1.16, 0, buggy).rotation.z = 0.05;
+  const wheelRim = std({ color: 0x2a221a, roughness: 0.9 });
+  for (const z of [-0.58, 0.58]) {
+    const w = new Mesh(new TorusGeometry(0.5, 0.04, 8, 28), wheelRim);
+    w.position.set(0, 0.5, z);
+    w.castShadow = true;
+    buggy.add(w);
+    for (let a = 0; a < 8; a++) {
+      const sp = box(0.03, 0.95, 0.03, darkWood, 0, 0.5, z, buggy, false);
+      sp.rotation.z = (a / 8) * Math.PI;
     }
   }
+  // barrels and crates along the back wall
+  const barrel = std({ color: 0x5a4630, roughness: 0.9 });
+  cyl(0.28, 0.7, barrel, gx0 + 0.6, 0.35, gz1 - 0.5, root, 14);
+  cyl(0.28, 0.7, barrel, gx0 + 1.2, 0.35, gz1 - 0.45, root, 14);
+  box(0.6, 0.5, 0.5, darkWood, gx0 + 0.5, 0.25, gz0 + 0.5, root);
+  box(0.5, 0.4, 0.5, darkWood, gx0 + 1.1, 0.2, gz0 + 0.5, root);
   // workbench, oil can, a lantern hook
   box(1.8, 0.06, 0.6, darkWood, gx1 - 0.4, 0.9, gz0 + 0.9, root).rotation.y = Math.PI / 2;
   box(0.06, 0.9, 0.06, darkWood, gx1 - 0.6, 0.45, gz0 + 0.2, root);

@@ -394,7 +394,7 @@ export class Stage12 {
     if (spot === 'tent') {
       const cx = w / 2;
       const cy = h * 0.56;
-      const rx = w * 0.3;
+      const rx = w < h ? w * 0.44 : w * 0.3;
       const ry = h * 0.36;
       this.peep.ellipse(cx, cy, rx, ry).cut();
       this.peepRim.ellipse(cx, cy, rx, ry).stroke({ width: Math.max(18, h * 0.04), color: 0x14110b, alpha: 0.85 });
@@ -402,7 +402,7 @@ export class Stage12 {
       this.peepRim.rect(cx - rx - 20, cy - ry, 26, ry * 1.6).fill({ color: 0x1c1913, alpha: 0.9 });
       this.peepRim.rect(cx + rx - 6, cy - ry * 0.9, 30, ry * 1.5).fill({ color: 0x1c1913, alpha: 0.9 });
     } else {
-      const ww = w * 0.34;
+      const ww = w < h ? w * 0.88 : w * 0.34;
       const hh = h * 0.3;
       const x = w / 2 - ww / 2;
       const y = h * 0.34;

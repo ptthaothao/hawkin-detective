@@ -131,7 +131,7 @@ export const AUTO_MS: Partial<Record<Beat, number>> = {
   title: 3_200,
   tumble: 3_400,
   yard: 14_000,
-  caught: 4_400,
+  caught: 7_000,
   sleep: 5_000,
   slam: 6_400,
   run: 6_000,

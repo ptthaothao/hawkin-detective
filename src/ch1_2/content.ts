@@ -51,7 +51,7 @@ export const TARGET_LABEL: Record<TargetId, string> = {
   wall: PROMPT.throwWall,
 };
 
-export const CAUGHT = ['Nó tìm thấy em.', 'Rồi nó đặt em xuống, nhẹ nhàng, như đặt một đứa trẻ vào giường.'];
+export const CAUGHT = ['Nó tìm thấy em.', 'Rồi nó đặt em xuống, nhẹ nhàng, như đặt một đứa trẻ vào giường.', 'Em bò về chỗ cũ, nín thở, và chờ nó đi tìm lại.'];
 export const CAUGHT_LOST = 'Một cây bút sáp rơi mất.';
 
 export const END = {

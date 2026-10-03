@@ -12,6 +12,8 @@ import '../styles/ch11.css';
 const AUTO_BEATS: Beat[] = ['back', 'answer', 'hide', 'mmm', 'found', 'faint', 'carried'];
 const LINE_MS = 2_300;
 
+/** Fixed target only: Chapter 1.2 lives on its own entry (?chapter=1.2) and opens with "Vài phút trước". */
+const NEXT_CHAPTER_URL = './?chapter=1.2';
 const JUMPS: readonly Beat[] = ['back', 'bark', 'answer', 'torch', 'look', 'shut', 'choose', 'hide', 'mmm', 'found', 'faint', 'carried', 'awake'];
 
 /** `?beat=hide&spot=bed` jumps straight to a beat, for testing and sharing a preview. Only known values are taken. */
@@ -325,6 +327,7 @@ function Play() {
         <div className="ch11-end">
           <h1>{END.title}</h1>
           <p>{END.teaser}</p>
+          <button onClick={() => window.location.assign(NEXT_CHAPTER_URL)}>{END.next}</button>
           <button onClick={() => useCh11.getState().start()}>{END.replay}</button>
         </div>
       )}

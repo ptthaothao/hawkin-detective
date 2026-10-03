@@ -479,10 +479,53 @@ export function buildWorld(): World {
   const fort = new Group();
   fort.position.set(denX, 0, denZ);
   root.add(fort);
-  const linen = std({ color: 0x8a8068, roughness: 1 });
   // a worn rug, a pillow, a crumpled blanket
   box(2.5, 0.03, 2.0, std({ color: 0x4a2a22, roughness: 1 }), 0.6, 0.03, 0, fort, false);
-  box(0.42, 0.1, 0.3, linen, -0.5, 0.095, -0.4, fort, false).rotation.y = 0.3;
+  const pillowTex = paint((x, cw, ch) => {
+    x.fillStyle = '#d9cfb4';
+    x.fillRect(0, 0, cw, ch);
+    for (let i = 0; i < 6000; i++) {
+      const v = 190 + Math.floor(Math.random() * 40);
+      x.fillStyle = `rgb(${v},${v - 6},${v - 24})`;
+      x.fillRect(Math.random() * cw, Math.random() * ch, 2, 1);
+    }
+    x.strokeStyle = '#7a5a3a';
+    x.lineWidth = 5;
+    x.strokeRect(34, 34, cw - 68, ch - 68);
+    x.strokeStyle = '#a8503a';
+    x.lineWidth = 3;
+    x.strokeRect(48, 48, cw - 96, ch - 96);
+    x.strokeStyle = 'rgba(120,100,70,0.35)';
+    x.lineWidth = 2;
+    for (let i = 0; i < 9; i++) {
+      x.beginPath();
+      x.moveTo(Math.random() * cw, Math.random() * ch);
+      x.quadraticCurveTo(Math.random() * cw, Math.random() * ch, Math.random() * cw, Math.random() * ch);
+      x.stroke();
+    }
+  }, 1, 1);
+  const pillowGeo = new BoxGeometry(0.46, 0.14, 0.32, 18, 6, 14);
+  {
+    const pa = pillowGeo.attributes.position;
+    for (let i = 0; i < pa.count; i++) {
+      const px = pa.getX(i) / 0.23;
+      const py = pa.getY(i) / 0.07;
+      const pz = pa.getZ(i) / 0.16;
+      const edge = Math.max(Math.abs(px), Math.abs(pz));
+      // puffy in the middle, pinched at the corners and edges like a stuffed cushion
+      const k = 1 - 0.55 * Math.pow(edge, 3);
+      pa.setY(i, py * 0.07 * (py > 0 ? k : 0.7 + 0.3 * k) + 0.008 * Math.sin(px * 5 + pz * 4));
+      pa.setX(i, px * 0.23 * (1 - 0.07 * pz * pz));
+      pa.setZ(i, pz * 0.16 * (1 - 0.07 * px * px));
+    }
+    pillowGeo.computeVertexNormals();
+  }
+  const denPillow = new Mesh(pillowGeo, std({ map: pillowTex, roughness: 1 }));
+  denPillow.position.set(-0.5, 0.115, -0.4);
+  denPillow.rotation.y = 0.3;
+  denPillow.castShadow = true;
+  denPillow.receiveShadow = true;
+  fort.add(denPillow);
   // the shelter: old blankets and sheets thrown over a hidden frame, so the cloth falls in heavy folds and
   // makes a low rounded tent with one dark way in at the front (+x). A dome with folds pushed into it.
   const wool = paint((x, cw, ch) => {
@@ -765,16 +808,11 @@ export function buildWorld(): World {
   fort.add(lamp);
   lathe([[0, 0], [0.06, 0], [0.065, 0.03], [0.045, 0.07], [0.05, 0.09], [0.03, 0.1], [0, 0.1]], toyBrass, 0, 0, 0, lamp);
   lathe([[0.03, 0.1], [0.045, 0.14], [0.05, 0.2], [0.04, 0.26], [0.034, 0.3]], new MeshStandardMaterial({ color: 0xfff0d0, transparent: true, opacity: 0.3, roughness: 0.1, side: DoubleSide }), 0, 0, 0, lamp);
-  const lampFlame = new Mesh(new SphereGeometry(0.022, 10, 10), new MeshBasicMaterial({ color: 0xffd27a }));
-  lampFlame.scale.set(0.8, 1.9, 0.8);
-  lampFlame.position.set(0, 0.17, 0);
-  lamp.add(lampFlame);
-  const lampLight = new PointLight(0xffa850, 2.4, 3.6, 2);
-  lampLight.position.set(0, 0.2, 0.05);
-  lamp.add(lampLight);
+  // the lamp is out: just a cold wick and glass
+  cyl(0.003, 0.02, std({ color: 0x1a120a, roughness: 1 }), 0, 0.115, 0, lamp, 6);
   // a tin car: pressed-steel body, windows, bumpers, rubber wheels with hubcaps
   const car = new Group();
-  car.position.set(-0.3, 0.052, -0.5);
+  car.position.set(1.0, 0.052, -0.4);
   car.rotation.y = 0.5;
   car.scale.setScalar(1.7);
   fort.add(car);
@@ -855,23 +893,6 @@ export function buildWorld(): World {
   yarn.position.set(-0.28, 0.065, 0.78);
   yarn.castShadow = true;
   fort.add(yarn);
-  // wooden alphabet blocks with letters
-  [['A', 0xb0302a, -0.7, 0.05, 0.42, 0], ['B', 0x2f5a8a, -0.78, 0.05, 0.32, 0.3], ['C', 0x3d7a3a, -0.73, 0.14, 0.37, 0.6]].forEach(([ch, col, bx, by, bz, ry]) => {
-    const tex = paint((x, cw, chh) => {
-      x.fillStyle = '#d8b46f';
-      x.fillRect(0, 0, cw, chh);
-      x.fillStyle = `#${(col as number).toString(16).padStart(6, '0')}`;
-      x.font = `bold ${Math.round(chh * 0.8)}px serif`;
-      x.textAlign = 'center';
-      x.textBaseline = 'middle';
-      x.fillText(ch as string, cw / 2, chh / 2 + 6);
-    }, 1, 1);
-    const b = new Mesh(new BoxGeometry(0.1, 0.1, 0.1), std({ map: tex, roughness: 0.7 }));
-    b.position.set(bx as number, by as number, bz as number);
-    b.rotation.y = ry as number;
-    b.castShadow = true;
-    fort.add(b);
-  });
   // a closed leather notebook with a pen, a key and a few coins
   const nb = box(0.22, 0.045, 0.3, std({ color: 0x4a2a1a, roughness: 0.55 }), -0.15, 0.065, 0.55, fort, false);
   nb.rotation.y = 0.5;
@@ -887,6 +908,58 @@ export function buildWorld(): World {
   box(0.11, 0.01, 0.014, brass, 1.22, 0.012, -0.15, fort, false);
   box(0.014, 0.01, 0.03, brass, 1.27, 0.012, -0.14, fort, false);
   for (const [x, z] of [[1.3, 0.1], [1.34, 0.16], [1.28, 0.18]]) cyl(0.02, 0.005, brass, x, 0.006, z, fort, 14);
+  // a few of his old shirts, thrown down and left in a heap: plaid flannel, striped, plain wool
+  const shirtTex = (kind: 'plaid' | 'stripe' | 'wool') =>
+    paint((x, cw, ch) => {
+      if (kind === 'plaid') {
+        x.fillStyle = '#7a2a22';
+        x.fillRect(0, 0, cw, ch);
+        x.fillStyle = 'rgba(20,16,12,0.55)';
+        for (let i = 0; i < cw; i += 64) { x.fillRect(i, 0, 22, ch); x.fillRect(0, i, cw, 22); }
+        x.fillStyle = 'rgba(220,190,120,0.35)';
+        for (let i = 40; i < cw; i += 128) { x.fillRect(i, 0, 5, ch); x.fillRect(0, i, cw, 5); }
+      } else if (kind === 'stripe') {
+        x.fillStyle = '#d6ccb0';
+        x.fillRect(0, 0, cw, ch);
+        x.fillStyle = '#3a5a86';
+        for (let i = 0; i < cw; i += 56) x.fillRect(i, 0, 22, ch);
+      } else {
+        x.fillStyle = '#566a52';
+        x.fillRect(0, 0, cw, ch);
+        x.fillStyle = 'rgba(30,40,28,0.35)';
+        for (let i = 0; i < ch; i += 14) x.fillRect(0, i, cw, 4);
+      }
+      for (let i = 0; i < 5000; i++) {
+        x.fillStyle = `rgba(${Math.random() > 0.5 ? 255 : 0},${Math.random() > 0.5 ? 255 : 0},${Math.random() > 0.5 ? 255 : 0},0.06)`;
+        x.fillRect(Math.random() * cw, Math.random() * ch, 2, 2);
+      }
+    }, 1, 1);
+  const shirt = (kind: 'plaid' | 'stripe' | 'wool', px: number, py: number, pz: number, ry: number, tilt: number) => {
+    const tex = shirtTex(kind);
+    tex.wrapS = tex.wrapT = RepeatWrapping;
+    tex.repeat.set(1.4, 1.4);
+    const sh = new Shape();
+    const pts: [number, number][] = [[-0.07, 0.17], [-0.17, 0.15], [-0.31, 0.03], [-0.27, -0.03], [-0.17, 0.04], [-0.155, -0.18], [0.155, -0.18], [0.17, 0.04], [0.27, -0.03], [0.31, 0.03], [0.17, 0.15], [0.07, 0.17], [0, 0.12]];
+    pts.forEach(([ax, ay], i) => (i ? sh.lineTo(ax, ay) : sh.moveTo(ax, ay)));
+    const geo = new ExtrudeGeometry(sh, { depth: 0.012, bevelEnabled: false });
+    const ga = geo.attributes.position;
+    for (let i = 0; i < ga.count; i++) {
+      const gx = ga.getX(i);
+      const gy = ga.getY(i);
+      ga.setZ(i, ga.getZ(i) + 0.014 * Math.sin(gx * 38 + gy * 21 + px * 9) + 0.01 * Math.sin(gx * 17 - gy * 29) + 0.02 * Math.max(0, Math.abs(gx) - 0.14));
+    }
+    geo.computeVertexNormals();
+    const m = new Mesh(geo, new MeshStandardMaterial({ map: tex, roughness: 1, side: DoubleSide }));
+    m.position.set(px, py, pz);
+    m.rotation.set(-Math.PI / 2 + tilt, 0, ry, 'YXZ');
+    m.castShadow = true;
+    m.receiveShadow = true;
+    fort.add(m);
+  };
+  shirt('plaid', -0.5, 0.17, -0.28, 0.5, 0.15);
+  shirt('stripe', -0.52, 0.06, 0.33, -0.4, 0.0);
+  shirt('wool', 0.1, 0.06, -0.35, 2.2, 0.0);
+  shirt('plaid', 0.9, 0.05, 0.62, 0.3, 0.0);
   // crayon stubs by the drawings on the rug
   for (const [cx, cz, cc, cr] of [[-0.4, 0.2, 0xb5342a, 0.4], [-0.35, 0.25, 0x2f4f8a, 1.2], [-0.45, 0.27, 0xd9a62a, 2.0]] as const) {
     cyl(0.008, 0.07, std({ color: cc, roughness: 0.7 }), cx, 0.012, cz, fort, 8).rotation.set(0, cr, Math.PI / 2);

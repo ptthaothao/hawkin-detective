@@ -1,0 +1,48 @@
+/* Chapter 1.2 reuses Chapter 1.1's frame (ch11.css); only what is new is here. */
+.ch12-title-card {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 44%;
+  margin: 0;
+  text-align: center;
+  font-family: 'Old Standard TT', serif;
+  font-style: italic;
+  font-size: clamp(30px, 5vw, 58px);
+  letter-spacing: 0.12em;
+  color: #cfc4a8;
+  animation: ch12-card both ease-in-out;
+}
+@keyframes ch12-card {
+  0% {
+    opacity: 0;
+  }
+  30%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.ch12-struggle {
+  bottom: 22%;
+}
+.ch12-pips {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 8px;
+}
+.ch12-pips i {
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(232, 223, 200, 0.6);
+  border-radius: 50%;
+}
+.ch12-pips i.on {
+  background: #e8dfc8;
+}
+.ch12-door.holding button {
+  background: rgba(40, 60, 90, 0.6);
+}

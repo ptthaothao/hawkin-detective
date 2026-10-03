@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="220 160 480 940" width="480" height="940">
+<!-- It, for Chapter 1.1: the black figure. Feet at y=1062; drawn 2.25 m tall in the game. -->
+<defs>
+    <radialGradient id="moon" cx="50%" cy="38%" r="60%">
+      <stop offset="0" stop-color="#3a4a63"/>
+      <stop offset="0.45" stop-color="#1a2232"/>
+      <stop offset="1" stop-color="#05070b"/>
+    </radialGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#121722"/>
+      <stop offset="1" stop-color="#030406"/>
+    </linearGradient>
+    <radialGradient id="eye" cx="45%" cy="42%" r="60%">
+      <stop offset="0" stop-color="#fbf8ea"/>
+      <stop offset="0.6" stop-color="#e2dcc4"/>
+      <stop offset="0.9" stop-color="#a99f80"/>
+      <stop offset="1" stop-color="#5b4a3a"/>
+    </radialGradient>
+    <radialGradient id="vig" cx="50%" cy="45%" r="75%">
+      <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.9"/>
+    </radialGradient>
+    <!-- inky, smoky edges -->
+    <filter id="ink" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="smoke" x="-50%" y="-50%" width="200%" height="200%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.06" numOctaves="4" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="60" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="6"/>
+    </filter>
+    <filter id="hair" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="10" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <clipPath id="lidL"><path d="M300 254 C340 250 410 256 456 280 V400 H300 Z"/></clipPath>
+    <clipPath id="lidR"><path d="M458 280 C490 262 520 254 560 252 V400 H458 Z"/></clipPath>
+    <radialGradient id="blank" cx="50%" cy="50%" r="55%">
+      <stop offset="0" stop-color="#b9b8ad"/>
+      <stop offset="0.6" stop-color="#97968c"/>
+      <stop offset="0.9" stop-color="#5f5e57"/>
+      <stop offset="1" stop-color="#2a2a27"/>
+    </radialGradient>
+    <filter id="bloom" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur stdDeviation="10" result="a"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="28" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="a"/></feMerge>
+    </filter>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11"/>
+      <feColorMatrix values="0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0.09 0"/>
+    </filter>
+  </defs>
+  <!-- it -->
+  <g fill="#030304" stroke="#030304" stroke-linecap="round" stroke-linejoin="round">
+    <!-- dark pooling round its feet -->
+    <g filter="url(#smoke)" opacity="0.9"><ellipse cx="455" cy="1058" rx="190" ry="34"/></g>
+    <g filter="url(#ink)">
+      <!-- legs: thin, knees like knots, bent wrong, up on its toes -->
+      <path d="M418 690 C410 760 392 820 388 880" stroke-width="30" fill="none"/>
+      <path d="M388 880 C392 950 386 1010 376 1060" stroke-width="18" fill="none"/>
+      <circle cx="388" cy="880" r="19"/>
+      <path d="M490 690 C502 760 520 820 526 880" stroke-width="30" fill="none"/>
+      <path d="M526 880 C520 950 528 1010 540 1058" stroke-width="18" fill="none"/>
+      <circle cx="526" cy="880" r="19"/>
+      <path d="M376 1060 l-34 8 M376 1060 l-24 16 M376 1060 l-8 18 M540 1058 l34 9 M540 1058 l24 16 M540 1058 l8 18" stroke-width="6"/>
+      <!-- the trunk: shoulders hunched up round its head, ribs, a waist you could close a hand round -->
+      <path d="M318 430 C330 395 380 372 452 372 C524 372 576 392 590 428 C596 470 560 510 540 560 C522 600 500 620 488 650 C484 670 498 690 500 705 L410 705 C412 690 424 670 420 650 C408 620 386 600 368 560 C348 512 310 472 318 430 Z"/>
+      <!-- arms: hanging past its knees -->
+      <path d="M336 432 C318 520 310 590 306 660" stroke-width="30" fill="none"/>
+      <circle cx="306" cy="664" r="16"/>
+      <path d="M306 664 C300 760 292 850 288 930" stroke-width="18" fill="none"/>
+      <path d="M572 432 C592 520 602 590 608 660" stroke-width="30" fill="none"/>
+      <circle cx="608" cy="664" r="16"/>
+      <path d="M608 664 C616 760 624 850 630 928" stroke-width="18" fill="none"/>
+      <!-- fingers: too many joints, too long -->
+      <g stroke-width="6" fill="none">
+        <path d="M288 930 C280 980 270 1010 262 1046 M288 930 C292 985 288 1020 286 1058 M288 930 C302 980 306 1010 310 1046 M288 930 C270 965 256 985 246 1018 M288 930 C308 960 320 980 328 1010"/>
+        <path d="M630 928 C638 978 648 1012 658 1046 M630 928 C628 982 632 1022 636 1058 M630 928 C616 978 610 1010 606 1042 M630 928 C650 960 662 982 674 1014 M630 928 C612 958 598 978 592 1004"/>
+      </g>
+    </g>
+    <!-- the head, sunk low between the shoulders and cocked over -->
+    <g transform="rotate(-16 452 300)">
+      <g filter="url(#ink)"><ellipse cx="452" cy="290" rx="84" ry="108"/></g>
+      <!-- hair: long, lank, wet, hanging in strings -->
+      <g stroke-width="5" fill="none" filter="url(#hair)">
+        <path d="M378 250 C360 330 352 400 344 480 M386 220 C366 300 362 380 358 460 M398 196 C380 280 376 360 374 430 M412 186 C398 260 396 330 394 390 M498 186 C512 260 516 330 518 400 M512 196 C532 280 540 360 548 450 M524 220 C546 300 556 380 566 470 M530 250 C552 330 566 410 584 480 M370 280 C352 360 348 440 334 520 M536 280 C556 360 570 440 592 512"/>
+      </g>
+    </g>
+  </g>
+
+</svg>

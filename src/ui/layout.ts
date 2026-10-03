@@ -24,7 +24,7 @@ export const NORMAL_HOTSPOTS: HotspotDef[] = [
   { id: 'radio', rect: { x: 62, y: 42, w: 12, h: 11 } },
   { id: 'flyer', rect: { x: 55.5, y: 49, w: 6, h: 4 } },
   { id: 'watch', rect: { x: 75.5, y: 50, w: 4, h: 3 } },
-  { id: 'mic', rect: { x: 57, y: 38, w: 3.5, h: 10 } },
+  { id: 'mic', rect: { x: 62.6, y: 50.2, w: 3.6, h: 2.6 } },
   // After the radio so it wins where the two overlap: the stub lies on the front edge of the desk.
   { id: 'crayon', rect: { x: 68.2, y: 51.3, w: 2.6, h: 1.9 }, visible: (s) => !s.crayonTaken },
 ];

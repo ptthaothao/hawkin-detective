@@ -1,0 +1,356 @@
+/* Chapter 1.1: the Pixi canvas fills the window; this layer sits on the same 16:9 frame. */
+.ch11 {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  color: #e8dfc8;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ch11-stage {
+  position: absolute;
+  inset: 0;
+}
+.ch11-stage canvas {
+  display: block;
+}
+
+.ch11-frame,
+.ch11-title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  transform: translate(-50%, -50%);
+}
+
+.ch11-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.9) 70%);
+  text-align: center;
+}
+.ch11-kicker {
+  font-family: 'VT323', monospace;
+  letter-spacing: 0.5em;
+  color: #c9a46a;
+  margin: 0;
+}
+.ch11-title h1 {
+  font-family: 'Old Standard TT', serif;
+  font-size: clamp(32px, 6vw, 64px);
+  margin: 0;
+}
+.ch11-sub {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  margin: 0 0 18px;
+}
+.ch11-title small {
+  font-family: 'IBM Plex Mono', monospace;
+  opacity: 0.55;
+  font-size: 12px;
+}
+
+.ch11 button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.ch11-title button,
+.ch11-say,
+.ch11-choices button,
+.ch11-end button,
+.ch11-breath button {
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.08em;
+  background: rgba(12, 10, 8, 0.72);
+  border: 1px solid rgba(232, 223, 200, 0.45);
+  padding: 10px 20px;
+  border-radius: 2px;
+}
+.ch11 button:hover {
+  border-color: #e8c27a;
+}
+
+.ch11-text {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 9%;
+  text-align: center;
+  pointer-events: none;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: clamp(15px, 2.1vw, 24px);
+  text-shadow: 0 1px 8px #000, 0 0 2px #000;
+}
+.ch11-lines p {
+  margin: 0.25em 0;
+  animation: ch11-in 0.9s ease both;
+}
+@keyframes ch11-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.ch11-mmm {
+  font-family: 'Old Standard TT', serif;
+  font-style: normal;
+  font-size: clamp(28px, 5vw, 56px);
+  letter-spacing: 0.3em;
+  color: #b9a888;
+  animation: ch11-choke 3.4s ease-in-out both;
+}
+@keyframes ch11-choke {
+  0% {
+    opacity: 0;
+    letter-spacing: 0.05em;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  45% {
+    opacity: 0.3;
+  }
+  55% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    letter-spacing: 0.6em;
+  }
+}
+
+.ch11-say {
+  position: absolute;
+  left: 50%;
+  bottom: 33%;
+  transform: translateX(-50%);
+  font-size: clamp(16px, 2.2vw, 22px);
+  animation: ch11-in 0.8s ease both;
+}
+
+.ch11-choices {
+  position: absolute;
+  left: 50%;
+  bottom: 24%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@keyframes ch11-ping {
+  from {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.ch11-breath {
+  position: absolute;
+  right: 4%;
+  bottom: 6%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  opacity: 0.55;
+  transition: opacity 0.4s;
+}
+.ch11-breath.urgent {
+  opacity: 1;
+}
+.ch11-breath.urgent button {
+  border-color: #e8a070;
+  animation: ch11-pulse 0.9s ease-in-out infinite;
+}
+.ch11-breath.holding button {
+  background: rgba(120, 40, 20, 0.6);
+  animation: none;
+}
+@keyframes ch11-pulse {
+  50% {
+    box-shadow: 0 0 18px rgba(232, 160, 112, 0.6);
+  }
+}
+.ch11-lungs {
+  width: 160px;
+  height: 4px;
+  background: rgba(232, 223, 200, 0.15);
+}
+.ch11-lungs i {
+  display: block;
+  height: 100%;
+  background: #e8dfc8;
+}
+.ch11-breath small {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.ch11-end {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.82);
+  animation: ch11-in 2s ease both;
+}
+.ch11-end h1 {
+  font-family: 'Old Standard TT', serif;
+  letter-spacing: 0.2em;
+  font-size: clamp(26px, 4vw, 44px);
+  margin: 0 0 8px;
+}
+.ch11-end p {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  margin: 0 0 22px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ch11 *,
+  .ch11 *::after {
+    animation-duration: 0.01s !important;
+  }
+}
+
+/* 3D stage overlay: eyelids and labels on the things he can use. */
+.ch11-3d-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ch11-lid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  background: #000;
+}
+.ch11-lid.top {
+  top: 0;
+}
+.ch11-lid.bottom {
+  bottom: 0;
+}
+/* Panorama click areas: invisible over the thing itself, the name shows on hover or when hinted. */
+.ch11-pano-overlay {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ch11-hot {
+  position: absolute;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.ch11-hot span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: #e8dfc8;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 5px 10px;
+  border: 1px solid rgba(232, 223, 200, 0.4);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.ch11-hot:hover span,
+.ch11-hot:focus-visible span,
+.ch11-hot.hint span {
+  opacity: 1;
+}
+.ch11-hot:hover {
+  outline: 1px dashed rgba(232, 200, 140, 0.35);
+  outline-offset: -6px;
+}
+.ch11-hot.hint::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  margin: 22px 0 0 -17px;
+  border: 1px solid rgba(232, 200, 140, 0.8);
+  border-radius: 50%;
+  animation: ch11-ping 1.8s ease-out infinite;
+}
+/* A hinted thing is off screen: an arrow on that side says which way to look. */
+.ch11-turn {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  font-family: 'Crimson Pro', serif;
+  font-size: 64px;
+  color: rgba(232, 200, 140, 0.85);
+  text-shadow: 0 0 12px #000;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.ch11-turn.left {
+  left: 18px;
+}
+.ch11-turn.right {
+  right: 18px;
+}
+.ch11-turn.on {
+  opacity: 1;
+  animation: ch11-nudge 1.2s ease-in-out infinite;
+}
+@keyframes ch11-nudge {
+  50% {
+    opacity: 0.4;
+  }
+}
+.ch11-objective {
+  pointer-events: none;
+}
+/* the room is darker than Chapter 0's: keep the resting note readable */
+.ch11-objective:not(.fresh) {
+  opacity: 0.75;
+}
+.ch11-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.75) 100%);
+}
+/* The text layer sits over the 3D stage: only its buttons take the pointer. */
+.ch11-frame {
+  pointer-events: none;
+}
+.ch11-frame button,
+.ch11-end,
+.ch11-breath {
+  pointer-events: auto;
+}

@@ -83,7 +83,7 @@ Game không tìm cách hù dọa bằng jumpscare. Khoảnh khắc đáng sợ n
 | # | Vật thể | Phía này (hiện tại) | Phía bên kia (quá khứ, hai lớp) | Vai trò |
 |---|---|---|---|---|
 | 1 | **Công tắc đèn** | Đèn sáng | Cùng vị trí là một **giá nến gắn tường**, ngọn nến đang cháy. Ánh nến không soi được gì (luật 4), chỉ có vùng sáng của đèn pin | Cơ chế flip. Mỗi lần tắt đèn, tường bên kia có thêm 1 vạch bút sáp (mục I). Muốn về phía này thì thổi tắt nến (cùng chỗ, cùng cử chỉ với công tắc). Khi sang lần sau, nến lại đang cháy. |
-| 2 | **Bàn radio** | Radio **vỏ gỗ cổ khoảng 1920** (mặt đen viền đồng, hai núm cũ), bố nhặt từ gara về sửa lại và bắt thêm một tấm kim loại xám có đồng hồ tín hiệu và 3 bánh xe số `_._ _ MHz`, đang để ở **2.58**, **đang bật** khi người chơi bước vào (đèn LED sáng, loa rè khẽ). Lần đầu nghe sẽ phát tiếng vọng của đêm 3 (mục R). Micro cầm tay móc gọn trên giá. Có chồng tờ tìm người. Có đồng hồ đeo tay của Theo kèm giấy nhắn của mẹ. Có vài tờ giấy Theo vẽ chơi và một mẩu bút sáp mòn. **Đáy radio có chữ MAR khắc mờ** (chỉ đọc được khi chà bút sáp lên, tùy chọn). | Bàn gỗ nâu cổ. Radio và micro của Theo nằm trên đó như một lớp **sáng màu, hiện đại** chồng lên đồ cũ, không đọc được số. **Không dây leo.** **Vết cào dày đặc quanh radio.** Một **đèn dầu cổ** ngay cạnh **vẫn nguyên vẹn**. **Micro rơi dưới sàn, nút bấm nói bị quấn băng keo, dây kéo căng về phía bức tường cạnh giường.** Trong góc có một **máy quay đĩa ống sáp có loa kèn**, im lặng (chỉ là bối cảnh ở Chapter 0). | P1, slot A, slot D |
+| 2 | **Bàn radio** | Radio **vỏ gỗ cổ khoảng 1920** (mặt đen viền đồng, hai núm cũ), bố nhặt từ gara về sửa lại và bắt thêm một tấm kim loại xám có đồng hồ tín hiệu và 3 bánh xe số `_._ _ MHz`, đang để ở **2.58**, **đang bật** khi người chơi bước vào (đèn LED sáng, loa rè khẽ). Lần đầu nghe sẽ phát tiếng vọng của đêm 3 (mục R). Micro cầm tay nằm lăn lóc trên bàn. Có chồng tờ tìm người. Có đồng hồ đeo tay của Theo kèm giấy nhắn của mẹ. Có vài tờ giấy Theo vẽ chơi và một mẩu bút sáp mòn. **Đáy radio có chữ MAR khắc mờ** (chỉ đọc được khi chà bút sáp lên, tùy chọn). | Bàn gỗ nâu cổ. Radio và micro của Theo nằm trên đó như một lớp **sáng màu, hiện đại** chồng lên đồ cũ, không đọc được số. **Không dây leo.** **Vết cào dày đặc quanh radio.** Một **đèn dầu cổ** ngay cạnh **vẫn nguyên vẹn**. **Micro rơi dưới sàn, quyển vở vẽ của Theo đè lên, gáy vở cấn chặt nút bấm nói, dây kéo căng về phía bức tường cạnh giường.** Trong góc có một **máy quay đĩa ống sáp có loa kèn**, im lặng (chỉ là bối cảnh ở Chapter 0). | P1, slot A, slot D |
 | 3 | **Đồng hồ treo tường** | Chạy bình thường, 11:47 PM, có tiếng tích tắc | **Đồng hồ quả lắc, đứng yên. Con lắc dừng lệch một bên. Kim ngắn gãy, nằm dưới đáy mặt kính. Kim dài dừng qua số 3 hai vạch nhỏ.** | P1 (số phút) |
 | 4 | **Thảm / sàn** | Tấm thảm; bên dưới có một tấm ván lỏng giấu nhật ký | Tấm thảm dệt cũ, sờn. **Tấm ván đã bị cạy lên**, hốc bên dưới trống, chỉ rộng bằng một cuốn sổ | Dẫn hướng tới nhật ký, bác bỏ đáp án "hốc sàn". (Hốc nối hai phía nhưng **không được dùng** trong Chapter 0.) |
 | 5 | **Bức tường cạnh giường** | Poster, không có gì lạ | Giấy dán tường ố nâu. **Vạch bút sáp màu sáng. Lần đầu thấy 4 vạch, sau đó +1 mỗi lần người chơi tắt đèn.** | Slot C, cho thấy Theo còn sống |
@@ -93,6 +93,7 @@ Game không tìm cách hù dọa bằng jumpscare. Khoảnh khắc đáng sợ n
 - **Hai lớp thấy được ở phía bên kia:** đồ cổ nâu (giá nến, đồng hồ quả lắc, giấy dán tường, đèn dầu, máy quay đĩa) và đồ sáng màu của Theo (micro, bút sáp, đèn pin). **Radio thuộc cả hai lớp:** vỏ gỗ 1920 là của nhà bà, tấm kim loại xám và micro là đồ bố gắn thêm. Người chơi không được giải thích; nhìn là hiểu "hai thời gian chồng lên nhau".
 - **Mục nát chỉ ở rìa:** góc xa của phòng, mép trần và khe cửa mục dần vào sương. Bàn radio, giường, tường cạnh giường và cửa **không** mục (đồ liên quan tới đứa con của bà).
 - Intro có dòng *"Mẹ đã ngủ ở tầng dưới, sau ba đêm thức trắng."* Đây là lý do giọng mẹ trên radio là điều không thể. Trong truyện, mẹ **chỉ nhớ mang máng** 3:17 có ý nghĩa gì đó (không nói ra ở Chapter 0).
+- Đêm Theo mất tích, mẹ đi làm **ca đêm**, chị đi **dã ngoại** với lớp, nên Theo ở nhà một mình. Tối đó Theo vẽ cả buổi rồi quăng **quyển vở vẽ** lên bàn, đè lên micro; gáy vở cấn chặt nút nói nên micro cứ phát mà Theo không biết. Lúc 3:17 em hỏi "mom?" khi nghe chó sủa, và tiếng đó lọt vào radio (cảnh này kể ở Chapter 1.1).
 
 ---
 
@@ -107,13 +108,13 @@ Clue card chỉ ghi lại **những gì thấy được**. Những chữ **in đ
 | **C3** Nhật ký tín hiệu | Phía này, dưới ván sàn | Xem nội dung đầy đủ bên dưới. |
 | **C4** Đồng hồ bên kia | Phía bên kia | "Đồng hồ quả lắc đứng yên. Con lắc dừng lệch một bên. Kim ngắn gãy, nằm dưới đáy mặt kính. Kim dài dừng qua số 3 hai vạch nhỏ." |
 | **C5** Bức tường có vạch | Phía bên kia | "**Bức tường có vạch bút sáp.** Lần 1: 4 vạch." Card tự ghi thêm sau mỗi lần sang, ví dụ "Lần 2: 5 vạch". Card không ghi lý do số vạch tăng. |
-| **C6** Bàn radio bên kia | Phía bên kia | "Vết cào sâu bao quanh **radio**. **Đèn dầu** ngay bên cạnh không có vết nào. **Micro** cầm tay rơi dưới sàn, dây kéo căng về phía bức tường cạnh giường. Nút bấm nói bị quấn băng keo cho kẹt xuống." Sau khi bắt được liên lạc, card ghi thêm: "Có thêm vết cào mới quanh radio." |
+| **C6** Bàn radio bên kia | Phía bên kia | "Vết cào sâu bao quanh **radio**. **Đèn dầu** ngay bên cạnh không có vết nào. **Micro** cầm tay rơi dưới sàn, dây kéo căng về phía bức tường cạnh giường. Quyển vở vẽ của Theo đè lên micro, gáy vở cấn chặt nút bấm nói." Sau khi bắt được liên lạc, card ghi thêm: "Có thêm vết cào mới quanh radio." |
 
 **Nội dung C3 — Nhật ký tín hiệu** (mỗi đêm một trang):
 
 > *Đêm 1 — 01:52. Radio kêu rè rè. Rồi có ba tiếng cộc cộc cộc. Chắc em nghe nhầm.*
 > *Đêm 2 — 02:34. Có ai thở trong radio. Em vặn to lên nghe cho rõ. Tiếng thở to hơn, nghe như ở ngay sau **cửa phòng** em. Em trùm chăn kín đầu.*
-> *Đêm 3 — 02:58. Nó gọi tên em. Bằng giọng của mẹ. Mà mẹ ngủ rồi mà. Lúc nó tới, đồng hồ đeo tay em tắt ngấm. Sáng ra mới chạy lại.*
+> *Đêm 3 — 02:58. Nó gọi tên em. Bằng giọng của mẹ. Mà mẹ đi làm ca đêm rồi mà. Lúc nó tới, đồng hồ đeo tay em tắt ngấm. Sáng ra mới chạy lại.*
 > *Radio của bố có cái **micro**. Em chưa dám bấm nút.*
 > *Em để một mẩu **bút sáp** trong cái **hốc dưới sàn**. Sáng ra mất tiêu.*
 >
@@ -208,8 +209,8 @@ Lời của Theo trong lần liên lạc đầu không được chứa các ch�
 Bằng chứng cần có:
 1. C3: "Radio của bố có cái micro. Em chưa dám bấm nút."
 2. C3: "Lần này em không chỉ ngồi nghe nữa."
-3. C6 (khoảnh khắc bị giữ nguyên ở phía bên kia): micro rơi, nút bấm nói bị
-   quấn băng keo, dây kéo căng về phía bức tường.
+3. C6 (khoảnh khắc bị giữ nguyên ở phía bên kia): micro rơi, quyển vở vẽ đè
+   lên, gáy vở cấn chặt nút bấm nói, dây kéo căng về phía bức tường.
 4. Trải nghiệm của chính người chơi: đã tắt đèn và nghe radio nhiều lần mà không bị kéo đi.
 
 Đáp án đúng: nói vào micro
@@ -399,7 +400,7 @@ Người chơi học dần các luật này và không có tutorial nào nói ra
 |---|---|---|---|
 | **Đồng hồ** | Đồng hồ treo tường chạy. Đồng hồ đeo tay `03:▯▯`. | Kim dài qua số 3 hai vạch | "Giờ ở bên này, phút ở bên kia." |
 | **Sàn nhà** | Tấm thảm, trông bình thường | Ván sàn bị cạy | "Khoan, chỗ này bên kia có gì đó, bên này chắc cũng vậy." |
-| **Micro** | Móc gọn trên giá | Rơi dưới sàn, nút bấm bị kẹt, dây kéo về phía tường | "Đêm đó Theo đã bấm nút nói." |
+| **Micro** | Nằm lăn lóc trên bàn | Rơi dưới sàn, nút bấm bị kẹt, dây kéo về phía tường | "Đêm đó micro vẫn đang phát." |
 | **Bức tường** (nhân quả ngược chiều) | Bạn tắt đèn | Thêm một vạch | "Có ai đó ở đó, **ngay lúc này**, và họ đang đếm mình." |
 | **Bàn radio** (nhân quả ngược chiều) | Bạn dò 3.17 | Xuất hiện vết cào mới | "Mình vừa gọi nó tới." |
 
@@ -435,7 +436,7 @@ BEAT 1 — PHÍA NÀY
   Đồng hồ đeo tay  → C2 (03:▯▯)
   Radio            → nghe: rè, im lặng, rồi giọng đàn bà gọi "Theo…" (tiếng vọng ở 2.58).
                      Xoay đi chỗ khác: chỉ còn rè.
-  Micro            → móc gọn trên giá. "Bạn không dám bấm."
+  Micro            → nằm lăn lóc trên bàn. "Bạn không dám bấm."
   Đồng hồ treo tường → "11:47. Vẫn chạy."   (để lát sau có cái so sánh)
   Poster, thảm     → thảm lật được bất cứ lúc nào, không bị chặn
 
@@ -517,7 +518,7 @@ Ký hiệu: 🟢 người chơi chắc chắn tự suy ra được · 🟡 có n
 | 26 | — | "'Mỗi lần bên chị tối đi… em đếm'… mấy vạch đó đang đếm MÌNH? 4 = 3 lần chớp + 1 lần mình tắt?" | Tắt, bật, tắt | 5 → 7 vạch | 🟢 |
 | 27 | Bàn phía bên kia: vết cào mới, một cái bóng đứng cạnh | "Mình vừa bật radio… và nó tới." | Soi | C6 ghi thêm | 🟢 |
 | 28 | Bật đèn về: bàn thật vẫn nguyên, chỉ có tiếng bước chân vọng từ đâu đó | "Nó ở bên kia… nhưng nó nghe được." | — | — | 🟢 |
-| 29 | Slot A | "Tắt đèn? Mình tắt mấy lần rồi có sao đâu. 'Chưa dám bấm nút'… 'không chỉ ngồi nghe'… nút bị quấn băng keo… Em đã nói vào micro." | Điền: nói vào micro | — | 🟢 |
+| 29 | Slot A | "Tắt đèn? Mình tắt mấy lần rồi có sao đâu. 'Chưa dám bấm nút'… 'không chỉ ngồi nghe'… quyển vở cấn chặt nút nói… Em đã nói vào micro." | Điền: nói vào micro | — | 🟢 |
 | 30 | Slot C | "Chỗ em đếm là bức tường." | Điền | — | 🟢 |
 | 31 | Slot D | "Theo nói 'tắt—'… tắt đèn? Nhưng đèn dầu nguyên vẹn, đèn pin mình soi mãi không sao… radio bị cào, và cào thêm ngay sau khi mình bật." | Điền: tiếng radio | — | 🟡 |
 | 32 | — | — | Nộp | Màn hình tối lại. Radio tự rè lên ở 3.17. | 🟢 |

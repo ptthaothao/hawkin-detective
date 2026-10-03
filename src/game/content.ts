@@ -243,7 +243,7 @@ export const CLUES: Record<ClueId, ClueDef> = {
   C6: {
     title: 'Bàn radio bên kia',
     world: 'other',
-    text: 'Vết cào sâu bao quanh radio. Đèn dầu ngay bên cạnh không có vết nào. Micro cầm tay rơi dưới sàn, dây kéo căng về phía bức tường cạnh giường. Nút bấm nói bị quấn băng keo cho kẹt xuống.',
+    text: 'Vết cào sâu bao quanh radio. Đèn dầu ngay bên cạnh không có vết nào. Micro cầm tay rơi dưới sàn, dây kéo căng về phía bức tường cạnh giường. Quyển vở vẽ của Theo đè lên micro, gáy vở cấn chặt nút bấm nói.',
   },
 };
 
@@ -253,14 +253,14 @@ export const C6_UPDATE = 'Có thêm vết cào mới quanh radio.';
 export const DIARY_PAGES = [
   'Đêm 1 — 01:52. Radio kêu rè rè. Rồi có ba tiếng cộc cộc cộc. Chắc em nghe nhầm.',
   'Đêm 2 — 02:34. Có ai thở trong radio. Em vặn to lên nghe cho rõ. Tiếng thở to hơn, nghe như ở ngay sau cửa phòng em. Em trùm chăn kín đầu.',
-  'Đêm 3 — 02:58. Nó gọi tên em. Bằng giọng của mẹ. Mà mẹ ngủ rồi mà. Lúc nó tới, đồng hồ đeo tay em tắt ngấm. Sáng ra mới chạy lại.',
+  'Đêm 3 — 02:58. Nó gọi tên em. Bằng giọng của mẹ. Mà mẹ đi làm ca đêm rồi mà. Lúc nó tới, đồng hồ đeo tay em tắt ngấm. Sáng ra mới chạy lại.',
   'Radio của bố có cái micro. Em chưa dám bấm nút.\n\nEm để một mẩu bút sáp trong cái hốc dưới sàn. Sáng ra mất tiêu.',
   // The last night's time is left blank: that blank is the question the player has to fill in.
   'Hôm nay em ở nhà Danny tới tối. Tụi em vẽ cả buổi. Về nhà em leo lên giường nghịch radio của bố.\n\nĐêm 4 — __:__. Đêm nay nó tới muộn hơn. Nó tới lúc nào em ghi vào đây.\n\nLần này em không chỉ ngồi nghe nữa.',
 ];
 
 export const HOTSPOT_TEXT = {
-  mic: 'Micro cầm tay móc gọn trên giá. Bạn không dám bấm.',
+  mic: 'Micro cầm tay nằm lăn lóc trên bàn. Bạn không dám bấm.',
   wallClock: '11:47. Vẫn chạy.',
   wallClockStopped: 'Đồng hồ đứng yên.',
   poster: 'Phim Theo thích nhất. Em xem bốn lần, rồi nói sau này sẽ làm phi hành gia.',

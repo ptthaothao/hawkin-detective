@@ -47,7 +47,7 @@ const HIDE_POSE: Record<HideSpot, Pose> = {
   bed: { pos: v(-1.6, 0.14, -2.45), yaw: -Math.PI / 2 - 0.3, pitch: 0.06, range: [0.45, 0.12] },
 };
 /** On the floor in the back corner, facing the closed doors and the crack of moonlight between them. */
-const AWAKE_POSE: Pose = { pos: v(GARAGE.x + 1.5, 0.32, GARAGE.z - 2.1), yaw: 2.06, pitch: 0.1, range: [1.2, 0.4] };
+const AWAKE_POSE: Pose = { pos: v(GARAGE.x + 1.5, 0.32, GARAGE.z - 2.1), yaw: 1.7, pitch: 0.1, range: [1.2, 0.4] };
 /** Its route outside the garage doors: cemetery to garage, passing the crack. */
 const PASS_X = GARAGE.x - GARAGE.w / 2 - 0.9;
 const PASS_FROM = GARAGE.z + 4;

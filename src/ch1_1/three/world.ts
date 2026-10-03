@@ -1,6 +1,6 @@
 import {
-  TorusGeometry,
   BoxGeometry,
+  CanvasTexture,
   Color,
   CylinderGeometry,
   DirectionalLight,
@@ -14,6 +14,8 @@ import {
   PointLight,
   SphereGeometry,
   SpotLight,
+  SRGBColorSpace,
+  TorusGeometry,
   type Material,
   type Texture,
 } from 'three';
@@ -452,8 +454,88 @@ export function buildWorld(): World {
   const barrel = std({ color: 0x5a4630, roughness: 0.9 });
   cyl(0.28, 0.7, barrel, gx0 + 0.6, 0.35, gz1 - 0.5, root, 14);
   cyl(0.28, 0.7, barrel, gx0 + 1.2, 0.35, gz1 - 0.45, root, 14);
-  box(0.6, 0.5, 0.5, darkWood, gx0 + 0.5, 0.25, gz0 + 0.5, root);
-  box(0.5, 0.4, 0.5, darkWood, gx0 + 1.1, 0.2, gz0 + 0.5, root);
+  // ---- Martin's den (his secret base, ~1920): the one clean, cared-for corner of a rotting garage ----
+  const denX = g.x - 0.7;
+  const denZ = gz0 + 0.75;
+  const wool = std({ color: 0x6a2f26, roughness: 1 });
+  const linen = std({ color: 0xb8ad94, roughness: 1 });
+  const label = (text: string, w: number, h: number, bg: string, fg: string, font: string, rot: number) => {
+    const c = document.createElement('canvas');
+    c.width = 512;
+    c.height = Math.round((512 * h) / w);
+    const x = c.getContext('2d')!;
+    x.fillStyle = bg;
+    x.fillRect(0, 0, c.width, c.height);
+    x.fillStyle = fg;
+    x.font = font;
+    x.textAlign = 'center';
+    x.textBaseline = 'middle';
+    x.translate(c.width / 2, c.height / 2);
+    x.rotate(rot);
+    x.fillText(text, 0, 0);
+    const tex = new CanvasTexture(c);
+    tex.colorSpace = SRGBColorSpace;
+    return new Mesh(new PlaneGeometry(w, h), new MeshStandardMaterial({ map: tex, roughness: 1 }));
+  };
+  // a rug and pillows on the floor
+  box(1.7, 0.03, 1.2, wool, denX, 0.03, denZ + 0.15, root, false);
+  box(0.5, 0.12, 0.34, linen, denX - 0.4, 0.1, denZ + 0.2, root, false).rotation.y = 0.3;
+  box(0.46, 0.1, 0.32, linen, denX + 0.2, 0.09, denZ + 0.5, root, false).rotation.y = -0.2;
+  // the fort: crates with a good wool blanket and the buggy's sheet thrown over them
+  box(0.7, 0.55, 0.5, darkWood, denX - 0.75, 0.28, denZ - 0.3, root);
+  box(0.7, 0.55, 0.5, darkWood, denX + 0.05, 0.28, denZ - 0.32, root);
+  box(0.6, 0.45, 0.5, darkWood, denX + 0.8, 0.23, denZ - 0.3, root);
+  const denDrape = box(2.3, 0.05, 0.95, wool, denX, 0.9, denZ - 0.2, root);
+  denDrape.rotation.x = -0.2;
+  // his name, cut into a plank with a penknife, and his sign on a stick: both stand in front of the fort, facing Theo
+  const faceTheo = 1.45;
+  const plank = box(0.62, 0.22, 0.03, std({ color: 0x3a2c1e, roughness: 0.9 }), denX - 0.2, 0.14, denZ + 1.0, root);
+  plank.rotation.set(-0.35, faceTheo, 0, 'YXZ');
+  const mar = label('MAR', 0.56, 0.18, '#3a2c1e', '#120c07', 'bold 150px serif', -0.04);
+  mar.position.set(0.0, 0.0, 0.017);
+  plank.add(mar);
+  box(0.025, 0.42, 0.025, darkWood, denX + 0.5, 0.21, denZ + 0.3, root, false);
+  const keepOut = label('CẤM VÀO', 0.4, 0.17, '#5e5240', '#3a120e', 'bold 128px serif', 0.05);
+  keepOut.position.set(denX + 0.51, 0.42, denZ + 0.3);
+  keepOut.rotation.y = faceTheo;
+  root.add(keepOut);
+  // toys: wooden horse, tin soldiers, a top, a hoop and its stick
+  const toyWood = std({ color: 0x9a7a4a, roughness: 0.8 });
+  const horse = new Group();
+  horse.position.set(denX - 0.1, 0.045, denZ + 0.55);
+  horse.rotation.y = 0.5;
+  root.add(horse);
+  box(0.26, 0.12, 0.08, toyWood, 0, 0.17, 0, horse, false);
+  for (const [lx, lz] of [[-0.1, -0.025], [-0.1, 0.025], [0.1, -0.025], [0.1, 0.025]]) box(0.025, 0.11, 0.025, toyWood, lx, 0.055, lz, horse, false);
+  box(0.06, 0.16, 0.06, toyWood, 0.15, 0.27, 0, horse, false).rotation.z = -0.3;
+  box(0.1, 0.06, 0.05, toyWood, 0.2, 0.36, 0, horse, false);
+  const tin = std({ color: 0x7a1e1a, roughness: 0.5, metalness: 0.3 });
+  for (let i = 0; i < 4; i++) {
+    cyl(0.018, 0.1, std({ color: 0x3a4a6a, roughness: 0.5, metalness: 0.3 }), denX - 0.7 + i * 0.07, 0.1, denZ + 0.62 - (i % 2) * 0.05, root, 8);
+    cyl(0.02, 0.025, tin, denX - 0.7 + i * 0.07, 0.165, denZ + 0.62 - (i % 2) * 0.05, root, 8);
+  }
+  const top = new Mesh(new CylinderGeometry(0.05, 0.008, 0.09, 12), std({ color: 0xa83a28, roughness: 0.6 }));
+  top.position.set(denX + 0.6, 0.075, denZ + 0.35);
+  top.rotation.z = 1.2;
+  root.add(top);
+  const hoop = new Mesh(new TorusGeometry(0.22, 0.012, 6, 28), toyWood);
+  hoop.position.set(denX + 1.2, 0.24, denZ - 0.3);
+  hoop.rotation.y = 0.5;
+  hoop.castShadow = true;
+  root.add(hoop);
+  box(0.02, 0.02, 0.6, toyWood, denX + 0.95, 0.15, denZ + 0.4, root, false).rotation.y = 0.6;
+  // his denRadio: the old wooden set (no grey plate yet), his listening post on the crate
+  const radioWood = std({ color: 0x4a3322, roughness: 0.5 });
+  const denRadio = new Group();
+  denRadio.position.set(denX + 0.05, 0.56, denZ - 0.32);
+  denRadio.rotation.y = 0.15;
+  root.add(denRadio);
+  box(0.36, 0.24, 0.2, radioWood, 0, 0.12, 0, denRadio);
+  box(0.26, 0.16, 0.01, std({ color: 0x0c0a08, roughness: 0.4 }), 0, 0.12, 0.105, denRadio, false);
+  for (const kx of [-0.13, 0.13]) {
+    const kn = cyl(0.025, 0.02, std({ color: 0xb08a4a, metalness: 0.6, roughness: 0.4 }), kx, 0.12, 0.115, denRadio, 12);
+    kn.rotation.x = Math.PI / 2;
+  }
   // workbench, oil can, a lantern hook
   box(1.8, 0.06, 0.6, darkWood, gx1 - 0.4, 0.9, gz0 + 0.9, root).rotation.y = Math.PI / 2;
   box(0.06, 0.9, 0.06, darkWood, gx1 - 0.6, 0.45, gz0 + 0.2, root);
@@ -466,7 +548,7 @@ export function buildWorld(): World {
   // (the light starts just inside the glass: the plank wall would shadow it otherwise)
   const garageMoon = new SpotLight(0x8aa4c8, 10, 8, 0.45, 0.7, 1.2);
   garageMoon.position.set(g.x + 0.8, 2.4, gz0 + 0.12);
-  garageMoon.target.position.set(g.x - 0.4, 0, g.z + 0.4);
+  garageMoon.target.position.set(denX, 0, denZ);
   garageMoon.castShadow = true;
   garageMoon.shadow.mapSize.set(512, 512);
   root.add(garageMoon, garageMoon.target);

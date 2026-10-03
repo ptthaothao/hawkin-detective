@@ -1,5 +1,7 @@
 import { StrictMode, Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import '@fontsource/crimson-pro/400.css';
 import '@fontsource/crimson-pro/400-italic.css';
 import '@fontsource/crimson-pro/600.css';
@@ -32,6 +34,8 @@ if (chapter === '1.2') document.title = 'STATIC — Chương 1.2';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <Analytics />
+    <SpeedInsights />
     {chapter === '1.1' || chapter === '1.2' ? (
       <Suspense fallback={null}>
         {chapter === '1.1' ? <Chapter11 /> : <Chapter12 />}

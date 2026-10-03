@@ -814,7 +814,7 @@ export function buildWorld(): World {
   const car = new Group();
   car.position.set(1.0, 0.052, -0.4);
   car.rotation.y = 0.5;
-  car.scale.setScalar(1.7);
+  car.scale.setScalar(1.25);
   fort.add(car);
   extruded([[-0.11, 0.02], [-0.11, 0.06], [-0.08, 0.075], [-0.055, 0.105], [-0.03, 0.135], [0.045, 0.135], [0.075, 0.105], [0.1, 0.085], [0.125, 0.065], [0.125, 0.02]], 0.085, metalRed, car);
   for (const sz of [-0.0445, 0.0445]) {
@@ -832,7 +832,7 @@ export function buildWorld(): World {
   const horse = new Group();
   horse.position.set(1.45, 0.0, 0.75);
   horse.rotation.y = -0.4;
-  horse.scale.setScalar(1.5);
+  horse.scale.setScalar(1.2);
   fort.add(horse);
   extruded([[-0.13, 0.1], [-0.14, 0.19], [-0.1, 0.225], [0.06, 0.225], [0.09, 0.27], [0.11, 0.35], [0.12, 0.4], [0.16, 0.42], [0.2, 0.395], [0.225, 0.34], [0.19, 0.325], [0.155, 0.33], [0.145, 0.27], [0.125, 0.19], [0.1, 0.19], [0.1, 0.07], [0.055, 0.07], [0.055, 0.15], [-0.05, 0.15], [-0.05, 0.07], [-0.1, 0.07], [-0.1, 0.12]], 0.045, toyWood, horse);
   extruded([[0.1, 0.34], [0.115, 0.42], [0.13, 0.4], [0.14, 0.43], [0.15, 0.34]], 0.05, std({ color: 0x3a2412, roughness: 1 }), horse);
@@ -847,9 +847,9 @@ export function buildWorld(): World {
   }
   // a spinning top: banded body, wooden peg and point
   const top = lathe([[0, -0.005], [0.012, 0], [0.035, 0.045], [0.05, 0.075], [0.052, 0.09], [0.04, 0.105], [0.01, 0.112], [0, 0.112]], paintBlue, 1.2, 0.0, -0.75, fort, 20);
-  top.scale.setScalar(1.6);
+  top.scale.setScalar(1.2);
   const topBand = lathe([[0.049, 0.07], [0.0525, 0.082], [0.0525, 0.09], [0.047, 0.098]], paintYellow, 1.2, 0.0, -0.75, fort, 20);
-  topBand.scale.setScalar(1.6);
+  topBand.scale.setScalar(1.2);
   cyl(0.008, 0.04, toyWood, 1.2, 0.2, -0.75, fort, 8);
   // three tin soldiers in a rank on a little base, with red caps and rifles
   for (let i = 0; i < 3; i++) {

@@ -750,6 +750,70 @@ export function buildWorld(): World {
   box(0.2, 0.04, 0.28, std({ color: 0x4a2a1a, roughness: 0.7 }), 1.05, 0.065, 0.75, fort, false).rotation.y = 0.3;
   const pen = cyl(0.006, 0.12, std({ color: 0x15110e, roughness: 0.5 }), 1.05, 0.095, 0.75, fort, 6);
   pen.rotation.set(0, 0, Math.PI / 2);
+  // more of his things, so it looks lived in: toys, odds and ends, inside and around the way in
+  const toyWood = std({ color: 0x7a5c36, roughness: 0.85 });
+  const paintRed = std({ color: 0x7a2a22, roughness: 0.6 });
+  const paintBlue = std({ color: 0x3a4a6a, roughness: 0.6 });
+  const tinGrey = std({ color: 0x6a6a64, roughness: 0.5, metalness: 0.5 });
+  // a wooden horse on wheels, the kind pulled on a string
+  const horse = new Group();
+  horse.position.set(1.5, 0.0, -0.8);
+  horse.rotation.y = -0.35;
+  fort.add(horse);
+  box(0.3, 0.1, 0.1, toyWood, 0, 0.17, 0, horse, false);
+  box(0.07, 0.17, 0.07, toyWood, 0.15, 0.27, 0, horse, false).rotation.z = -0.3;
+  box(0.1, 0.06, 0.06, toyWood, 0.22, 0.37, 0, horse, false);
+  box(0.02, 0.1, 0.05, std({ color: 0x3a2a1a, roughness: 1 }), 0.12, 0.35, 0, horse, false);
+  box(0.34, 0.025, 0.06, toyWood, 0, 0.07, 0, horse, false);
+  for (const wx of [-0.12, 0.12]) for (const wz of [-0.05, 0.05]) cyl(0.035, 0.012, paintRed, wx, 0.035, wz, horse, 12).rotation.x = Math.PI / 2;
+  // a spinning top, a hoop and its stick, a drum
+  const top = new Mesh(new CylinderGeometry(0.05, 0.006, 0.09, 14), paintRed);
+  top.position.set(1.85, 0.05, -0.2);
+  top.rotation.z = 1.25;
+  fort.add(top);
+  const hoop = new Mesh(new TorusGeometry(0.22, 0.012, 6, 30), toyWood);
+  hoop.position.set(0.9, 0.23, 1.3);
+  hoop.rotation.y = 0.15;
+  hoop.castShadow = true;
+  fort.add(hoop);
+  box(0.02, 0.02, 0.5, toyWood, 1.3, 0.012, 1.2, fort, false).rotation.y = 0.3;
+  cyl(0.08, 0.1, std({ color: 0x9a8668, roughness: 0.9 }), 1.7, 0.05, 0.9, fort, 18);
+  cyl(0.082, 0.02, paintRed, 1.7, 0.01, 0.9, fort, 18);
+  cyl(0.082, 0.02, paintRed, 1.7, 0.09, 0.9, fort, 18);
+  // tin soldiers in a rank, a tin boat, marbles
+  for (let i = 0; i < 6; i++) {
+    cyl(0.016, 0.07, i % 2 ? paintBlue : paintRed, 1.85, 0.035, -0.95 + i * 0.09, fort, 8);
+    cyl(0.018, 0.02, tinGrey, 1.85, 0.08, -0.95 + i * 0.09, fort, 8);
+  }
+  box(0.2, 0.03, 0.07, paintBlue, 1.7, 0.03, -1.05, fort, false);
+  box(0.02, 0.1, 0.02, toyWood, 1.7, 0.1, -1.05, fort, false);
+  box(0.07, 0.07, 0.003, std({ color: 0xd8c8a0, roughness: 1 }), 1.7, 0.11, -1.04, fort, false);
+  for (const [mx, mz, mc] of [[1.35, 0.95, 0x2a5a8a], [1.4, 0.99, 0x8a2a2a], [1.3, 1.0, 0x3a7a4a], [1.43, 0.9, 0xc8a24a], [1.36, 0.88, 0x6a3a8a], [1.28, 0.92, 0xd8d8d0]] as const) {
+    const m = new Mesh(new SphereGeometry(0.014, 10, 8), std({ color: mc, roughness: 0.2, metalness: 0.1 }));
+    m.position.set(mx, 0.014, mz);
+    fort.add(m);
+  }
+  // blocks stacked, a picture book, a wooden sword lying on the floor
+  for (const [bx, bz, bi] of [[1.9, 0.95, 0], [1.9, 0.95, 1], [1.97, 0.88, 0]] as const) box(0.08, 0.08, 0.08, toyWood, bx, 0.04 + bi * 0.08, bz, fort, false).rotation.y = bi * 0.3 + bx;
+  box(0.2, 0.025, 0.15, std({ color: 0x3a5a4a, roughness: 0.8 }), 1.0, 0.04, -0.6, fort, false).rotation.y = 0.2;
+  box(0.19, 0.012, 0.14, std({ color: 0xc8b890, roughness: 1 }), 1.0, 0.055, -0.6, fort, false).rotation.y = 0.2;
+  box(0.5, 0.02, 0.05, toyWood, 1.1, 0.012, 1.0, fort, false).rotation.y = -0.3;
+  box(0.02, 0.025, 0.14, toyWood, 1.2, 0.015, 0.96, fort, false).rotation.y = -0.3;
+  // inside: a second pillow, a cap, a tin bucket, a glass jar, a rubber ball, a few crayon stubs
+  box(0.34, 0.08, 0.26, linen, -0.35, 0.07, 0.4, fort, false).rotation.y = -0.4;
+  cyl(0.09, 0.025, std({ color: 0x4a4a3a, roughness: 1 }), -0.1, 0.03, 0.45, fort, 14);
+  cyl(0.06, 0.09, tinGrey, 0.6, 0.045, -0.5, fort, 14);
+  const jar = new Mesh(new CylinderGeometry(0.045, 0.045, 0.11, 14), new MeshStandardMaterial({ color: 0x8aa890, transparent: true, opacity: 0.45, roughness: 0.1 }));
+  jar.position.set(0.65, 0.065, 0.5);
+  fort.add(jar);
+  cyl(0.047, 0.015, tinGrey, 0.65, 0.125, 0.5, fort, 14);
+  const rubber = new Mesh(new SphereGeometry(0.045, 14, 10), std({ color: 0x9a2a22, roughness: 0.6 }));
+  rubber.position.set(0.5, 0.045, 0.3);
+  fort.add(rubber);
+  for (const [cx, cz, cc, cr] of [[1.55, 0.1, 0xb5342a, 0.4], [1.6, 0.14, 0x2f4f8a, 1.2], [1.52, 0.16, 0xd9a62a, 2.0], [1.65, 0.05, 0x3d7a3a, 0.2]] as const) {
+    const st = cyl(0.007, 0.05, std({ color: cc, roughness: 0.7 }), cx, 0.008, cz, fort, 6);
+    st.rotation.set(0, cr, Math.PI / 2);
+  }
   // the old wooden radio stays out in the garage, on the workbench, not in his hideout
   const denRadio = new Group();
   denRadio.position.set(gx1 - 0.4, 0.93, gz0 + 1.25);

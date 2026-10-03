@@ -25,14 +25,16 @@ if (import.meta.env.DEV) (window as unknown as { __store: typeof useStore }).__s
 
 // Chapter 1.1 (PixiJS) loads on its own, so Chapter 0 does not pay for WebGL.
 const Chapter11 = lazy(() => import('./ch1_1/Chapter11'));
+const Chapter12 = lazy(() => import('./ch1_2/Chapter12'));
 const chapter = currentChapter();
 if (chapter === '1.1') document.title = 'STATIC — Chương 1.1';
+if (chapter === '1.2') document.title = 'STATIC — Chương 1.2';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {chapter === '1.1' ? (
+    {chapter === '1.1' || chapter === '1.2' ? (
       <Suspense fallback={null}>
-        <Chapter11 />
+        {chapter === '1.1' ? <Chapter11 /> : <Chapter12 />}
       </Suspense>
     ) : (
       <App />

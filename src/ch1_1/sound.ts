@@ -332,6 +332,81 @@ class Ch11Sound {
         break;
     }
   }
+
+  /** Chapter 1.2's own sounds, on the same synth. */
+  play12(sfx: Sfx12) {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    switch (sfx) {
+      case 'scream': {
+        // a child's scream, this time with a voice: a rising, cracking tone
+        const o = this.ctx.createOscillator();
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(620, t);
+        o.frequency.linearRampToValueAtTime(980, t + 0.35);
+        o.frequency.linearRampToValueAtTime(760, t + 1.1);
+        const f = this.ctx.createBiquadFilter();
+        f.type = 'bandpass';
+        f.frequency.value = 1700;
+        f.Q.value = 1.4;
+        const g = this.ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.28, t + 0.06);
+        g.gain.linearRampToValueAtTime(0.22, t + 0.9);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 1.2);
+        o.connect(f).connect(g).connect(this.master!);
+        o.start(t);
+        o.stop(t + 1.25);
+        this.noiseBurst(t, 1.1, 3000, 0.05);
+        break;
+      }
+      case 'tumble':
+        [0, 0.16, 0.31, 0.5, 0.62, 0.9].forEach((d, i) => {
+          this.thump(t + d, 90 - i * 6, 0.5);
+          this.noiseBurst(t + d, 0.12, 700, 0.18);
+        });
+        break;
+      case 'cans':
+        // tin cans going over: bright, uneven clinks that die away
+        [0, 0.07, 0.13, 0.3, 0.37, 0.52, 0.8].forEach((d, i) => {
+          const o = this.ctx!.createOscillator();
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(1500 + ((i * 487) % 1100), t + d);
+          const g = this.ctx!.createGain();
+          g.gain.setValueAtTime(0.16 / (1 + i * 0.25), t + d);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.22);
+          o.connect(g).connect(this.master!);
+          o.start(t + d);
+          o.stop(t + d + 0.25);
+          this.noiseBurst(t + d, 0.05, 4500, 0.1);
+        });
+        break;
+      case 'garageSlam':
+        this.thump(t, 46, 1);
+        this.thump(t + 0.04, 62, 0.8);
+        this.noiseBurst(t, 0.5, 700, 0.6);
+        this.noiseBurst(t + 0.12, 1.4, 250, 0.3, 'lowpass');
+        this.thump(t + 0.35, 55, 0.25);
+        break;
+      case 'tick':
+        this.noiseBurst(t, 0.03, 3800, 0.2);
+        this.thump(t, 320, 0.1);
+        break;
+      case 'stepYard':
+        this.thump(t, 70, 0.5);
+        this.noiseBurst(t + 0.02, 0.18, 1400, 0.16, 'lowpass');
+        break;
+      case 'doorSoft':
+        this.creak(t, 1.4, 120, 180, 0.04);
+        this.noiseBurst(t + 1.3, 0.05, 900, 0.1);
+        break;
+      case 'doorCreak':
+        this.creak(t, 0.9, 150, 340, 0.1);
+        break;
+    }
+  }
 }
+
+export type Sfx12 = 'scream' | 'tumble' | 'cans' | 'garageSlam' | 'tick' | 'stepYard' | 'doorSoft' | 'doorCreak';
 
 export const sound = new Ch11Sound();

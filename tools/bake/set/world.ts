@@ -964,6 +964,110 @@ export function buildWorld(): World {
   for (const [cx, cz, cc, cr] of [[-0.4, 0.2, 0xb5342a, 0.4], [-0.35, 0.25, 0x2f4f8a, 1.2], [-0.45, 0.27, 0xd9a62a, 2.0]] as const) {
     cyl(0.008, 0.07, std({ color: cc, roughness: 0.7 }), cx, 0.012, cz, fort, 8).rotation.set(0, cr, Math.PI / 2);
   }
+  // ---- waking behind cloth: a dark sheet of canvas close to his face, one thin slit with moonlight ----
+  // Used for the wake-up shot; it reads as the tent's blanket or the buggy's canvas hood alike.
+  const clothRig = new Group();
+  clothRig.position.set(40, 0, 0);
+  root.add(clothRig);
+  const clothTex = paint((x, cw, ch) => {
+    x.fillStyle = '#6a6a62';
+    x.fillRect(0, 0, cw, ch);
+    for (let i = 0; i < 14000; i++) {
+      const v = 70 + Math.floor(Math.random() * 110);
+      x.fillStyle = `rgba(${v},${v},${v - 6},0.5)`;
+      x.fillRect(Math.random() * cw, Math.random() * ch, 3, 1);
+      x.fillRect(Math.random() * cw, Math.random() * ch, 1, 3);
+    }
+    x.strokeStyle = 'rgba(20,20,16,0.45)';
+    x.lineWidth = 1;
+    for (let i = 0; i < cw; i += 5) {
+      x.beginPath();
+      x.moveTo(i, 0);
+      x.lineTo(i, ch);
+      x.stroke();
+    }
+    for (let i = 0; i < ch; i += 5) {
+      x.beginPath();
+      x.moveTo(0, i);
+      x.lineTo(cw, i);
+      x.stroke();
+    }
+  }, 1, 1);
+  clothTex.wrapS = clothTex.wrapT = RepeatWrapping;
+  clothTex.repeat.set(5, 4);
+  const slitX = (y: number) => 0.01 * Math.sin(y * 3.1 + 0.6) + 0.006 * Math.sin(y * 9);
+  const slitW = (y: number) => 0.028 + 0.02 * Math.max(0, Math.sin(y * 2.1 + 0.4)) + 0.014 * Math.sin(y * 7.5 + 1) ** 2;
+  const panel = (side: -1 | 1) => {
+    const NX = 120;
+    const NY = 90;
+    const W = 3.4;
+    const H = 2.4;
+    const pos: number[] = [];
+    const uv: number[] = [];
+    const col: number[] = [];
+    const idx: number[] = [];
+    for (let j = 0; j <= NY; j++) {
+      const y = -0.02 + (j / NY) * H;
+      for (let i = 0; i <= NX; i++) {
+        const u = i / NX;
+        // from the slit edge outward; denser near the edge
+        const d = Math.pow(u, 1.6) * W;
+        const edge = slitX(y) + (side * slitW(y)) / 2;
+        const px = edge + side * d;
+        const hang = 1 + 0.12 * Math.sin(px * 7 + 1.3) + 0.06 * Math.sin(px * 19 + y * 3) + 0.04 * Math.sin(y * 5 + px * 2);
+        // the cloth bows toward the camera away from the slit and pulls back at its edge
+        const pz = -0.55 + 0.1 * hang + 0.12 * (1 - Math.exp(-d * 2.2)) - 0.015 * Math.sin(y * 31 + px * 7) * (1 - u);
+        pos.push(px, y, pz);
+        uv.push(px, y);
+        const glow = Math.exp(-d * 18);
+        const shade = (0.45 + 0.35 * hang) * (1 - 0.35 * Math.min(1, d / 1.4));
+        col.push(shade * (1 + 2.4 * glow), shade * (1 + 2.8 * glow), shade * (1.05 + 3.4 * glow));
+      }
+    }
+    for (let j = 0; j < NY; j++)
+      for (let i = 0; i < NX; i++) {
+        const k = j * (NX + 1) + i;
+        if (side > 0) idx.push(k, k + 1, k + NX + 1, k + 1, k + NX + 2, k + NX + 1);
+        else idx.push(k, k + NX + 1, k + 1, k + 1, k + NX + 1, k + NX + 2);
+      }
+    const gm = new BufferGeometry();
+    gm.setAttribute('position', new Float32BufferAttribute(pos, 3));
+    gm.setAttribute('uv', new Float32BufferAttribute(uv, 2));
+    gm.setAttribute('color', new Float32BufferAttribute(col, 3));
+    gm.setIndex(idx);
+    gm.computeVertexNormals();
+    const m = new Mesh(gm, new MeshStandardMaterial({ map: clothTex, vertexColors: true, roughness: 1, side: DoubleSide }));
+    m.receiveShadow = true;
+    return m;
+  };
+  clothRig.add(panel(-1), panel(1));
+  // the moonlit yard behind the slit
+  const moonYard = new Mesh(
+    new PlaneGeometry(6, 5),
+    new MeshBasicMaterial({
+      map: paint((x, cw, ch) => {
+        const gr = x.createLinearGradient(0, 0, 0, ch);
+        gr.addColorStop(0, '#6f8db8');
+        gr.addColorStop(0.55, '#a9c2e2');
+        gr.addColorStop(1, '#2c3a4e');
+        x.fillStyle = gr;
+        x.fillRect(0, 0, cw, ch);
+        x.fillStyle = 'rgba(20,28,40,0.55)';
+        x.fillRect(cw * 0.42, ch * 0.38, cw * 0.025, ch * 0.4);
+      }, 6, 5),
+    }),
+  );
+  moonYard.position.set(0, 0.3, -1.4);
+  clothRig.add(moonYard);
+  const clothFill = new PointLight(0x8aa0c8, 2.4, 5, 2);
+  clothFill.position.set(-0.7, 0.5, 0.15);
+  clothRig.add(clothFill);
+  const clothFloor = new Mesh(new PlaneGeometry(10, 8), new MeshBasicMaterial({ color: 0x0a0b0e }));
+  clothFloor.rotation.x = -Math.PI / 2;
+  clothFloor.position.set(0, -0.03, -0.5);
+  clothFloor.receiveShadow = true;
+  clothRig.add(clothFloor);
+
   // the old wooden radio stays out in the garage, on the workbench, not in his hideout
   const denRadio = new Group();
   denRadio.position.set(gx1 - 0.4, 0.93, gz0 + 1.25);

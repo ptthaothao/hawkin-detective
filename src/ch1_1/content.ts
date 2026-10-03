@@ -74,4 +74,5 @@ export const END = {
   title: 'HẾT CHƯƠNG 1.1',
   teaser: 'Theo phải về được phòng mình.',
   replay: 'Chơi lại',
+  next: 'Sang Chương 1.2',
 } as const;

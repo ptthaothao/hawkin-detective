@@ -7,7 +7,9 @@ import {
   DirectionalLight,
   DoubleSide,
   Float32BufferAttribute,
+  ExtrudeGeometry,
   Group,
+  LatheGeometry,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
@@ -15,10 +17,12 @@ import {
   PlaneGeometry,
   PointLight,
   RepeatWrapping,
+  Shape,
   SphereGeometry,
   SpotLight,
   SRGBColorSpace,
   TorusGeometry,
+  Vector2,
   type Material,
   type Texture,
 } from 'three';
@@ -503,9 +507,10 @@ export function buildWorld(): World {
     const k = Math.max(0, Math.min(1, (v - a0) / (a1 - a0)));
     return k * k * (3 - 2 * k);
   };
+  const Rx_IN = 1.08;
   const tent = (() => {
     const NT = 360;
-    const NH = 90;
+    const NH = 240;
     const Rx = 1.08;
     const Rz = 1.0;
     const H = 0.98;
@@ -523,9 +528,10 @@ export function buildWorld(): World {
       const t = j / NH;
       for (let i = 0; i <= NT; i++) {
         // each row starts and ends at the edge of the doorway, so the rim of the arch is a clean curve
-        const open = t < 0.7 ? 0.62 * Math.sqrt(1 - (t / 0.7) ** 2) : 0;
+        const open = t < 0.7 ? 0.9 * Math.pow(1 - (t / 0.7) ** 2.6, 1 / 2.6) : 0;
         const th = open + (i / NT) * (Math.PI * 2 - 2 * open);
-        const fold = 1 + 0.085 * Math.sin(th * 13 + 2.2 * t) * (1 - 0.4 * t) + 0.045 * Math.sin(th * 31 + 5 * t) + 0.035 * Math.sin(th * 5 + 1);
+        const calm = 1 - 0.9 * smooth(-Math.cos(th), 0.2, 0.7);
+        const fold = 1 + calm * (0.085 * Math.sin(th * 13 + 2.2 * t) * (1 - 0.4 * t) + 0.045 * Math.sin(th * 31 + 5 * t) + 0.035 * Math.sin(th * 5 + 1));
         const r = Math.sqrt(Math.max(0, 1 - t * t)) * fold * (1 + 0.14 * Math.pow(1 - t, 6));
         pos.push(Math.cos(th) * Rx * r, H * t + 0.018 * Math.sin(th * 9) * (1 - t), Math.sin(th) * Rz * r);
         const wCream = smooth(th, 0.45 * Math.PI, 0.6 * Math.PI) * (1 - smooth(th, 0.9 * Math.PI, 1.05 * Math.PI));
@@ -535,7 +541,7 @@ export function buildWorld(): World {
         const stripe = Math.sin(t * 46 + th * 6) > 0.2 ? gold : brown;
         tmp.lerp(stripe, wGold);
         const shade = 0.5 + 0.5 * Math.min(1, t * 1.8);
-        col.push(tmp.r * shade, tmp.g * shade, tmp.b * shade);
+        col.push(tmp.r * shade * 1.7, tmp.g * shade * 1.7, tmp.b * shade * 1.7);
         uv.push((i / NT) * 8, (j / NH) * 3);
       }
     }
@@ -696,123 +702,201 @@ export function buildWorld(): World {
         }, w, h),
       }),
     );
-  // the pile of drawings, spilled over the rug and the floor outside: his family among them, as stick people
-  const spill: [string, number, number, number][] = [
-    ['family', 1.45, 0.45, 0.3], ['train', 1.3, -0.35, -0.5], ['horse', 1.75, -0.05, 0.9], ['tree', 1.1, 0.2, -0.2],
-    ['house', 1.85, 0.6, 0.6], ['dog', 1.15, 0.7, 1.2], ['moon', 1.6, -0.65, -0.8], ['car', 1.55, 0.2, 0.1],
+  // ---- inside the shelter: his things, made to be recognised at a glance, lit by the lamp ----
+  const lathe = (pts: [number, number][], mat: Material, x: number, y: number, z: number, parent: Object3D, seg = 20) => {
+    const m = new Mesh(new LatheGeometry(pts.map(([r, h]) => new Vector2(r, h)), seg), mat);
+    m.position.set(x, y, z);
+    m.castShadow = true;
+    m.receiveShadow = true;
+    parent.add(m);
+    return m;
+  };
+  const extruded = (pts: [number, number][], depth: number, mat: Material, parent: Object3D) => {
+    const sh = new Shape();
+    pts.forEach(([px, py], i) => (i ? sh.lineTo(px, py) : sh.moveTo(px, py)));
+    const geo = new ExtrudeGeometry(sh, { depth, bevelEnabled: true, bevelSize: 0.004, bevelThickness: 0.004, bevelSegments: 2 });
+    geo.translate(0, 0, -depth / 2);
+    const m = new Mesh(geo, mat);
+    m.castShadow = true;
+    m.receiveShadow = true;
+    parent.add(m);
+    return m;
+  };
+  const label = (text: string, bg: string, fg: string) =>
+    paint((x, cw, ch) => {
+      x.fillStyle = bg;
+      x.fillRect(0, 0, cw, ch);
+      x.strokeStyle = fg;
+      x.lineWidth = 6;
+      x.strokeRect(10, 14, cw - 20, ch - 28);
+      x.fillStyle = fg;
+      x.font = `bold ${Math.round(ch * 0.4)}px serif`;
+      x.textAlign = 'center';
+      x.textBaseline = 'middle';
+      x.fillText(text, cw / 2, ch / 2);
+    }, 4, 1);
+  const metalRed = std({ color: 0xa8281c, roughness: 0.35, metalness: 0.5 });
+  const rubber = std({ color: 0x15110e, roughness: 0.8 });
+  const chrome = std({ color: 0xb8bcb8, roughness: 0.25, metalness: 0.9 });
+  const toyBrass = std({ color: 0xc9a14a, roughness: 0.3, metalness: 0.85 });
+  const toyWood = std({ color: 0xb98a52, roughness: 0.7 });
+  const paintRed = std({ color: 0xb0302a, roughness: 0.5 });
+  const paintBlue = std({ color: 0x2f5a8a, roughness: 0.5 });
+  const paintYellow = std({ color: 0xd9a62a, roughness: 0.5 });
+  // his drawings, pinned to the inside of the cloth at the back, and a few fallen on the rug
+  const pinned: [string, number, number, number, number][] = [
+    ['family', 0, 0.34, 0.5, 0.37], ['house', -0.36, 0.28, 0.26, 0.19], ['tree', 0.36, 0.28, 0.26, 0.19],
+    ['moon', -0.2, 0.62, 0.22, 0.16], ['train', 0.2, 0.62, 0.24, 0.17],
   ];
-  spill.forEach(([kind, x, z, ry], i) => {
+  const inner = (y: number) => -Rx_IN * Math.sqrt(1 - Math.min(0.97, y / 0.98) ** 2);
+  for (const [kind, pz, py, pw, ph] of pinned) {
+    const m = paper(kind, pw, ph);
+    const xb = inner(py - ph / 2);
+    const xt = inner(py + ph / 2);
+    m.position.set((xb + xt) / 2 + 0.07, py, pz);
+    m.rotation.set(0, Math.PI / 2, -Math.atan2(xt - xb, ph), 'ZYX');
+    fort.add(m);
+  }
+  for (const [kind, px, pz, ry] of [['horse', -0.35, -0.2, 0.3], ['dog', 0.05, 0.55, -0.5], ['car', 1.25, 0.5, 0.8], ['moon', 1.35, -0.4, -0.6]] as [string, number, number, number][]) {
     const m = paper(kind, 0.3, 0.22);
-    m.position.set(x, 0.048 + i * 0.004, z);
+    m.position.set(px, 0.05, pz);
     m.rotation.set(-Math.PI / 2, 0, ry);
     fort.add(m);
-  });
-  // one small tin car, on the rug
-  const car = new Group();
-  car.position.set(0.95, 0.045, 0.12);
-  car.rotation.y = 0.5;
-  fort.add(car);
-  const tin = std({ color: 0x7a2a22, roughness: 0.5, metalness: 0.35 });
-  box(0.16, 0.045, 0.07, tin, 0, 0.04, 0, car, false);
-  box(0.07, 0.04, 0.062, tin, -0.01, 0.083, 0, car, false);
-  for (const wx of [-0.05, 0.05]) for (const wz of [-0.04, 0.04]) cyl(0.022, 0.012, std({ color: 0x15110e, roughness: 0.8 }), wx, 0.022, wz, car, 10).rotation.x = Math.PI / 2;
-  // the oil lamp on two bricks: the light everything is arranged around
-  const brick = std({ color: 0x6a3a2a, roughness: 1 });
-  box(0.22, 0.07, 0.11, brick, 0.3, 0.065, -0.1, fort, false).rotation.y = 0.2;
-  box(0.2, 0.07, 0.1, brick, 0.3, 0.135, -0.1, fort, false).rotation.y = -0.1;
+  }
+  // the oil lamp on two bricks, inside, by the way in: the light everything is arranged around
+  const brick = std({ color: 0x8a4a38, roughness: 1 });
+  box(0.24, 0.07, 0.12, brick, 0.4, 0.065, -0.5, fort, false).rotation.y = 0.2;
+  box(0.22, 0.07, 0.11, brick, 0.4, 0.135, -0.5, fort, false).rotation.y = -0.1;
   const lamp = new Group();
-  lamp.position.set(0.3, 0.17, -0.1);
+  lamp.position.set(0.4, 0.17, -0.5);
   fort.add(lamp);
-  cyl(0.04, 0.05, std({ color: 0x7a5a2a, metalness: 0.6, roughness: 0.4 }), 0, 0.025, 0, lamp, 12);
-  cyl(0.028, 0.1, new MeshBasicMaterial({ color: 0xffd08a, transparent: true, opacity: 0.85 }), 0, 0.1, 0, lamp, 12);
-  const lampLight = new PointLight(0xffa850, 1.8, 3.4, 2);
-  lampLight.position.set(0, 0.16, 0);
+  lathe([[0, 0], [0.06, 0], [0.065, 0.03], [0.045, 0.07], [0.05, 0.09], [0.03, 0.1], [0, 0.1]], toyBrass, 0, 0, 0, lamp);
+  lathe([[0.03, 0.1], [0.045, 0.14], [0.05, 0.2], [0.04, 0.26], [0.034, 0.3]], new MeshStandardMaterial({ color: 0xfff0d0, transparent: true, opacity: 0.3, roughness: 0.1, side: DoubleSide }), 0, 0, 0, lamp);
+  const lampFlame = new Mesh(new SphereGeometry(0.022, 10, 10), new MeshBasicMaterial({ color: 0xffd27a }));
+  lampFlame.scale.set(0.8, 1.9, 0.8);
+  lampFlame.position.set(0, 0.17, 0);
+  lamp.add(lampFlame);
+  const lampLight = new PointLight(0xffa850, 2.4, 3.6, 2);
+  lampLight.position.set(0, 0.2, 0.05);
   lamp.add(lampLight);
-  // tin cans with faded labels, wooden blocks, a ball of string, a key, a few coins, his closed notebook
-  const cans: [number, number, number][] = [[1.2, -0.9, 0xa0743a], [1.35, -0.8, 0x7a5a3a], [1.1, -0.78, 0x8a6a40], [1.28, -0.65, 0xb08a4a]];
-  for (const [x, z, c] of cans) {
-    cyl(0.055, 0.11, std({ color: c, metalness: 0.5, roughness: 0.55 }), x, 0.055, z, fort, 14);
-    cyl(0.056, 0.05, std({ color: 0x7a2a22, roughness: 0.8 }), x, 0.06, z, fort, 14);
+  // a tin car: pressed-steel body, windows, bumpers, rubber wheels with hubcaps
+  const car = new Group();
+  car.position.set(0.55, 0.04, 0.1);
+  car.rotation.y = -0.35;
+  car.scale.setScalar(1.7);
+  fort.add(car);
+  extruded([[-0.11, 0.02], [-0.11, 0.06], [-0.08, 0.075], [-0.055, 0.105], [-0.03, 0.135], [0.045, 0.135], [0.075, 0.105], [0.1, 0.085], [0.125, 0.065], [0.125, 0.02]], 0.085, metalRed, car);
+  for (const sz of [-0.0445, 0.0445]) {
+    box(0.07, 0.03, 0.002, std({ color: 0x1a2a34, roughness: 0.1, metalness: 0.6 }), 0.008, 0.108, sz, car, false);
+    box(0.19, 0.008, 0.002, std({ color: 0xf0d8a0, roughness: 0.4 }), 0.0, 0.07, sz, car, false);
+    for (const wx of [-0.065, 0.075]) {
+      cyl(0.026, 0.014, rubber, wx, 0.026, sz * 0.9, car, 14).rotation.x = Math.PI / 2;
+      cyl(0.012, 0.016, chrome, wx, 0.026, sz * 0.98, car, 10).rotation.x = Math.PI / 2;
+    }
   }
-  for (const [x, z, r] of [[1.6, -0.6, 0.4], [1.8, -0.4, 1.0], [1.5, 0.75, 0.2]] as const) {
-    const blk = box(0.08, 0.08, 0.08, std({ color: 0xa8864e, roughness: 0.8 }), x, 0.04, z, fort, false);
-    blk.rotation.y = r;
+  box(0.01, 0.01, 0.09, chrome, 0.132, 0.03, 0, car, false);
+  box(0.01, 0.01, 0.09, chrome, -0.116, 0.03, 0, car, false);
+  for (const lz of [-0.028, 0.028]) cyl(0.011, 0.008, new MeshBasicMaterial({ color: 0xffe6a0 }), 0.128, 0.058, lz, car, 10).rotation.z = Math.PI / 2;
+  // a wooden horse on wheels, cut from a board: a real horse silhouette with mane, tail and a pull-string
+  const horse = new Group();
+  horse.position.set(0.15, 0.0, 0.5);
+  horse.rotation.y = -0.6;
+  horse.scale.setScalar(1.5);
+  fort.add(horse);
+  extruded([[-0.13, 0.1], [-0.14, 0.19], [-0.1, 0.225], [0.06, 0.225], [0.09, 0.27], [0.11, 0.35], [0.12, 0.4], [0.16, 0.42], [0.2, 0.395], [0.225, 0.34], [0.19, 0.325], [0.155, 0.33], [0.145, 0.27], [0.125, 0.19], [0.1, 0.19], [0.1, 0.07], [0.055, 0.07], [0.055, 0.15], [-0.05, 0.15], [-0.05, 0.07], [-0.1, 0.07], [-0.1, 0.12]], 0.045, toyWood, horse);
+  extruded([[0.1, 0.34], [0.115, 0.42], [0.13, 0.4], [0.14, 0.43], [0.15, 0.34]], 0.05, std({ color: 0x3a2412, roughness: 1 }), horse);
+  extruded([[-0.135, 0.2], [-0.19, 0.17], [-0.2, 0.08], [-0.17, 0.12], [-0.14, 0.15]], 0.04, std({ color: 0x3a2412, roughness: 1 }), horse);
+  const eye = new Mesh(new SphereGeometry(0.008, 8, 8), new MeshBasicMaterial({ color: 0x120a04 }));
+  eye.position.set(0.185, 0.385, 0.026);
+  horse.add(eye);
+  box(0.3, 0.025, 0.07, toyWood, 0, 0.055, 0, horse, false);
+  for (const wx of [-0.1, 0.09]) for (const wz of [-0.04, 0.04]) {
+    cyl(0.032, 0.012, paintRed, wx, 0.034, wz, horse, 14).rotation.x = Math.PI / 2;
+    cyl(0.008, 0.014, toyBrass, wx, 0.034, wz * 1.1, horse, 8).rotation.x = Math.PI / 2;
   }
-  const ball = new Mesh(new SphereGeometry(0.06, 14, 10), std({ color: 0xa8905a, roughness: 1 }));
-  ball.position.set(0.9, 0.08, -0.45);
-  fort.add(ball);
-  const keyRing = new Mesh(new TorusGeometry(0.03, 0.007, 6, 14), std({ color: 0x9a8a5a, metalness: 0.7, roughness: 0.4 }));
-  keyRing.position.set(1.6, 0.012, 0.45);
+  // a spinning top: banded body, wooden peg and point
+  const top = lathe([[0, -0.005], [0.012, 0], [0.035, 0.045], [0.05, 0.075], [0.052, 0.09], [0.04, 0.105], [0.01, 0.112], [0, 0.112]], paintBlue, 0.1, 0.0, 0.1, fort, 20);
+  top.scale.setScalar(1.6);
+  const topBand = lathe([[0.049, 0.07], [0.0525, 0.082], [0.0525, 0.09], [0.047, 0.098]], paintYellow, 0.1, 0.0, 0.1, fort, 20);
+  topBand.scale.setScalar(1.6);
+  cyl(0.008, 0.04, toyWood, 0.1, 0.2, 0.1, fort, 8);
+  // three tin soldiers in a rank on a little base, with red caps and rifles
+  for (let i = 0; i < 3; i++) {
+    const s = new Group();
+    s.position.set(-0.1, 0, -0.1 + i * 0.1);
+    s.scale.setScalar(1.7);
+    fort.add(s);
+    box(0.045, 0.01, 0.04, std({ color: 0x3a3a34, roughness: 0.6, metalness: 0.5 }), 0, 0.005, 0, s, false);
+    lathe([[0, 0.01], [0.018, 0.01], [0.02, 0.05], [0.025, 0.09], [0.02, 0.1], [0, 0.1]], paintBlue, 0, 0, 0, s, 12);
+    const head = new Mesh(new SphereGeometry(0.014, 10, 8), std({ color: 0xe0b48a, roughness: 0.6 }));
+    head.position.set(0, 0.116, 0);
+    head.castShadow = true;
+    s.add(head);
+    lathe([[0.016, 0.122], [0.016, 0.136], [0.01, 0.145], [0, 0.145]], paintRed, 0, 0, 0, s, 12);
+    const rifle = cyl(0.003, 0.14, chrome, 0.022, 0.08, 0, s, 6);
+    rifle.rotation.z = -0.12;
+    box(0.045, 0.006, 0.005, paintYellow, 0, 0.065, 0.018, s, false);
+  }
+  // tin cans with paper labels
+  const canLabel = [label('TEA', '#c9a05a', '#4a2a10'), label('PEAS', '#7ea060', '#1f3a18')];
+  [[-0.45, -0.5, 0, 1], [-0.58, -0.38, 1, 0.8], [-0.3, 0.55, 0, 0.9]].forEach(([cx, cz, li, sc]) => {
+    const body = new Mesh(new CylinderGeometry(0.06 * sc, 0.06 * sc, 0.13 * sc, 24), [std({ map: canLabel[li], roughness: 0.7 }), chrome, chrome]);
+    body.position.set(cx, 0.065 * sc, cz);
+    body.rotation.y = 2.4;
+    body.castShadow = true;
+    fort.add(body);
+  });
+  // a ball of red yarn and its loose end
+  const yarn = new Mesh(new SphereGeometry(0.065, 20, 14), std({ map: paint((x, cw, ch) => {
+    x.fillStyle = '#a83f3a';
+    x.fillRect(0, 0, cw, ch);
+    x.strokeStyle = '#6a1d1a';
+    x.lineWidth = 3;
+    for (let i = 0; i < 40; i++) {
+      x.beginPath();
+      x.moveTo(0, (i / 40) * ch);
+      x.bezierCurveTo(cw * 0.3, (i / 40) * ch + 18, cw * 0.6, (i / 40) * ch - 18, cw, (i / 40) * ch + 6);
+      x.stroke();
+    }
+  }, 1, 1), roughness: 1 }));
+  yarn.position.set(-0.25, 0.065, 0.62);
+  yarn.castShadow = true;
+  fort.add(yarn);
+  // wooden alphabet blocks with letters
+  [['A', 0xb0302a, -0.5, 0.05, 0.2, 0], ['B', 0x2f5a8a, -0.58, 0.05, 0.1, 0.3], ['C', 0x3d7a3a, -0.53, 0.14, 0.15, 0.6]].forEach(([ch, col, bx, by, bz, ry]) => {
+    const tex = paint((x, cw, chh) => {
+      x.fillStyle = '#d8b46f';
+      x.fillRect(0, 0, cw, chh);
+      x.fillStyle = `#${(col as number).toString(16).padStart(6, '0')}`;
+      x.font = `bold ${Math.round(chh * 0.8)}px serif`;
+      x.textAlign = 'center';
+      x.textBaseline = 'middle';
+      x.fillText(ch as string, cw / 2, chh / 2 + 6);
+    }, 1, 1);
+    const b = new Mesh(new BoxGeometry(0.1, 0.1, 0.1), std({ map: tex, roughness: 0.7 }));
+    b.position.set(bx as number, by as number, bz as number);
+    b.rotation.y = ry as number;
+    b.castShadow = true;
+    fort.add(b);
+  });
+  // a closed leather notebook with a pen, a key and a few coins
+  const nb = box(0.22, 0.045, 0.3, std({ color: 0x4a2a1a, roughness: 0.55 }), 0.1, 0.065, -0.1, fort, false);
+  nb.rotation.y = 0.5;
+  box(0.2, 0.038, 0.28, std({ color: 0xd8c8a0, roughness: 1 }), 0.1, 0.065, -0.1, fort, false).rotation.y = 0.5;
+  box(0.07, 0.005, 0.1, brass, 0.1, 0.091, -0.1, fort, false).rotation.y = 0.5;
+  const pen = cyl(0.006, 0.14, std({ color: 0x15110e, roughness: 0.4 }), 0.26, 0.095, -0.2, fort, 8);
+  pen.rotation.set(0, 0, Math.PI / 2);
+  pen.rotation.y = 0.9;
+  const keyRing = new Mesh(new TorusGeometry(0.03, 0.008, 8, 18), brass);
+  keyRing.position.set(0.7, 0.012, -0.3);
   keyRing.rotation.x = Math.PI / 2;
   fort.add(keyRing);
-  box(0.09, 0.008, 0.012, std({ color: 0x9a8a5a, metalness: 0.7, roughness: 0.4 }), 1.67, 0.012, 0.45, fort, false);
-  for (const [x, z] of [[1.95, 0.0], [2.0, 0.07], [1.9, 0.12]]) cyl(0.017, 0.004, std({ color: 0xb09a60, metalness: 0.8, roughness: 0.4 }), x, 0.004, z, fort, 12);
-  box(0.2, 0.04, 0.28, std({ color: 0x4a2a1a, roughness: 0.7 }), 1.05, 0.065, 0.75, fort, false).rotation.y = 0.3;
-  const pen = cyl(0.006, 0.12, std({ color: 0x15110e, roughness: 0.5 }), 1.05, 0.095, 0.75, fort, 6);
-  pen.rotation.set(0, 0, Math.PI / 2);
-  // more of his things, so it looks lived in: toys, odds and ends, inside and around the way in
-  const toyWood = std({ color: 0x7a5c36, roughness: 0.85 });
-  const paintRed = std({ color: 0x7a2a22, roughness: 0.6 });
-  const paintBlue = std({ color: 0x3a4a6a, roughness: 0.6 });
-  const tinGrey = std({ color: 0x6a6a64, roughness: 0.5, metalness: 0.5 });
-  // a wooden horse on wheels, the kind pulled on a string
-  const horse = new Group();
-  horse.position.set(1.5, 0.0, -0.8);
-  horse.rotation.y = -0.35;
-  fort.add(horse);
-  box(0.3, 0.1, 0.1, toyWood, 0, 0.17, 0, horse, false);
-  box(0.07, 0.17, 0.07, toyWood, 0.15, 0.27, 0, horse, false).rotation.z = -0.3;
-  box(0.1, 0.06, 0.06, toyWood, 0.22, 0.37, 0, horse, false);
-  box(0.02, 0.1, 0.05, std({ color: 0x3a2a1a, roughness: 1 }), 0.12, 0.35, 0, horse, false);
-  box(0.34, 0.025, 0.06, toyWood, 0, 0.07, 0, horse, false);
-  for (const wx of [-0.12, 0.12]) for (const wz of [-0.05, 0.05]) cyl(0.035, 0.012, paintRed, wx, 0.035, wz, horse, 12).rotation.x = Math.PI / 2;
-  // a spinning top, a hoop and its stick, a drum
-  const top = new Mesh(new CylinderGeometry(0.05, 0.006, 0.09, 14), paintRed);
-  top.position.set(1.85, 0.05, -0.2);
-  top.rotation.z = 1.25;
-  fort.add(top);
-  const hoop = new Mesh(new TorusGeometry(0.22, 0.012, 6, 30), toyWood);
-  hoop.position.set(0.9, 0.23, 1.3);
-  hoop.rotation.y = 0.15;
-  hoop.castShadow = true;
-  fort.add(hoop);
-  box(0.02, 0.02, 0.5, toyWood, 1.3, 0.012, 1.2, fort, false).rotation.y = 0.3;
-  cyl(0.08, 0.1, std({ color: 0x9a8668, roughness: 0.9 }), 1.7, 0.05, 0.9, fort, 18);
-  cyl(0.082, 0.02, paintRed, 1.7, 0.01, 0.9, fort, 18);
-  cyl(0.082, 0.02, paintRed, 1.7, 0.09, 0.9, fort, 18);
-  // tin soldiers in a rank, a tin boat, marbles
-  for (let i = 0; i < 6; i++) {
-    cyl(0.016, 0.07, i % 2 ? paintBlue : paintRed, 1.85, 0.035, -0.95 + i * 0.09, fort, 8);
-    cyl(0.018, 0.02, tinGrey, 1.85, 0.08, -0.95 + i * 0.09, fort, 8);
-  }
-  box(0.2, 0.03, 0.07, paintBlue, 1.7, 0.03, -1.05, fort, false);
-  box(0.02, 0.1, 0.02, toyWood, 1.7, 0.1, -1.05, fort, false);
-  box(0.07, 0.07, 0.003, std({ color: 0xd8c8a0, roughness: 1 }), 1.7, 0.11, -1.04, fort, false);
-  for (const [mx, mz, mc] of [[1.35, 0.95, 0x2a5a8a], [1.4, 0.99, 0x8a2a2a], [1.3, 1.0, 0x3a7a4a], [1.43, 0.9, 0xc8a24a], [1.36, 0.88, 0x6a3a8a], [1.28, 0.92, 0xd8d8d0]] as const) {
-    const m = new Mesh(new SphereGeometry(0.014, 10, 8), std({ color: mc, roughness: 0.2, metalness: 0.1 }));
-    m.position.set(mx, 0.014, mz);
-    fort.add(m);
-  }
-  // blocks stacked, a picture book, a wooden sword lying on the floor
-  for (const [bx, bz, bi] of [[1.9, 0.95, 0], [1.9, 0.95, 1], [1.97, 0.88, 0]] as const) box(0.08, 0.08, 0.08, toyWood, bx, 0.04 + bi * 0.08, bz, fort, false).rotation.y = bi * 0.3 + bx;
-  box(0.2, 0.025, 0.15, std({ color: 0x3a5a4a, roughness: 0.8 }), 1.0, 0.04, -0.6, fort, false).rotation.y = 0.2;
-  box(0.19, 0.012, 0.14, std({ color: 0xc8b890, roughness: 1 }), 1.0, 0.055, -0.6, fort, false).rotation.y = 0.2;
-  box(0.5, 0.02, 0.05, toyWood, 1.1, 0.012, 1.0, fort, false).rotation.y = -0.3;
-  box(0.02, 0.025, 0.14, toyWood, 1.2, 0.015, 0.96, fort, false).rotation.y = -0.3;
-  // inside: a second pillow, a cap, a tin bucket, a glass jar, a rubber ball, a few crayon stubs
-  box(0.34, 0.08, 0.26, linen, -0.35, 0.07, 0.4, fort, false).rotation.y = -0.4;
-  cyl(0.09, 0.025, std({ color: 0x4a4a3a, roughness: 1 }), -0.1, 0.03, 0.45, fort, 14);
-  cyl(0.06, 0.09, tinGrey, 0.6, 0.045, -0.5, fort, 14);
-  const jar = new Mesh(new CylinderGeometry(0.045, 0.045, 0.11, 14), new MeshStandardMaterial({ color: 0x8aa890, transparent: true, opacity: 0.45, roughness: 0.1 }));
-  jar.position.set(0.65, 0.065, 0.5);
-  fort.add(jar);
-  cyl(0.047, 0.015, tinGrey, 0.65, 0.125, 0.5, fort, 14);
-  const rubber = new Mesh(new SphereGeometry(0.045, 14, 10), std({ color: 0x9a2a22, roughness: 0.6 }));
-  rubber.position.set(0.5, 0.045, 0.3);
-  fort.add(rubber);
-  for (const [cx, cz, cc, cr] of [[1.55, 0.1, 0xb5342a, 0.4], [1.6, 0.14, 0x2f4f8a, 1.2], [1.52, 0.16, 0xd9a62a, 2.0], [1.65, 0.05, 0x3d7a3a, 0.2]] as const) {
-    const st = cyl(0.007, 0.05, std({ color: cc, roughness: 0.7 }), cx, 0.008, cz, fort, 6);
-    st.rotation.set(0, cr, Math.PI / 2);
+  box(0.11, 0.01, 0.014, brass, 0.77, 0.012, -0.3, fort, false);
+  box(0.014, 0.01, 0.03, brass, 0.82, 0.012, -0.29, fort, false);
+  for (const [x, z] of [[0.9, 0.2], [0.94, 0.26], [0.88, 0.28]]) cyl(0.02, 0.005, brass, x, 0.006, z, fort, 14);
+  // crayon stubs by the drawings on the rug
+  for (const [cx, cz, cc, cr] of [[-0.1, -0.35, 0xb5342a, 0.4], [-0.05, -0.3, 0x2f4f8a, 1.2], [-0.15, -0.28, 0xd9a62a, 2.0]] as const) {
+    cyl(0.008, 0.07, std({ color: cc, roughness: 0.7 }), cx, 0.012, cz, fort, 8).rotation.set(0, cr, Math.PI / 2);
   }
   // the old wooden radio stays out in the garage, on the workbench, not in his hideout
   const denRadio = new Group();

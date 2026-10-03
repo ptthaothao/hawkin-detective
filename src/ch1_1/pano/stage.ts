@@ -423,7 +423,7 @@ export class PanoStage {
       const b = marks[`pass${Math.floor(i) + 1}`];
       const f = i % 1;
       const c = v.crack;
-      this.crackMask.clear().rect(c.x, c.y, c.w, c.h).fill({ color: 0xffffff });
+      this.crackMask.clear().rect(c.x, c.y, c.w, c.h).fill({ color: 0xffffff, alpha: 0 });
       it.mask = this.crackMask;
       it.visible = true;
       it.pose({ x: lerp(a.x, b.x, f), y: lerp(a.y, b.y, f), s: lerp(a.s, b.s, f), flip: true, stride: (((t - PASS_AT_MS) / STEP_MS) % 1 + 1) % 1 });

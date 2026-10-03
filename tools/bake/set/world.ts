@@ -1,6 +1,7 @@
 import {
   BoxGeometry,
   CanvasTexture,
+  CircleGeometry,
   Color,
   CylinderGeometry,
   DirectionalLight,
@@ -454,83 +455,183 @@ export function buildWorld(): World {
   const barrel = std({ color: 0x5a4630, roughness: 0.9 });
   cyl(0.28, 0.7, barrel, gx0 + 0.6, 0.35, gz1 - 0.5, root, 14);
   cyl(0.28, 0.7, barrel, gx0 + 1.2, 0.35, gz1 - 0.45, root, 14);
-  // ---- Martin's den (his secret base, ~1920): the one clean, cared-for corner of a rotting garage ----
+  // ---- Martin's fort (his secret base, ~1920): the one clean, cared-for corner of a rotting garage ----
+  // Built the way a boy builds one: crates for walls with a notch at the top like a castle, a gate at the front,
+  // an old blanket for a roof, a flag, a wooden shield and sword, a drainpipe cannon, tin soldiers at the gate.
   const denX = g.x - 0.7;
   const denZ = gz0 + 0.75;
   const wool = std({ color: 0x6a2f26, roughness: 1 });
   const linen = std({ color: 0xb8ad94, roughness: 1 });
-  const label = (text: string, w: number, h: number, bg: string, fg: string, font: string, rot: number) => {
+  const toyWood = std({ color: 0x9a7a4a, roughness: 0.8 });
+  const paint = (draw: (x: CanvasRenderingContext2D, w: number, h: number) => void, w: number, h: number) => {
     const c = document.createElement('canvas');
     c.width = 512;
     c.height = Math.round((512 * h) / w);
-    const x = c.getContext('2d')!;
-    x.fillStyle = bg;
-    x.fillRect(0, 0, c.width, c.height);
-    x.fillStyle = fg;
-    x.font = font;
-    x.textAlign = 'center';
-    x.textBaseline = 'middle';
-    x.translate(c.width / 2, c.height / 2);
-    x.rotate(rot);
-    x.fillText(text, 0, 0);
+    draw(c.getContext('2d')!, c.width, c.height);
     const tex = new CanvasTexture(c);
     tex.colorSpace = SRGBColorSpace;
-    return new Mesh(new PlaneGeometry(w, h), new MeshStandardMaterial({ map: tex, roughness: 1 }));
+    return tex;
   };
-  // a rug and pillows on the floor
-  box(1.7, 0.03, 1.2, wool, denX, 0.03, denZ + 0.15, root, false);
-  box(0.5, 0.12, 0.34, linen, denX - 0.4, 0.1, denZ + 0.2, root, false).rotation.y = 0.3;
-  box(0.46, 0.1, 0.32, linen, denX + 0.2, 0.09, denZ + 0.5, root, false).rotation.y = -0.2;
-  // the fort: crates with a good wool blanket and the buggy's sheet thrown over them
-  box(0.7, 0.55, 0.5, darkWood, denX - 0.75, 0.28, denZ - 0.3, root);
-  box(0.7, 0.55, 0.5, darkWood, denX + 0.05, 0.28, denZ - 0.32, root);
-  box(0.6, 0.45, 0.5, darkWood, denX + 0.8, 0.23, denZ - 0.3, root);
-  const denDrape = box(2.3, 0.05, 0.95, wool, denX, 0.9, denZ - 0.2, root);
-  denDrape.rotation.x = -0.2;
-  // his name, cut into a plank with a penknife, and his sign on a stick: both stand in front of the fort, facing Theo
-  const faceTheo = 1.45;
-  const plank = box(0.62, 0.22, 0.03, std({ color: 0x3a2c1e, roughness: 0.9 }), denX - 0.2, 0.14, denZ + 1.0, root);
-  plank.rotation.set(-0.35, faceTheo, 0, 'YXZ');
-  const mar = label('MAR', 0.56, 0.18, '#3a2c1e', '#120c07', 'bold 150px serif', -0.04);
-  mar.position.set(0.0, 0.0, 0.017);
-  plank.add(mar);
-  box(0.025, 0.42, 0.025, darkWood, denX + 0.5, 0.21, denZ + 0.3, root, false);
-  const keepOut = label('CẤM VÀO', 0.4, 0.17, '#5e5240', '#3a120e', 'bold 128px serif', 0.05);
-  keepOut.position.set(denX + 0.51, 0.42, denZ + 0.3);
-  keepOut.rotation.y = faceTheo;
-  root.add(keepOut);
-  // toys: wooden horse, tin soldiers, a top, a hoop and its stick
-  const toyWood = std({ color: 0x9a7a4a, roughness: 0.8 });
+  const label = (text: string, w: number, h: number, bg: string, fg: string, font: string, rot: number) =>
+    new Mesh(
+      new PlaneGeometry(w, h),
+      new MeshStandardMaterial({
+        roughness: 1,
+        map: paint((x, cw, ch) => {
+          x.fillStyle = bg;
+          x.fillRect(0, 0, cw, ch);
+          x.fillStyle = fg;
+          x.font = font;
+          x.textAlign = 'center';
+          x.textBaseline = 'middle';
+          x.translate(cw / 2, ch / 2);
+          x.rotate(rot);
+          x.fillText(text, 0, 0);
+        }, w, h),
+      }),
+    );
+  const fort = new Group();
+  fort.position.set(denX, 0, denZ);
+  root.add(fort);
+  // a rug that runs out from the gate, and pillows inside
+  box(2.2, 0.03, 1.3, std({ color: 0x4a2420, roughness: 1 }), 0.45, 0.03, 0, fort, false);
+  box(0.5, 0.12, 0.34, linen, -0.35, 0.1, -0.35, fort, false).rotation.y = 0.3;
+  box(0.46, 0.1, 0.32, linen, -0.2, 0.09, 0.4, fort, false).rotation.y = -0.2;
+  // crates: walls two high, the top row notched into battlements
+  const slat = std({ color: 0x8a6e4a, roughness: 0.8 });
+  const post = std({ color: 0x2a1c12, roughness: 0.9 });
+  let crateN = 0;
+  const crate = (x: number, y: number, z: number, w = 0.56, h = 0.5, d = 0.5) => {
+    // each crate a slightly different tint, with slats across the faces and dark corner posts
+    const tint = [0xb09a80, 0x9a8468, 0xc0aa8c, 0xa48c70][crateN++ % 4];
+    const c = box(d, h, w, std({ map: T.darkWood, color: tint, roughness: 0.75 }), x, y + h / 2, z, fort);
+    for (const dy of [0.13, h - 0.13]) {
+      box(d + 0.012, 0.04, w, slat, x, y + dy, z, fort, false);
+      box(d, 0.04, w + 0.012, slat, x, y + dy, z, fort, false);
+    }
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) box(0.04, h, 0.04, post, x + (sx * d) / 2, y + h / 2, z + (sz * w) / 2, fort, false);
+    return c;
+  };
+  for (const z of [-0.6, 0, 0.6]) crate(-0.85, 0, z);
+  crate(-0.85, 0.5, -0.6);
+  crate(-0.85, 0.5, 0.6);
+  for (const x of [-0.35, 0.2]) {
+    crate(x, 0, -0.9, 0.5, 0.5, 0.56);
+    crate(x, 0, 0.9, 0.5, 0.5, 0.56);
+  }
+  crate(-0.1, 0.5, -0.9, 0.5, 0.5, 0.56);
+  crate(-0.1, 0.5, 0.9, 0.5, 0.5, 0.56);
+  // the front: a tower three crates high at each corner, a battlemented wall between them and the gate
+  for (const z of [-0.95, 0.95]) {
+    crate(0.75, 0, z, 0.5, 0.5, 0.5);
+    crate(0.75, 0.5, z, 0.5, 0.5, 0.5);
+    crate(0.75, 1.0, z, 0.5, 0.5, 0.5);
+  }
+  for (const z of [-0.55, 0.55]) {
+    crate(0.75, 0, z, 0.4, 0.5, 0.5);
+    crate(0.75, 0.5, z, 0.3, 0.5, 0.5);
+  }
+  // the gate: tall posts either side with a lintel; the keep-out sign sits on top of it
+  box(0.06, 1.55, 0.06, darkWood, 0.8, 0.78, -0.37, fort);
+  box(0.06, 1.55, 0.06, darkWood, 0.8, 0.78, 0.37, fort);
+  box(0.08, 0.1, 0.84, darkWood, 0.8, 1.17, 0, fort);
+  const keepOut = label('CẤM VÀO', 0.62, 0.22, '#5e5240', '#3a120e', 'bold 128px serif', 0.03);
+  keepOut.position.set(0.85, 1.42, 0);
+  keepOut.rotation.y = Math.PI / 2;
+  fort.add(keepOut);
+  // bunting from tower to tower: a rope with scraps of cloth
+  const rope = box(0.015, 0.015, 1.9, std({ color: 0x3a2e22, roughness: 1 }), 0.84, 1.62, 0, fort, false);
+  rope.rotation.x = 0;
+  const scraps = [0x7a1e1a, 0xb8ad94, 0x3a4a6a];
+  for (let i = 0; i < 8; i++) {
+    const z = -0.85 + i * 0.24;
+    const sag = -0.07 * Math.sin(((z + 0.95) / 1.9) * Math.PI);
+    const tri = new Mesh(new CylinderGeometry(0.07, 0, 0.13, 3), std({ color: scraps[i % 3], roughness: 1 }));
+    tri.position.set(0.85, 1.55 + sag, z);
+    tri.rotation.set(0, Math.PI / 2, 0);
+    tri.scale.set(0.2, 1, 1);
+    fort.add(tri);
+  }
+  // the roof: an old blanket stretched from the back wall to two poles, sagging
+  for (const z of [-0.8, 0.8]) box(0.04, 1.35, 0.04, darkWood, 0.3, 0.68, z, fort);
+  const roof = box(1.35, 0.04, 2.0, wool, -0.3, 1.18, 0, fort);
+  roof.rotation.z = 0.1;
+  box(0.06, 0.06, 2.0, darkWood, 0.35, 1.32, 0, fort, false);
+  // the flag on a pole on top of the right tower: a cream cloth painted with his M
+  box(0.025, 1.0, 0.025, darkWood, 0.75, 2.0, -0.95, fort, false);
+  const flagTex = paint((x, cw, ch) => {
+    x.fillStyle = '#b8a888';
+    x.fillRect(0, 0, cw, ch);
+    x.fillStyle = '#6a1c16';
+    x.font = 'bold 190px serif';
+    x.textAlign = 'center';
+    x.textBaseline = 'middle';
+    x.fillText('M', cw / 2, ch / 2 + 8);
+  }, 0.4, 0.28);
+  const flag = new Mesh(new PlaneGeometry(0.4, 0.28), new MeshStandardMaterial({ map: flagTex, roughness: 1, side: DoubleSide }));
+  flag.position.set(0.76, 2.25, -0.75);
+  flag.rotation.y = Math.PI / 2 - 0.25;
+  fort.add(flag);
+  // a round wooden shield with a painted cross, on the gate crate, and a wooden sword stuck beside it
+  const shieldTex = paint((x, cw, ch) => {
+    x.fillStyle = '#7a5a34';
+    x.fillRect(0, 0, cw, ch);
+    x.strokeStyle = '#8a1c16';
+    x.lineWidth = 46;
+    x.beginPath();
+    x.moveTo(cw / 2, 50);
+    x.lineTo(cw / 2, ch - 50);
+    x.moveTo(50, ch / 2);
+    x.lineTo(cw - 50, ch / 2);
+    x.stroke();
+  }, 0.5, 0.5);
+  const shield = new Mesh(new CircleGeometry(0.22, 24), new MeshStandardMaterial({ map: shieldTex, roughness: 0.8 }));
+  shield.position.set(1.01, 0.62, 0.55);
+  shield.rotation.y = Math.PI / 2;
+  fort.add(shield);
+  const sword = box(0.02, 0.62, 0.05, toyWood, 1.01, 0.4, -0.55, fort, false);
+  sword.rotation.set(0, 0, 0.0);
+  box(0.02, 0.05, 0.22, toyWood, 1.01, 0.12, -0.55, fort, false);
+  // a drainpipe "cannon" on a small crate, aimed at the doors
+  crate(1.35, 0, -0.72, 0.4, 0.3, 0.4);
+  const pipe = cyl(0.07, 0.62, std({ color: 0x4a4a46, roughness: 0.5, metalness: 0.6 }), 1.4, 0.4, -0.72, fort, 14);
+  pipe.rotation.z = Math.PI / 2 - 0.1;
+  // tin soldiers lined up at the gate, a wooden horse, a top, the hoop and its stick
+  const tinBlue = std({ color: 0x3a4a6a, roughness: 0.5, metalness: 0.3 });
+  const tinRed = std({ color: 0x7a1e1a, roughness: 0.5, metalness: 0.3 });
+  for (let i = 0; i < 5; i++) {
+    cyl(0.018, 0.1, tinBlue, 1.1, 0.08, -0.25 + i * 0.12, fort, 8);
+    cyl(0.02, 0.025, tinRed, 1.1, 0.145, -0.25 + i * 0.12, fort, 8);
+  }
   const horse = new Group();
-  horse.position.set(denX - 0.1, 0.045, denZ + 0.55);
-  horse.rotation.y = 0.5;
-  root.add(horse);
+  horse.position.set(1.2, 0.03, 0.35);
+  horse.rotation.y = -0.5;
+  fort.add(horse);
   box(0.26, 0.12, 0.08, toyWood, 0, 0.17, 0, horse, false);
   for (const [lx, lz] of [[-0.1, -0.025], [-0.1, 0.025], [0.1, -0.025], [0.1, 0.025]]) box(0.025, 0.11, 0.025, toyWood, lx, 0.055, lz, horse, false);
   box(0.06, 0.16, 0.06, toyWood, 0.15, 0.27, 0, horse, false).rotation.z = -0.3;
   box(0.1, 0.06, 0.05, toyWood, 0.2, 0.36, 0, horse, false);
-  const tin = std({ color: 0x7a1e1a, roughness: 0.5, metalness: 0.3 });
-  for (let i = 0; i < 4; i++) {
-    cyl(0.018, 0.1, std({ color: 0x3a4a6a, roughness: 0.5, metalness: 0.3 }), denX - 0.7 + i * 0.07, 0.1, denZ + 0.62 - (i % 2) * 0.05, root, 8);
-    cyl(0.02, 0.025, tin, denX - 0.7 + i * 0.07, 0.165, denZ + 0.62 - (i % 2) * 0.05, root, 8);
-  }
   const top = new Mesh(new CylinderGeometry(0.05, 0.008, 0.09, 12), std({ color: 0xa83a28, roughness: 0.6 }));
-  top.position.set(denX + 0.6, 0.075, denZ + 0.35);
+  top.position.set(0.95, 0.075, 0.55);
   top.rotation.z = 1.2;
-  root.add(top);
+  fort.add(top);
   const hoop = new Mesh(new TorusGeometry(0.22, 0.012, 6, 28), toyWood);
-  hoop.position.set(denX + 1.2, 0.24, denZ - 0.3);
-  hoop.rotation.y = 0.5;
+  hoop.position.set(0.25, 0.24, 0.98);
   hoop.castShadow = true;
-  root.add(hoop);
-  box(0.02, 0.02, 0.6, toyWood, denX + 0.95, 0.15, denZ + 0.4, root, false).rotation.y = 0.6;
-  // his denRadio: the old wooden set (no grey plate yet), his listening post on the crate
-  const radioWood = std({ color: 0x4a3322, roughness: 0.5 });
+  fort.add(hoop);
+  // his name, cut into a plank with a penknife, leaning at the gate
+  const plank = box(0.42, 0.16, 0.03, std({ color: 0x3a2c1e, roughness: 0.9 }), 1.5, 0.1, 0.05, fort);
+  plank.rotation.set(-0.35, Math.PI / 2, 0, 'YXZ');
+  const mar = label('MAR', 0.38, 0.13, '#3a2c1e', '#120c07', 'bold 150px serif', -0.04);
+  mar.position.set(0.0, 0.0, 0.017);
+  plank.add(mar);
+  // his radio: the old wooden set (no grey plate yet), on a crate inside where he listened
+  crate(-0.45, 0, 0.0, 0.5, 0.45, 0.4);
   const denRadio = new Group();
-  denRadio.position.set(denX + 0.05, 0.56, denZ - 0.32);
-  denRadio.rotation.y = 0.15;
-  root.add(denRadio);
-  box(0.36, 0.24, 0.2, radioWood, 0, 0.12, 0, denRadio);
+  denRadio.position.set(-0.45, 0.46, 0);
+  denRadio.rotation.y = Math.PI / 2 - 0.15;
+  fort.add(denRadio);
+  box(0.36, 0.24, 0.2, std({ color: 0x4a3322, roughness: 0.5 }), 0, 0.12, 0, denRadio);
   box(0.26, 0.16, 0.01, std({ color: 0x0c0a08, roughness: 0.4 }), 0, 0.12, 0.105, denRadio, false);
   for (const kx of [-0.13, 0.13]) {
     const kn = cyl(0.025, 0.02, std({ color: 0xb08a4a, metalness: 0.6, roughness: 0.4 }), kx, 0.12, 0.115, denRadio, 12);

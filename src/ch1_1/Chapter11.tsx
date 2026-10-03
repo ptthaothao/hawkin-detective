@@ -5,7 +5,6 @@ import { FilmGrain } from '../ui/scene/Atmosphere';
 import { AFTER, END, FAINT, FOUND, FOUND_AFTER, HIDE_LABEL, HIDE_LINES, MMM, NARRATION, OBJECTIVE, PROMPT } from './content';
 import { AUTO_MS, BREATH_MS, DOOR_OPENS_MS, PASS_AT_MS, PASS_STEPS, ROUTE, STEP_MS, isNear, stepsBy, type Beat, type Ch11State, type HideSpot } from './machine';
 import { PanoStage, type SpotId, type SpotSpec, type ViewId } from './pano/stage';
-import { Stage3D } from './three/stage3d';
 import { sound } from './sound';
 import { clock, useCh11 } from './store';
 import '../styles/ch11.css';
@@ -125,10 +124,8 @@ function useSoundDriver(s: Ch11State, started: boolean) {
   }, [now, s, started]);
 }
 
-/** The beats played in the PixiJS panoramas of Theo's room; the rest is still the 3D stage for now. */
-const ROOM_BEATS: Beat[] = ['back', 'bark', 'answer', 'torch', 'look', 'shut', 'choose'];
-
-export function viewFor(s: Ch11State): ViewId {
+export function viewFor(s: Ch11State, now: number): ViewId | null {
+  const t = now - s.beatAt;
   switch (s.beat) {
     case 'look':
       return 'room-torch';
@@ -137,12 +134,25 @@ export function viewFor(s: Ch11State): ViewId {
       return s.radioOff ? 'room-quiet' : 'room-shut';
     case 'choose':
       return 'room-quiet';
+    case 'hide':
+    case 'mmm':
+    case 'found':
+      return s.hideSpot === 'bed' ? 'hide-bed' : 'hide-wardrobe';
+    case 'faint':
+      return null;
+    case 'carried':
+      return `carried-${Math.min(4, Math.floor(Math.max(0, t / AUTO_MS.carried!) * 5))}` as ViewId;
+    case 'awake':
+    case 'end':
+      return 'garage';
     default:
       return 'room-start';
   }
 }
 
-const torchOn = (s: Ch11State) => s.beat === 'look' || s.beat === 'shut' || s.beat === 'choose';
+/** The flashlight is on from the doorway on, and in the garage once he finds it in his pocket. */
+const torchOn = (s: Ch11State, now: number) =>
+  s.beat === 'look' || s.beat === 'shut' || s.beat === 'choose' || ((s.beat === 'awake' || s.beat === 'end') && now - s.beatAt > 4_200);
 
 /** What the player can use right now, and whether to point it out (stuck for a while). */
 export function spotsFor(s: Ch11State, t: number): SpotSpec[] {
@@ -199,30 +209,6 @@ function PanoHost() {
     return () => stage.destroy();
   }, []);
   return <div className="ch11-stage" ref={ref} />;
-}
-
-function ThreeHost() {
-  const ref = useRef<HTMLDivElement>(null);
-  const quality = useQuality();
-  const low = useRef(quality === 'low');
-  low.current = quality === 'low';
-  useEffect(() => {
-    const stage = new Stage3D();
-    stage.mount(ref.current!, {
-      state: () => useCh11.getState().s,
-      now: clock,
-      low: () => low.current,
-      onFrame: tickAuto,
-    });
-    return () => stage.destroy();
-  }, []);
-  return <div className="ch11-stage" ref={ref} />;
-}
-
-/** The room is panoramas; hiding and after are still the 3D stage until they are baked too. */
-function StageHost() {
-  const inRoom = useCh11((st) => !st.started || ROOM_BEATS.includes(st.s.beat));
-  return inRoom ? <PanoHost /> : <ThreeHost />;
 }
 
 /** The note in the corner, as in Chapter 0: where Theo is, what he is wondering, what to do. */
@@ -370,7 +356,7 @@ export default function Chapter11() {
   const started = useCh11((st) => st.started);
   return (
     <div className="ch11">
-      <StageHost />
+      <PanoHost />
       <div className="ch11-vignette" />
       <FilmGrain />
       {started ? <Play /> : <Title />}
